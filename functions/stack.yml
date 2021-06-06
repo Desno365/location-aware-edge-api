@@ -17,3 +17,17 @@ functions:
     handler: ./myfunc14
     image: desno365/myfunc14:latest
 
+  redis-get:
+    lang: node14
+    handler: ./redis-get
+    image: desno365/redis-get:latest
+    environment_file:
+      - redis-environment-variables.yml
+
+  redis-set:
+    lang: node14
+    handler: ./redis-set
+    image: desno365/redis-set:latest
+    environment_file:
+      - redis-environment-variables.yml
+
