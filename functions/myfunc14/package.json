@@ -1,0 +1,12 @@
+{
+  "name": "myfunc14",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 0"
+  },
+  "keywords": [],
+  "author": "Desno365",
+  "license": "MIT"
+}

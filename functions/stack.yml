@@ -1,0 +1,19 @@
+provider:
+  name: openfaas
+
+functions:
+  myfunc:
+    lang: node
+    handler: ./myfunc
+    image: desno365/myfunc:latest
+
+  myfunc12:
+    lang: node12
+    handler: ./myfunc12
+    image: desno365/myfunc12:latest
+
+  myfunc14:
+    lang: node14
+    handler: ./myfunc14
+    image: desno365/myfunc14:latest
+
