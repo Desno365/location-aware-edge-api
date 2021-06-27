@@ -1,3 +1,4 @@
 environment:
-  REDIS_IP: "10.62.0.1"
+  REDIS_HOST: "my-openfaas-redis-master.openfaas-fn.svc.cluster.local"
   REDIS_PORT: 6379
+  REDIS_PASSWORD: "jTz0fwjvts"

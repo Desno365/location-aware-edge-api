@@ -4,7 +4,10 @@
   "description": "",
   "main": "handler.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 0"
+    "test": "echo \"Error: no test specified\" && exit 0",
+    "update": "cd .. && faas-cli publish --filter myfunc14 --platforms linux/amd64 && faas-cli deploy --filter myfunc14 --gateway http://$(minikube ip):31112",
+    "invoke": "curl -X POST http://10.211.55.17:31112/function/myfunc14",
+    "logs": "faas-cli logs myfunc14 --gateway http://$(minikube ip):31112"
   },
   "keywords": [],
   "author": "Desno365",

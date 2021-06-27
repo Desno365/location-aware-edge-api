@@ -1,10 +1,14 @@
 'use strict'
 
+let myVar = 0;
+
 module.exports = async (event, context) => {
+  myVar++;
+
   const result = {
     'body': JSON.stringify(event.body),
     'content-type': event.headers["content-type"],
-    'version': process.version
+    'version': myVar
   };
 
   return context

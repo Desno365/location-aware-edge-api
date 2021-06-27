@@ -5,9 +5,9 @@
   "main": "handler.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0",
-    "update": "cd .. && faas-cli publish --filter redis-set --platforms linux/arm/v7 && faas-cli deploy --filter redis-set --gateway http://192.168.2.5:8080",
-    "invoke": "curl -X POST http://192.168.2.5:8080/function/redis-get",
-    "logs": "faas-cli logs redis-get --gateway http://192.168.2.5:8080"
+    "update": "cd .. && faas-cli publish --filter redis-set --platforms linux/amd64 && faas-cli deploy --filter redis-set --gateway http://$(minikube ip):31112",
+    "invoke": "curl -X POST http://10.211.55.17:31112/function/redis-get",
+    "logs": "faas-cli logs redis-get --gateway http://$(minikube ip):31112"
   },
   "keywords": [],
   "author": "Desno365",
