@@ -1,0 +1,59 @@
+{
+  "areaTypesIdentifiers": ["continent", "country", "city"],
+  "hierarchy": {
+    "europe": {
+      "italy": {
+        "milan": {
+          "milan001": {
+            "ip": "10.211.55.22",
+            "port": "31112",
+            "password": "936af6e5370686ce2ddad6ab03891e471ccd5969"
+          },
+          "milan002": {
+            "ip": "10.211.55.23",
+            "port": "31112",
+            "password": "936af6e5370686ce2ddad6ab03891e471ccd5969"
+          }
+        },
+        "turin": {
+          "turin001": {
+            "ip": "10.211.55.24",
+            "port": "31112",
+            "password": "936af6e5370686ce2ddad6ab03891e471ccd5969"
+          },
+          "turin002": {
+            "ip": "10.211.55.25",
+            "port": "31112",
+            "password": "936af6e5370686ce2ddad6ab03891e471ccd5969"
+          }
+        }
+      },
+      "france": {
+        "paris": {
+          "paris001": {
+            "ip": "10.211.55.26",
+            "port": "31112",
+            "password": "936af6e5370686ce2ddad6ab03891e471ccd5969"
+          },
+          "paris002": {
+            "ip": "10.211.55.27",
+            "port": "31112",
+            "password": "936af6e5370686ce2ddad6ab03891e471ccd5969"
+          }
+        },
+        "nice": {
+          "nice001": {
+            "ip": "10.211.55.28",
+            "port": "31112",
+            "password": "936af6e5370686ce2ddad6ab03891e471ccd5969"
+          },
+          "nice002": {
+            "ip": "10.211.55.29",
+            "port": "31112",
+            "password": "936af6e5370686ce2ddad6ab03891e471ccd5969"
+          }
+        }
+      }
+    }
+  }
+}

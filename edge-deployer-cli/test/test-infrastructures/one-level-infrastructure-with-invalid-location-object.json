@@ -1,0 +1,14 @@
+{
+  "areaTypesIdentifiers": [],
+  "hierarchy": {
+    "milan001": {
+      "ip": "10.211.55.22",
+      "port": "31112"
+    },
+    "milan002": {
+      "ip": "10.211.55.23",
+      "port": "31112",
+      "password": "936af6e5370686ce2ddad6ab03891e471ccd5969"
+    }
+  }
+}
