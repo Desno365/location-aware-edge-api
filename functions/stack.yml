@@ -10,7 +10,7 @@ functions:
       memory: 256Mi
       cpu: 1000m
     requests:
-      memory: 1Mi
+      memory: 4Mi
       cpu: 0m
 
   myfunc12:
@@ -21,7 +21,7 @@ functions:
       memory: 256Mi
       cpu: 1000m
     requests:
-      memory: 1Mi
+      memory: 4Mi
       cpu: 0m
 
   myfunc14:
@@ -32,7 +32,7 @@ functions:
       memory: 256Mi
       cpu: 1000m
     requests:
-      memory: 1Mi
+      memory: 4Mi
       cpu: 0m
 
   redis-get:
@@ -45,7 +45,7 @@ functions:
       memory: 256Mi
       cpu: 1000m
     requests:
-      memory: 1Mi
+      memory: 4Mi
       cpu: 0m
 
   redis-set:
@@ -58,6 +58,6 @@ functions:
       memory: 256Mi
       cpu: 1000m
     requests:
-      memory: 1Mi
+      memory: 4Mi
       cpu: 0m
 
