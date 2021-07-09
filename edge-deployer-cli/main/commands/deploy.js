@@ -5,7 +5,7 @@ const shell = require("shelljs");
 const fs = require('fs');
 const infrastructureParser = require('./../utils/infrastructureParser')
 
-module.exports = function deploy(infrastructure) {
+module.exports = function deploy(infrastructure, {yaml}) {
     try {
         // Read json file.
         const data = fs.readFileSync(infrastructure, 'utf8');
@@ -21,7 +21,7 @@ module.exports = function deploy(infrastructure) {
                 const gateway = "http://" + location.ip + ":" + location.port;
                 console.log(chalk.white.bold("📶 Deploying on " + gateway + "."));
                 shell.exec("echo " + location.password + " | faas-cli login --username admin --password-stdin --gateway " + gateway);
-                shell.exec("faas-cli deploy --yaml stack.yml --gateway " + gateway);
+                shell.exec("faas-cli deploy --yaml " + yaml + " --gateway " + gateway);
             }
         } else {
             console.log(chalk.red.bold("❌ The infrastructure JSON is NOT correct."));
