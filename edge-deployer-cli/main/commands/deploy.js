@@ -12,14 +12,21 @@ module.exports = function deploy(infrastructure) {
         const infrastructureJson = JSON.parse(data);
 
         // Check correctness of file.
+        console.log(chalk.white.bold("🔄 Checking if infrastructure is correct."));
         if(infrastructureParser.isInfrastructureJsonCorrect(infrastructureJson)) {
             console.log(chalk.green.bold("✅ The infrastructure JSON is correct."));
+            console.log(chalk.white.bold("🔄 Getting all locations of infrastructure."));
+            const listOfLocations = infrastructureParser.getAllLocations(infrastructureJson);
+            for(const location of listOfLocations) {
+                const gateway = "http://" + location.ip + ":" + location.port;
+                console.log(chalk.white.bold("📶 Deploying on " + gateway + "."));
+                shell.exec("echo " + location.password + " | faas-cli login --username admin --password-stdin --gateway " + gateway);
+                shell.exec("faas-cli deploy --yaml stack.yml --gateway " + gateway);
+            }
         } else {
             console.log(chalk.red.bold("❌ The infrastructure JSON is NOT correct."));
         }
     } catch(err) {
         console.error(err);
     }
-    //shell.exec("echo 936af6e5370686ce2ddad6ab03891e471ccd5969 | faas-cli login --username admin --password-stdin --gateway http://10.211.55.22:31112");
-    //shell.exec("faas-cli deploy --yaml stack.yml --gateway http://10.211.55.22:31112");
 }
