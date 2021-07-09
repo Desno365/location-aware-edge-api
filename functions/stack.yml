@@ -6,16 +6,34 @@ functions:
     lang: node
     handler: ./myfunc
     image: desno365/myfunc:latest
+    limits:
+      memory: 256Mi
+      cpu: 1000m
+    requests:
+      memory: 1Mi
+      cpu: 0m
 
   myfunc12:
     lang: node12
     handler: ./myfunc12
     image: desno365/myfunc12:latest
+    limits:
+      memory: 256Mi
+      cpu: 1000m
+    requests:
+      memory: 1Mi
+      cpu: 0m
 
   myfunc14:
     lang: node14
     handler: ./myfunc14
     image: desno365/myfunc14:latest
+    limits:
+      memory: 256Mi
+      cpu: 1000m
+    requests:
+      memory: 1Mi
+      cpu: 0m
 
   redis-get:
     lang: node14
@@ -23,6 +41,12 @@ functions:
     image: desno365/redis-get:latest
     environment_file:
       - redis-environment-variables.yml
+    limits:
+      memory: 256Mi
+      cpu: 1000m
+    requests:
+      memory: 1Mi
+      cpu: 0m
 
   redis-set:
     lang: node14
@@ -30,4 +54,10 @@ functions:
     image: desno365/redis-set:latest
     environment_file:
       - redis-environment-variables.yml
+    limits:
+      memory: 256Mi
+      cpu: 1000m
+    requests:
+      memory: 1Mi
+      cpu: 0m
 
