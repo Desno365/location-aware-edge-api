@@ -1,0 +1,16 @@
+{
+  "name": "redis-set",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 0",
+    "logs": "faas-cli logs iot-data-reduction --gateway http://$(minikube ip --profile p1):31112"
+  },
+  "keywords": [],
+  "author": "Desno365",
+  "license": "MIT",
+  "dependencies": {
+    "redis": "3.1.2"
+  }
+}

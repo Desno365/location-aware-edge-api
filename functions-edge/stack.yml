@@ -1,0 +1,17 @@
+provider:
+  name: openfaas
+
+functions:
+  iot-data-reduction:
+    lang: node14
+    handler: ./iot-data-reduction
+    image: desno365/iot-data-reduction:latest
+    environment_file:
+      - redis-environment-variables.yml
+    limits:
+      memory: 256Mi
+      cpu: 1000m
+    requests:
+      memory: 4Mi
+      cpu: 0m
+
