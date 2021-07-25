@@ -2,7 +2,13 @@
 'use strict';
 
 const { program } = require('commander');
+const checkInfrastructure = require('./main/commands/checkInfrastructure');
 const deploy = require('./main/commands/deploy');
+
+program
+    .command('check-infrastructure <infrastructure>')
+    .description('Check if the infrastructure JSON is correct.')
+    .action(checkInfrastructure);
 
 // Note: <areas...> signifies that it can be more than one area, but because we are using <> that means it should include at least one.
 // Note: When an argument is required, we use <ARG_NAME>, whereas if it’s optional, we use [ARG_NAME].
