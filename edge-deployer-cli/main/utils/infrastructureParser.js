@@ -84,7 +84,9 @@ let getAreaLevel = exports.getAreaLevel = function(infrastructureJson, areaNameT
 exports.getAllLocations = function(infrastructureJson, inEvery, inAreas, exceptIn) {
     const areaTypesIdentifiers = infrastructureJson.areaTypesIdentifiers;
     const hierarchy = infrastructureJson.hierarchy;
-    return getListOfLocationsInHierarchyObject(hierarchy, areaTypesIdentifiers, inEvery, inAreas, exceptIn);
+    const possibleAreaTypesIdentifiers = areaTypesIdentifiers.concat(["location"]);
+    const inEveryLevel = possibleAreaTypesIdentifiers.indexOf(inEvery);
+    return getListOfLocationsInHierarchyObject(hierarchy, areaTypesIdentifiers, inEveryLevel, inAreas, exceptIn);
 }
 
 
@@ -253,14 +255,18 @@ function checkIfAreaIsInLocationsContainerAndGetLevel(locationsContainer, level,
 //region Get all locations methods.
 // ############################################################################
 
-function getListOfLocationsInHierarchyObject(hierarchy, areaTypesIdentifiers, inEvery, inAreas, exceptIn) {
+function getListOfLocationsInHierarchyObject(hierarchy, areaTypesIdentifiers, inEveryLevel, inAreas, exceptIn) {
     let listOfLocations = [];
-    const subListOfLocations = getListOfLocationsInAreasContainer(hierarchy, areaTypesIdentifiers, inEvery, inAreas, exceptIn, [], 0);
+    const subListOfLocations = getListOfLocationsInAreasContainer(hierarchy, areaTypesIdentifiers, inEveryLevel, inAreas, exceptIn, [], 0, null);
     listOfLocations = listOfLocations.concat(subListOfLocations);
     return listOfLocations;
 }
 
-function getListOfLocationsInAreasContainer(areasContainer, areaTypesIdentifiers, inEvery, inAreas, exceptIn, listOfParents, level) {
+function getListOfLocationsInAreasContainer(areasContainer, areaTypesIdentifiers, inEveryLevel, inAreas, exceptIn, listOfParents, level, singleMainLocationToGet) {
+    if(level === inEveryLevel + 1) {
+        singleMainLocationToGet = areasContainer["main-location"];
+    }
+
     // Check if it is an areas container or a locations container (last level).
     if(areaTypesIdentifiers.length > level) {
         // It's an areas container.
@@ -269,21 +275,24 @@ function getListOfLocationsInAreasContainer(areasContainer, areaTypesIdentifiers
             if(areaName === "main-location") {
                 continue;
             }
-            const subListOfLocations = getListOfLocationsInAreasContainer(areasContainer[areaName], areaTypesIdentifiers, inEvery, inAreas, exceptIn, listOfParents.concat(areaName), level + 1);
+            const subListOfLocations = getListOfLocationsInAreasContainer(areasContainer[areaName], areaTypesIdentifiers, inEveryLevel, inAreas, exceptIn, listOfParents.concat(areaName), level + 1, singleMainLocationToGet);
             console.log("Area " + areaName + " has " + subListOfLocations.length + " included locations inside.");
             listOfLocations = listOfLocations.concat(subListOfLocations);
         }
         return listOfLocations;
     } else {
         // It's actually a locations container (each field in areasContainer is a location object).
-        return getListOfLocationsInLocationsContainer(areasContainer, inEvery, inAreas, exceptIn, listOfParents);
+        return getListOfLocationsInLocationsContainer(areasContainer, inEveryLevel, inAreas, exceptIn, listOfParents, singleMainLocationToGet);
     }
 }
 
-function getListOfLocationsInLocationsContainer(locationsContainer, inEvery, inAreas, exceptIn, listOfParents) {
+function getListOfLocationsInLocationsContainer(locationsContainer, inEveryLevel, inAreas, exceptIn, listOfParents, singleMainLocationToGet) {
     let listOfLocations = [];
     for(const locationName in locationsContainer) {
         if(locationName === "main-location") {
+            continue;
+        }
+        if(singleMainLocationToGet !== null && singleMainLocationToGet !== locationName) {
             continue;
         }
         const listOfLocationAndItsParents = listOfParents.concat(locationName);

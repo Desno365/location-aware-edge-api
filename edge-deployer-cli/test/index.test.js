@@ -191,6 +191,9 @@ describe('Tests', () => {
                 const infrastructureJson = JSON.parse(data);
                 assert.equal(infrastructureParser.isInfrastructureJsonCorrect(infrastructureJson), true);
                 assert.equal(infrastructureParser.isDeploymentInputCorrect(infrastructureJson, "continent", ["paris"]), false);
+                assert.equal(infrastructureParser.isDeploymentInputCorrect(infrastructureJson, "country", ["paris"]), false);
+                assert.equal(infrastructureParser.isDeploymentInputCorrect(infrastructureJson, "city", ["paris"]), true);
+                assert.equal(infrastructureParser.isDeploymentInputCorrect(infrastructureJson, "location", ["paris"]), true);
             });
 
             it('Input with wrong exceptIn: not an array', () => {
@@ -334,6 +337,30 @@ describe('Tests', () => {
                 assert.equal(infrastructureParser.getAllLocations(infrastructureJson, "location", undefined, ["milan001", "milan002"]).length, 0);
                 assert.equal(infrastructureParser.getAllLocations(infrastructureJson, "location", undefined, ["milan001"]).length, 1);
                 assert.equal(infrastructureParser.getAllLocations(infrastructureJson, "location", undefined, ["milan002"]).length, 1);
+            });
+
+            it('All locations of standard infrastructure with inEvery', () => {
+                const infrastructurePath = "./test/test-infrastructures/infrastructure-correct.json";
+                const data = fs.readFileSync(infrastructurePath, 'utf8');
+                const infrastructureJson = JSON.parse(data);
+                assert.equal(infrastructureParser.isInfrastructureJsonCorrect(infrastructureJson), true);
+                assert.equal(infrastructureParser.getAllLocations(infrastructureJson, "continent", undefined, undefined).length, 1);
+                assert.equal(infrastructureParser.getAllLocations(infrastructureJson, "country", undefined, undefined).length, 2);
+                assert.equal(infrastructureParser.getAllLocations(infrastructureJson, "city", undefined, undefined).length, 4);
+                assert.equal(infrastructureParser.getAllLocations(infrastructureJson, "location", undefined, undefined).length, 8);
+            });
+
+            it('Some locations of standard infrastructure with inEvery', () => {
+                const infrastructurePath = "./test/test-infrastructures/infrastructure-correct.json";
+                const data = fs.readFileSync(infrastructurePath, 'utf8');
+                const infrastructureJson = JSON.parse(data);
+                assert.equal(infrastructureParser.isInfrastructureJsonCorrect(infrastructureJson), true);
+                assert.equal(infrastructureParser.getAllLocations(infrastructureJson, "continent", ["europe"], undefined).length, 1);
+                assert.equal(infrastructureParser.getAllLocations(infrastructureJson, "country", ["italy"], undefined).length, 1);
+                assert.equal(infrastructureParser.getAllLocations(infrastructureJson, "country", ["europe"], ["france"]).length, 1);
+                assert.equal(infrastructureParser.getAllLocations(infrastructureJson, "city", ["italy"], ["milan"]).length, 1);
+                assert.equal(infrastructureParser.getAllLocations(infrastructureJson, "city", ["europe"], ["nice", "paris"]).length, 2);
+                assert.equal(infrastructureParser.getAllLocations(infrastructureJson, "city", ["france"], ["paris"]).length, 1);
             });
         });
     });
