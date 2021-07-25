@@ -55,7 +55,7 @@ class EdgeDbClientWithDataDomain {
         if(ttl > TTL_MAX_VALUE) {
             throw "Field ttl is too big. It must be lower than " + TTL_MAX_VALUE + ".";
         }
-        if(ttl < TTL_MAX_VALUE) {
+        if(ttl < TTL_MIN_VALUE) {
             throw "Field ttl is too small. It must be bigger than " + TTL_MIN_VALUE + ".";
         }
         console.log("Creating EdgeDbClientWithDataDomain with data domain having referringAreaType: " + referringAreaType + ", ttl: " + ttl + ".");
