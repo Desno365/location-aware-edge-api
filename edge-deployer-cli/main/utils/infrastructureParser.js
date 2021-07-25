@@ -22,10 +22,69 @@ exports.isInfrastructureJsonCorrect = function(infrastructureJson) {
     }
 }
 
-exports.getAllLocations = function(infrastructureJson) {
+exports.isDeploymentInputCorrect = function(infrastructureJson, inEvery, inAreas, exceptIn) {
+    const areaTypesIdentifiers = infrastructureJson.areaTypesIdentifiers;
+
+    // Check that inEvery field is valid.
+    const possibleAreaTypesIdentifiers = areaTypesIdentifiers.concat(["location"]);
+    if(!(possibleAreaTypesIdentifiers.includes(inEvery))) {
+        console.log(chalk.red("Error: --inEvery is not a valid area type identifier. Valid identifiers for the infrastructure are: " + possibleAreaTypesIdentifiers + "."));
+        return false;
+    }
+
+    // Check that inAreas field is valid.
+    if(inAreas !== null && inAreas !== undefined) {
+        if(!Array.isArray(inAreas)) {
+            console.log(chalk.red("Error: field inAreas is not an array."));
+            return false;
+        }
+
+        // The areas specified in inAreas must have an area type bigger or equal than the area type specified in inEvery.
+        const inEveryLevel = possibleAreaTypesIdentifiers.indexOf(inEvery);
+        for(const areaName of inAreas) {
+            const areaLevel = getAreaLevel(infrastructureJson, areaName);
+            if(areaLevel === null) {
+                console.log(chalk.red("Error: --inAreas contains an area that does not exist in the infrastructure. Area: " + areaName + "."));
+                return false;
+            }
+            if(inEveryLevel < areaLevel) {
+                console.log(chalk.red("Error: the areas specified in --inAreas must have an area type bigger or equal than the area type specified in --inEvery."));
+                console.log(chalk.red("This error has been found while analyzing area: " + areaName + "."));
+                return false;
+            }
+        }
+    }
+
+    // Check that exceptIn field is valid.
+    if(exceptIn !== null && exceptIn !== undefined) {
+        if(!Array.isArray(exceptIn)) {
+            console.log(chalk.red("Error: field exceptIn is not an array."));
+            return false;
+        }
+
+        for(const areaName of exceptIn) {
+            const areaLevel = getAreaLevel(infrastructureJson, areaName);
+            if(areaLevel === null) {
+                console.log(chalk.red("Error: --exceptIn contains an area that does not exist in the infrastructure. Area: " + areaName + "."));
+                return false;
+            }
+        }
+    }
+
+    // All correct.
+    return true;
+}
+
+let getAreaLevel = exports.getAreaLevel = function(infrastructureJson, areaNameToBeChecked) {
     const areaTypesIdentifiers = infrastructureJson.areaTypesIdentifiers;
     const hierarchy = infrastructureJson.hierarchy;
-    return getListOfLocationsInHierarchyObject(hierarchy, areaTypesIdentifiers);
+    return checkIfAreaIsInHierarchyAndGetLevel(hierarchy, areaTypesIdentifiers, areaNameToBeChecked);
+}
+
+exports.getAllLocations = function(infrastructureJson, inEvery, inAreas, exceptIn) {
+    const areaTypesIdentifiers = infrastructureJson.areaTypesIdentifiers;
+    const hierarchy = infrastructureJson.hierarchy;
+    return getListOfLocationsInHierarchyObject(hierarchy, areaTypesIdentifiers, inEvery, inAreas, exceptIn);
 }
 
 
@@ -115,37 +174,111 @@ function canBeValidLocation(location) {
 
 
 // ############################################################################
+//region Get level of area methods.
+// ############################################################################
+
+function checkIfAreaIsInHierarchyAndGetLevel(hierarchy, areaTypesIdentifiers, areaNameToBeChecked) {
+    return checkIfAreaIsInAreasContainerAndGetLevel(hierarchy, areaTypesIdentifiers, 0, areaNameToBeChecked);
+}
+
+function checkIfAreaIsInAreasContainerAndGetLevel(areasContainer, areaTypesIdentifiers, level, areaNameToBeChecked) {
+    // Check if it is an areas container or a locations container (last level).
+    if(areaTypesIdentifiers.length > level) {
+        // It's an areas container.
+        for(const areaName in areasContainer) {
+            if(areaName === areaNameToBeChecked) {
+                console.log("Area " + areaName + " is the area searched amd it has a level of " + level + ".");
+                return level;
+            }
+            const resultOfLowerLevel = checkIfAreaIsInAreasContainerAndGetLevel(areasContainer[areaName], areaTypesIdentifiers, level + 1, areaNameToBeChecked);
+            console.log("Area " + areaName + " has been searched if it contains the area called " + areaNameToBeChecked + ", the result is: " + resultOfLowerLevel + ".");
+            if(resultOfLowerLevel !== null)
+                return resultOfLowerLevel;
+        }
+        return null;
+    } else {
+        // It's actually a locations container (each field in areasContainer is a location object).
+        const resultOfLocationsLevel = checkIfAreaIsInLocationsContainerAndGetLevel(areasContainer, level, areaNameToBeChecked);
+        console.log("A locations container has been searched if it contains the area called " + areaNameToBeChecked + ", the result is: " + resultOfLocationsLevel + ".");
+        return resultOfLocationsLevel;
+    }
+}
+
+function checkIfAreaIsInLocationsContainerAndGetLevel(locationsContainer, level, areaNameToBeChecked) {
+    for(const locationName in locationsContainer) {
+        if(locationName === areaNameToBeChecked) {
+            console.log("Location " + locationName + " is the area searched and it has a level of " + level + ".");
+            return level;
+        }
+    }
+    return null;
+}
+//endregion
+
+
+// ############################################################################
 //region Get all locations methods.
 // ############################################################################
 
-function getListOfLocationsInHierarchyObject(hierarchy, areaTypesIdentifiers) {
-    return getListOfLocationsInAreasContainer(hierarchy, areaTypesIdentifiers, 0);
+function getListOfLocationsInHierarchyObject(hierarchy, areaTypesIdentifiers, inEvery, inAreas, exceptIn) {
+    let listOfLocations = [];
+    const subListOfLocations = getListOfLocationsInAreasContainer(hierarchy, areaTypesIdentifiers, inEvery, inAreas, exceptIn, [], 0);
+    listOfLocations = listOfLocations.concat(subListOfLocations);
+    return listOfLocations;
 }
 
-function getListOfLocationsInAreasContainer(areasContainer, areaTypesIdentifiers, level) {
+function getListOfLocationsInAreasContainer(areasContainer, areaTypesIdentifiers, inEvery, inAreas, exceptIn, listOfParents, level) {
     // Check if it is an areas container or a locations container (last level).
     if(areaTypesIdentifiers.length > level) {
         // It's an areas container.
         let listOfLocations = [];
-        for(const area in areasContainer) {
-            const subListOfLocations = getListOfLocationsInAreasContainer(areasContainer[area], areaTypesIdentifiers, level + 1);
-            console.log("Area " + area + " has " + subListOfLocations.length + " locations inside.");
+        for(const areaName in areasContainer) {
+            const subListOfLocations = getListOfLocationsInAreasContainer(areasContainer[areaName], areaTypesIdentifiers, inEvery, inAreas, exceptIn, listOfParents.concat(areaName), level + 1);
+            console.log("Area " + areaName + " has " + subListOfLocations.length + " included locations inside.");
             listOfLocations = listOfLocations.concat(subListOfLocations);
         }
         return listOfLocations;
     } else {
         // It's actually a locations container (each field in areasContainer is a location object).
-        return getListOfLocationsInLocationsContainer(areasContainer);
+        return getListOfLocationsInLocationsContainer(areasContainer, inEvery, inAreas, exceptIn, listOfParents);
     }
 }
 
-function getListOfLocationsInLocationsContainer(locationsContainer) {
+function getListOfLocationsInLocationsContainer(locationsContainer, inEvery, inAreas, exceptIn, listOfParents) {
     let listOfLocations = [];
-    for(const location in locationsContainer) {
-        const locationObject = locationsContainer[location];
-        console.log("Location " + location + " has been added to the list.");
-        listOfLocations.push(locationObject);
+    for(const locationName in locationsContainer) {
+        const listOfLocationAndItsParents = listOfParents.concat(locationName);
+        if(shouldLocationBeIncluded(listOfLocationAndItsParents, inAreas) && !shouldLocationBeExcluded(listOfLocationAndItsParents, exceptIn)) {
+            const locationObject = locationsContainer[locationName];
+            console.log("Location " + locationName + " has been added to the list.");
+            listOfLocations.push(locationObject);
+        }
     }
     return listOfLocations;
 }
+
+function shouldLocationBeIncluded(listOfLocationAndItsParents, inAreas) {
+    if(inAreas === null || inAreas === undefined) {
+        return true;
+    }
+    for(const areaName of listOfLocationAndItsParents) {
+        if(inAreas.includes(areaName)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function shouldLocationBeExcluded(listOfLocationAndItsParents, exceptIn) {
+    if(exceptIn === null || exceptIn === undefined) {
+        return false;
+    }
+    for(const areaName of listOfLocationAndItsParents) {
+        if(exceptIn.includes(areaName)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 //endregion
