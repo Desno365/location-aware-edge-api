@@ -5,8 +5,8 @@
   "main": "handler.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0",
-    "update": "cd .. && faas-cli publish --filter iot-data-reduction --platforms linux/arm/v7,linux/amd64 && deployer deploy infrastructure.json",
-    "invoke": "curl -X POST http://$(minikube ip --profile p1):31112/function/iot-data-reduction -H \"Content-Type:application/json\" -d '{\"iot_data\":\"22.6\"}'",
+    "update": "cd .. && faas-cli publish --filter iot-data-reduction --platforms linux/arm/v7,linux/amd64 && deployer deploy iot-data-reduction infrastructure.json --inEvery location --inAreas milan",
+    "invoke": "curl -X POST http://$(minikube ip --profile p1):31112/function/iot-data-reduction -H \"Content-Type:application/json\" -d '{\"iot_data\":\"22.7\"}'",
     "logs": "faas-cli logs iot-data-reduction --gateway http://$(minikube ip --profile p1):31112"
   },
   "keywords": [],
