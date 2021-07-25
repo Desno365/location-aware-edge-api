@@ -5,7 +5,7 @@
   "main": "handler.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0",
-    "update": "cd .. && faas-cli publish --filter redis-get --platforms linux/amd64 && faas-cli deploy --filter redis-get --gateway http://$(minikube ip --profile p1):31112",
+    "update": "cd .. && faas-cli publish --filter redis-get --platforms linux/arm/v7,linux/amd64 && faas-cli deploy --filter redis-get --gateway http://$(minikube ip --profile p1):31112",
     "invoke": "curl -X POST http://$(minikube ip --profile p1):31112/function/redis-get",
     "logs": "faas-cli logs redis-get --gateway http://$(minikube ip --profile p1):31112"
   },
