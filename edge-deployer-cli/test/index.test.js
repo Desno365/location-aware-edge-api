@@ -79,6 +79,34 @@ describe('Tests', () => {
                 assert.equal(infrastructureParser.isInfrastructureJsonCorrect(infrastructureJson), false);
             });
 
+            it('Simple infrastructure with invalid main-location in areas container', () => {
+                const infrastructurePath = "./test/test-infrastructures/simple-infrastructure-with-invalid-main-location-in-areas-container.json";
+                const data = fs.readFileSync(infrastructurePath, 'utf8');
+                const infrastructureJson = JSON.parse(data);
+                assert.equal(infrastructureParser.isInfrastructureJsonCorrect(infrastructureJson), false);
+            });
+
+            it('Simple infrastructure with invalid main-location in locations container', () => {
+                const infrastructurePath = "./test/test-infrastructures/simple-infrastructure-with-invalid-main-location-in-locations-container.json";
+                const data = fs.readFileSync(infrastructurePath, 'utf8');
+                const infrastructureJson = JSON.parse(data);
+                assert.equal(infrastructureParser.isInfrastructureJsonCorrect(infrastructureJson), false);
+            });
+
+            it('Simple infrastructure without main-location in areas container', () => {
+                const infrastructurePath = "./test/test-infrastructures/simple-infrastructure-without-main-location-in-areas-container.json";
+                const data = fs.readFileSync(infrastructurePath, 'utf8');
+                const infrastructureJson = JSON.parse(data);
+                assert.equal(infrastructureParser.isInfrastructureJsonCorrect(infrastructureJson), false);
+            });
+
+            it('Simple infrastructure without main-location in locations container', () => {
+                const infrastructurePath = "./test/test-infrastructures/simple-infrastructure-without-main-location-in-locations-container.json";
+                const data = fs.readFileSync(infrastructurePath, 'utf8');
+                const infrastructureJson = JSON.parse(data);
+                assert.equal(infrastructureParser.isInfrastructureJsonCorrect(infrastructureJson), false);
+            });
+
             it('One level infrastructure with invalid location object', () => {
                 const infrastructurePath = "./test/test-infrastructures/one-level-infrastructure-with-invalid-location-object.json";
                 const data = fs.readFileSync(infrastructurePath, 'utf8');

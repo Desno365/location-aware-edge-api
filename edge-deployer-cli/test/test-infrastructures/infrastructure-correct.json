@@ -2,8 +2,11 @@
   "areaTypesIdentifiers": ["continent", "country", "city"],
   "hierarchy": {
     "europe": {
+      "main-location": "milan001",
       "italy": {
+        "main-location": "milan001",
         "milan": {
+          "main-location": "milan001",
           "milan001": {
             "ip": "10.211.55.22",
             "port": "31112",
@@ -16,6 +19,7 @@
           }
         },
         "turin": {
+          "main-location": "turin001",
           "turin001": {
             "ip": "10.211.55.24",
             "port": "31112",
@@ -29,7 +33,9 @@
         }
       },
       "france": {
+        "main-location": "paris001",
         "paris": {
+          "main-location": "paris001",
           "paris001": {
             "ip": "10.211.55.26",
             "port": "31112",
@@ -42,6 +48,7 @@
           }
         },
         "nice": {
+          "main-location": "nice001",
           "nice001": {
             "ip": "10.211.55.28",
             "port": "31112",

@@ -103,7 +103,12 @@ function isAreasContainerCorrect(areasContainer, areaTypesIdentifiers, level) {
     if(areaTypesIdentifiers.length > level) {
         // It's an areas container.
         const currentAreaTypeIdentifier = areaTypesIdentifiers[level];
+        let mainLocationOfAreaContainer = "";
         for(const areaName in areasContainer) {
+            if(areaName === "main-location") {
+                mainLocationOfAreaContainer = areasContainer[areaName];
+                continue;
+            }
             console.log("Currently analyzing area: " + areaName + ".");
             if(!canBeValidArea(areaName, areaTypesIdentifiers)) {
                 console.log(chalk.red("Error: area with name \"" + areaName + "\" of type \"" + currentAreaTypeIdentifier + "\" is not a valid name."));
@@ -115,7 +120,11 @@ function isAreasContainerCorrect(areasContainer, areaTypesIdentifiers, level) {
             }
             console.log(chalk.green("Area \"" + areaName + "\" is correct."));
         }
-        return true;
+
+        if(level === 0)
+            return true; // hierarchy field does not need the main-location field.
+        else
+            return isMainLocationFieldCorrect(mainLocationOfAreaContainer, areasContainer, areaTypesIdentifiers);
     } else {
         // It's actually a locations container (each field in areasContainer is a location object).
         return isLocationsContainerCorrect(areasContainer, areaTypesIdentifiers);
@@ -123,7 +132,12 @@ function isAreasContainerCorrect(areasContainer, areaTypesIdentifiers, level) {
 }
 
 function isLocationsContainerCorrect(locationsContainer, areaTypesIdentifiers) {
+    let mainLocationOfAreaContainer = "";
     for(const locationName in locationsContainer) {
+        if(locationName === "main-location") {
+            mainLocationOfAreaContainer = locationsContainer[locationName];
+            continue;
+        }
         console.log("Currently analyzing location: " + locationName + ".");
         if(!canBeValidArea(locationName, areaTypesIdentifiers)) {
             console.log(chalk.red("Error: location with name \"" + locationName + "\" is not a valid name."));
@@ -135,7 +149,20 @@ function isLocationsContainerCorrect(locationsContainer, areaTypesIdentifiers) {
         }
         console.log(chalk.green("Location \"" + locationName + "\" is correct."));
     }
-    return true;
+    return isMainLocationFieldCorrect(mainLocationOfAreaContainer, locationsContainer, areaTypesIdentifiers);
+}
+
+function isMainLocationFieldCorrect(mainLocationString, areasContainer, areaTypesIdentifiers) {
+    if(mainLocationString.length > 0) {
+        if(checkIfAreaIsInHierarchyAndGetLevel(areasContainer, areaTypesIdentifiers, mainLocationString) !== null) {
+            return true;
+        } else {
+            console.log(chalk.red("Error: the main-location called " + mainLocationString + " is not present in the area container."));
+        }
+    } else {
+        console.log(chalk.red("Error: there is an area without the required field main-location."));
+        return false;
+    }
 }
 
 function isAUniqueAreaName(areaName) {
@@ -163,7 +190,7 @@ function canBeValidAreaType(areaType) {
 
 function canBeValidAreaName(areaName, areaTypesIdentifiers) {
     return (typeof areaName === 'string' || areaName instanceof String)
-        && areaName !== 'ip' && areaName !== 'port' && areaName !== 'password'
+        && areaName !== 'ip' && areaName !== 'port' && areaName !== 'password' && areaName !== 'main-location'
         && areaTypesIdentifiers.every((areaType) => areaType !== areaName);
 }
 
@@ -186,8 +213,11 @@ function checkIfAreaIsInAreasContainerAndGetLevel(areasContainer, areaTypesIdent
     if(areaTypesIdentifiers.length > level) {
         // It's an areas container.
         for(const areaName in areasContainer) {
+            if(areaName === "main-location") {
+                continue;
+            }
             if(areaName === areaNameToBeChecked) {
-                console.log("Area " + areaName + " is the area searched amd it has a level of " + level + ".");
+                console.log("Area " + areaName + " is the area searched and it has a level of " + level + ".");
                 return level;
             }
             const resultOfLowerLevel = checkIfAreaIsInAreasContainerAndGetLevel(areasContainer[areaName], areaTypesIdentifiers, level + 1, areaNameToBeChecked);
@@ -206,6 +236,9 @@ function checkIfAreaIsInAreasContainerAndGetLevel(areasContainer, areaTypesIdent
 
 function checkIfAreaIsInLocationsContainerAndGetLevel(locationsContainer, level, areaNameToBeChecked) {
     for(const locationName in locationsContainer) {
+        if(locationName === "main-location") {
+            continue;
+        }
         if(locationName === areaNameToBeChecked) {
             console.log("Location " + locationName + " is the area searched and it has a level of " + level + ".");
             return level;
@@ -233,6 +266,9 @@ function getListOfLocationsInAreasContainer(areasContainer, areaTypesIdentifiers
         // It's an areas container.
         let listOfLocations = [];
         for(const areaName in areasContainer) {
+            if(areaName === "main-location") {
+                continue;
+            }
             const subListOfLocations = getListOfLocationsInAreasContainer(areasContainer[areaName], areaTypesIdentifiers, inEvery, inAreas, exceptIn, listOfParents.concat(areaName), level + 1);
             console.log("Area " + areaName + " has " + subListOfLocations.length + " included locations inside.");
             listOfLocations = listOfLocations.concat(subListOfLocations);
@@ -247,6 +283,9 @@ function getListOfLocationsInAreasContainer(areasContainer, areaTypesIdentifiers
 function getListOfLocationsInLocationsContainer(locationsContainer, inEvery, inAreas, exceptIn, listOfParents) {
     let listOfLocations = [];
     for(const locationName in locationsContainer) {
+        if(locationName === "main-location") {
+            continue;
+        }
         const listOfLocationAndItsParents = listOfParents.concat(locationName);
         if(shouldLocationBeIncluded(listOfLocationAndItsParents, inAreas) && !shouldLocationBeExcluded(listOfLocationAndItsParents, exceptIn)) {
             const locationObject = locationsContainer[locationName];

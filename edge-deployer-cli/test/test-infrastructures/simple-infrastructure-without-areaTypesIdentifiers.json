@@ -1,8 +1,11 @@
 {
   "hierarchy": {
     "europe": {
+      "main-location": "milan001",
       "italy": {
+        "main-location": "milan001",
         "milan": {
+          "main-location": "milan001",
           "milan001": {
             "ip": "10.211.55.22",
             "port": "31112",
