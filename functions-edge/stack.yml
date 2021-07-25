@@ -1,11 +1,17 @@
 provider:
   name: openfaas
 
+configuration:
+  copy:
+    - ./common
+
 functions:
   iot-data-reduction:
     lang: node14
     handler: ./iot-data-reduction
     image: desno365/iot-data-reduction:latest
+    copy-common:
+      - ./common/
     environment_file:
       - redis-environment-variables.yml
     limits:
