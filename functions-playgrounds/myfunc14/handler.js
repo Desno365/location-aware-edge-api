@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 let myVar = 0;
 

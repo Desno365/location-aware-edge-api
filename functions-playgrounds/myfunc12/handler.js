@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 module.exports = async (event, context) => {
   const result = {
