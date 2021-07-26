@@ -27,6 +27,7 @@ exports.isDeploymentInputCorrect = function(infrastructureJson, inEvery, inAreas
 
     // Check that inEvery field is valid.
     const possibleAreaTypesIdentifiers = areaTypesIdentifiers.concat(["location"]);
+    const inEveryLevel = possibleAreaTypesIdentifiers.indexOf(inEvery);
     if(!(possibleAreaTypesIdentifiers.includes(inEvery))) {
         console.log(chalk.red("Error: --inEvery is not a valid area type identifier. Valid identifiers for the infrastructure are: " + possibleAreaTypesIdentifiers + "."));
         return false;
@@ -40,7 +41,6 @@ exports.isDeploymentInputCorrect = function(infrastructureJson, inEvery, inAreas
         }
 
         // The areas specified in inAreas must have an area type bigger or equal than the area type specified in inEvery.
-        const inEveryLevel = possibleAreaTypesIdentifiers.indexOf(inEvery);
         for(const areaName of inAreas) {
             const areaLevel = getAreaLevel(infrastructureJson, areaName);
             if(areaLevel === null) {
@@ -62,10 +62,16 @@ exports.isDeploymentInputCorrect = function(infrastructureJson, inEvery, inAreas
             return false;
         }
 
+        // The areas specified in exceptIn must have an area type bigger or equal than the area type specified in inEvery.
         for(const areaName of exceptIn) {
             const areaLevel = getAreaLevel(infrastructureJson, areaName);
             if(areaLevel === null) {
                 console.log(chalk.red("Error: --exceptIn contains an area that does not exist in the infrastructure. Area: " + areaName + "."));
+                return false;
+            }
+            if(inEveryLevel < areaLevel) {
+                console.log(chalk.red("Error: the areas specified in --exceptIn must have an area type bigger or equal than the area type specified in --inEvery."));
+                console.log(chalk.red("This error has been found while analyzing area: " + areaName + "."));
                 return false;
             }
         }

@@ -212,6 +212,17 @@ describe('Tests', () => {
                 assert.equal(infrastructureParser.isDeploymentInputCorrect(infrastructureJson, "location", undefined, ["paris", "fjnrjefew"]), false);
             });
 
+            it('Input with wrong exceptIn: the areas specified in exceptIn does not have an area type bigger or equal than the area type specified in inEvery', () => {
+                const infrastructurePath = "./test/test-infrastructures/infrastructure-correct.json";
+                const data = fs.readFileSync(infrastructurePath, 'utf8');
+                const infrastructureJson = JSON.parse(data);
+                assert.equal(infrastructureParser.isInfrastructureJsonCorrect(infrastructureJson), true);
+                assert.equal(infrastructureParser.isDeploymentInputCorrect(infrastructureJson, "continent", undefined, ["paris"]), false);
+                assert.equal(infrastructureParser.isDeploymentInputCorrect(infrastructureJson, "country", undefined, ["paris"]), false);
+                assert.equal(infrastructureParser.isDeploymentInputCorrect(infrastructureJson, "city", undefined, ["paris"]), true);
+                assert.equal(infrastructureParser.isDeploymentInputCorrect(infrastructureJson, "location", undefined, ["paris"]), true);
+            });
+
         });
 
         describe('getAreaLevel', () => {
