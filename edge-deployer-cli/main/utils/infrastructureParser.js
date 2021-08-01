@@ -193,12 +193,12 @@ function canBeValidArea(areaName, areaTypesIdentifiers) {
 
 function canBeValidAreaType(areaType) {
     return (typeof areaType === 'string' || areaType instanceof String)
-        && areaType !== 'id' && areaType !== 'openfaas_gateway' && areaType !== 'openfaas_password' && areaType !== 'redis_host' && areaType !== 'redis_port' && areaType !== 'redis_password' && areaType !== 'main-location';
+        && areaType !== 'location_id' && areaType !== 'openfaas_gateway' && areaType !== 'openfaas_password' && areaType !== 'redis_host' && areaType !== 'redis_port' && areaType !== 'redis_password' && areaType !== 'main-location';
 }
 
 function canBeValidAreaName(areaName, areaTypesIdentifiers) {
     return (typeof areaName === 'string' || areaName instanceof String)
-        && areaName !== 'id' && areaName !== 'openfaas_gateway' && areaName !== 'openfaas_password' && areaName !== 'redis_host' && areaName !== 'redis_port' && areaName !== 'redis_password' && areaName !== 'main-location'
+        && areaName !== 'location_id' && areaName !== 'openfaas_gateway' && areaName !== 'openfaas_password' && areaName !== 'redis_host' && areaName !== 'redis_port' && areaName !== 'redis_password' && areaName !== 'main-location'
         && areaTypesIdentifiers.every((areaType) => areaType !== areaName);
 }
 
@@ -304,6 +304,7 @@ function getListOfLocationsInLocationsContainer(locationsContainer, inEveryLevel
         const listOfLocationAndItsParents = listOfParents.concat(locationName);
         if(shouldLocationBeIncluded(listOfLocationAndItsParents, inAreas) && !shouldLocationBeExcluded(listOfLocationAndItsParents, exceptIn)) {
             const locationObject = locationsContainer[locationName];
+            locationObject.location_id = locationName;
             console.log("Location " + locationName + " has been added to the list.");
             listOfLocations.push(locationObject);
         }
