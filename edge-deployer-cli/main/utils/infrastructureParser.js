@@ -2,6 +2,11 @@
 
 const chalk = require('chalk');
 
+/**
+ * Returns true if the infrastructure is correct, so all constraints are respected and everything is correctly specified.
+ * @param infrastructureJson the JSON of the infrastructure.
+ * @returns {boolean|boolean} true if the infrastructure is correct, false otherwise.
+ */
 exports.isInfrastructureJsonCorrect = function(infrastructureJson) {
     const areaTypesIdentifiers = infrastructureJson.areaTypesIdentifiers;
     const hierarchy = infrastructureJson.hierarchy;
@@ -22,6 +27,14 @@ exports.isInfrastructureJsonCorrect = function(infrastructureJson) {
     }
 }
 
+/**
+ * Return true if the deployment input (--inEvery, --inAreas, --exceptIn) are correct considering the infrastructure.
+ * @param infrastructureJson the JSON of the infrastructure.
+ * @param inEvery string of the --inEvery parameter.
+ * @param inAreas array of strings of the --inAreas parameter.
+ * @param exceptIn array of strings of the --exceptIn parameter.
+ * @returns {boolean} true if the deployment input is correct, false otherwise.
+ */
 exports.isDeploymentInputCorrect = function(infrastructureJson, inEvery, inAreas, exceptIn) {
     const areaTypesIdentifiers = infrastructureJson.areaTypesIdentifiers;
 
@@ -81,12 +94,23 @@ exports.isDeploymentInputCorrect = function(infrastructureJson, inEvery, inAreas
     return true;
 }
 
+/**
+ * Returns the level of areaNameToBeChecked inside the infrastructure or null if the area is not present.
+ */
 let getAreaLevel = exports.getAreaLevel = function(infrastructureJson, areaNameToBeChecked) {
     const areaTypesIdentifiers = infrastructureJson.areaTypesIdentifiers;
     const hierarchy = infrastructureJson.hierarchy;
     return checkIfAreaIsInHierarchyAndGetLevel(hierarchy, areaTypesIdentifiers, areaNameToBeChecked);
 }
 
+/**
+ * Returns the locations of the infrastructure included in the deployment input.
+ * @param infrastructureJson the JSON of the infrastructure.
+ * @param inEvery string of the --inEvery parameter.
+ * @param inAreas array of strings of the --inAreas parameter.
+ * @param exceptIn array of strings of the --exceptIn parameter.
+ * @returns {*[]} an array of location objects. Every location object has the fields: location_id, openfaas_gateway, openfaas_password, redis_host, redis_port, redis_password.
+ */
 exports.getAllLocations = function(infrastructureJson, inEvery, inAreas, exceptIn) {
     const areaTypesIdentifiers = infrastructureJson.areaTypesIdentifiers;
     const hierarchy = infrastructureJson.hierarchy;
