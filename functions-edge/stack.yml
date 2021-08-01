@@ -19,3 +19,18 @@ functions:
       memory: 4Mi
       cpu: 0m
 
+  cron-tester:
+    lang: node14
+    handler: ./cron-tester
+    image: desno365/cron-tester:latest
+    copy-common:
+      - ./common/
+    limits:
+      memory: 256Mi
+      cpu: 1000m
+    requests:
+      memory: 4Mi
+      cpu: 0m
+    annotations:
+      topic: cron-function
+      schedule: "*/2 * * * *"
