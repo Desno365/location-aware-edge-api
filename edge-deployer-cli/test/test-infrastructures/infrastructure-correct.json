@@ -8,27 +8,35 @@
         "milan": {
           "main-location": "milan001",
           "milan001": {
-            "ip": "10.211.55.22",
-            "port": "31112",
-            "password": "936af6e5370686ce2ddad6ab03891e471ccd5969"
+            "openfaas_gateway": "http://10.211.55.22:31112",
+            "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
+            "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
+            "redis_port": 6379,
+            "redis_password": "658f28bb7ec61e93ebaa"
           },
           "milan002": {
-            "ip": "10.211.55.23",
-            "port": "31112",
-            "password": "936af6e5370686ce2ddad6ab03891e471ccd5969"
+            "openfaas_gateway": "http://10.211.55.23:31112",
+            "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
+            "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
+            "redis_port": 6379,
+            "redis_password": "658f28bb7ec61e93ebaa"
           }
         },
         "turin": {
           "main-location": "turin001",
           "turin001": {
-            "ip": "10.211.55.24",
-            "port": "31112",
-            "password": "936af6e5370686ce2ddad6ab03891e471ccd5969"
+            "openfaas_gateway": "http://10.211.55.24:31112",
+            "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
+            "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
+            "redis_port": 6379,
+            "redis_password": "658f28bb7ec61e93ebaa"
           },
           "turin002": {
-            "ip": "10.211.55.25",
-            "port": "31112",
-            "password": "936af6e5370686ce2ddad6ab03891e471ccd5969"
+            "openfaas_gateway": "http://10.211.55.25:31112",
+            "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
+            "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
+            "redis_port": 6379,
+            "redis_password": "658f28bb7ec61e93ebaa"
           }
         }
       },
@@ -37,27 +45,35 @@
         "paris": {
           "main-location": "paris001",
           "paris001": {
-            "ip": "10.211.55.26",
-            "port": "31112",
-            "password": "936af6e5370686ce2ddad6ab03891e471ccd5969"
+            "openfaas_gateway": "http://10.211.55.26:31112",
+            "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
+            "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
+            "redis_port": 6379,
+            "redis_password": "658f28bb7ec61e93ebaa"
           },
           "paris002": {
-            "ip": "10.211.55.27",
-            "port": "31112",
-            "password": "936af6e5370686ce2ddad6ab03891e471ccd5969"
+            "openfaas_gateway": "http://10.211.55.27:31112",
+            "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
+            "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
+            "redis_port": 6379,
+            "redis_password": "658f28bb7ec61e93ebaa"
           }
         },
         "nice": {
           "main-location": "nice001",
           "nice001": {
-            "ip": "10.211.55.28",
-            "port": "31112",
-            "password": "936af6e5370686ce2ddad6ab03891e471ccd5969"
+            "openfaas_gateway": "http://10.211.55.28:31112",
+            "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
+            "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
+            "redis_port": 6379,
+            "redis_password": "658f28bb7ec61e93ebaa"
           },
           "nice002": {
-            "ip": "10.211.55.29",
-            "port": "31112",
-            "password": "936af6e5370686ce2ddad6ab03891e471ccd5969"
+            "openfaas_gateway": "http://10.211.55.29:31112",
+            "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
+            "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
+            "redis_port": 6379,
+            "redis_password": "658f28bb7ec61e93ebaa"
           }
         }
       }

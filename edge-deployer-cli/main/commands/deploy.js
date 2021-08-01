@@ -37,10 +37,10 @@ module.exports = function deploy(functionName, infrastructure, {inEvery, inAreas
 
         // Deploy to all locations.
         for(const location of listOfLocations) {
-            const gateway = "http://" + location.ip + ":" + location.port;
-            console.log(chalk.white.bold("📶 Deploying on " + gateway + "."));
-            shell.exec("echo " + location.password + " | faas-cli login --username admin --password-stdin --gateway " + gateway);
-            shell.exec("faas-cli deploy --filter " + functionName + " --yaml " + yaml + " --gateway " + gateway + " --env=MY_ENV1=test1 --env=MY_ENV2=test2");
+            const envVariablesString = "--env=REDIS_HOST=" + location.redis_host + " --env=REDIS_PORT=" + location.redis_port + " --env=REDIS_PASSWORD=" + location.redis_password;
+            console.log(chalk.white.bold("📶 Deploying on " + location.openfaas_gateway + "."));
+            shell.exec("echo " + location.openfaas_password + " | faas-cli login --username admin --password-stdin --gateway " + location.openfaas_gateway);
+            shell.exec("faas-cli deploy --filter " + functionName + " --yaml " + yaml + " --gateway " + location.openfaas_gateway + " " + envVariablesString);
         }
     } catch(err) {
         console.error(err);

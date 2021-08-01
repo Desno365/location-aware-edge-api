@@ -193,17 +193,17 @@ function canBeValidArea(areaName, areaTypesIdentifiers) {
 
 function canBeValidAreaType(areaType) {
     return (typeof areaType === 'string' || areaType instanceof String)
-        && areaType !== 'ip' && areaType !== 'port' && areaType !== 'password';
+        && areaType !== 'id' && areaType !== 'openfaas_gateway' && areaType !== 'openfaas_password' && areaType !== 'redis_host' && areaType !== 'redis_port' && areaType !== 'redis_password' && areaType !== 'main-location';
 }
 
 function canBeValidAreaName(areaName, areaTypesIdentifiers) {
     return (typeof areaName === 'string' || areaName instanceof String)
-        && areaName !== 'ip' && areaName !== 'port' && areaName !== 'password' && areaName !== 'main-location'
+        && areaName !== 'id' && areaName !== 'openfaas_gateway' && areaName !== 'openfaas_password' && areaName !== 'redis_host' && areaName !== 'redis_port' && areaName !== 'redis_password' && areaName !== 'main-location'
         && areaTypesIdentifiers.every((areaType) => areaType !== areaName);
 }
 
 function canBeValidLocation(location) {
-    return location.ip && location.port && location.password;
+    return location.openfaas_gateway && location.openfaas_password && location.redis_host && location.redis_port && location.redis_password;
 }
 //endregion
 

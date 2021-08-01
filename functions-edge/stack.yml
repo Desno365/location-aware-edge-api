@@ -12,8 +12,6 @@ functions:
     image: desno365/iot-data-reduction:latest
     copy-common:
       - ./common/
-    environment_file:
-      - redis-environment-variables.yml
     limits:
       memory: 256Mi
       cpu: 1000m

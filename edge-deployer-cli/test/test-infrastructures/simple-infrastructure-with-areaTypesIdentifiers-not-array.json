@@ -4,14 +4,18 @@
     "milan": {
       "main-location": "milan001",
       "milan001": {
-        "ip": "10.211.55.22",
-        "port": "31112",
-        "password": "936af6e5370686ce2ddad6ab03891e471ccd5969"
+        "openfaas_gateway": "http://10.211.55.22:31112",
+        "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
+        "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
+        "redis_port": 6379,
+        "redis_password": "658f28bb7ec61e93ebaa"
       },
       "milan002": {
-        "ip": "10.211.55.23",
-        "port": "31112",
-        "password": "936af6e5370686ce2ddad6ab03891e471ccd5969"
+        "openfaas_gateway": "http://10.211.55.23:31112",
+        "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
+        "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
+        "redis_port": 6379,
+        "redis_password": "658f28bb7ec61e93ebaa"
       }
     }
   }
