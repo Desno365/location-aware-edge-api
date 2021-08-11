@@ -6,6 +6,8 @@ const chai = require('chai');
 const assert = chai.assert;
 const sinon = require('sinon');
 const fs = require('fs');
+const infrastructureParser = require('../main/utils/infrastructureParser');
+const onBoardInfrastructureParser = require('../../functions-edge/common/edge-db/onBoardInfrastructureParser');
 
 describe('Tests', () => {
 
@@ -24,11 +26,6 @@ describe('Tests', () => {
     describe('infrastructureParser', () => {
 
         describe('isInfrastructureJsonCorrect', () => {
-
-            let infrastructureParser;
-            before(() => {
-                infrastructureParser = require('../main/utils/infrastructureParser');
-            });
 
             it('Simple infrastructure without hierarchy', () => {
                 const infrastructurePath = "./test/test-infrastructures/simple-infrastructure-without-hierarchy.json";
@@ -139,11 +136,6 @@ describe('Tests', () => {
 
         describe('isDeploymentInputCorrect', () => {
 
-            let infrastructureParser;
-            before(() => {
-                infrastructureParser = require('../main/utils/infrastructureParser');
-            });
-
             it('Correct input without specifying inAreas and exceptIn', () => {
                 const infrastructurePath = "./test/test-infrastructures/infrastructure-correct.json";
                 const data = fs.readFileSync(infrastructurePath, 'utf8');
@@ -227,11 +219,6 @@ describe('Tests', () => {
 
         describe('getAreaLevel', () => {
 
-            let infrastructureParser;
-            before(() => {
-                infrastructureParser = require('../main/utils/infrastructureParser');
-            });
-
             it('Areas of standard infrastructure', () => {
                 const infrastructurePath = "./test/test-infrastructures/infrastructure-correct.json";
                 const data = fs.readFileSync(infrastructurePath, 'utf8');
@@ -270,11 +257,6 @@ describe('Tests', () => {
         });
 
         describe('getAllLocations', () => {
-
-            let infrastructureParser;
-            before(() => {
-                infrastructureParser = require('../main/utils/infrastructureParser');
-            });
 
             it('All locations of standard infrastructure', () => {
                 const infrastructurePath = "./test/test-infrastructures/infrastructure-correct.json";
@@ -374,6 +356,63 @@ describe('Tests', () => {
                 assert.equal(infrastructureParser.getAllLocations(infrastructureJson, "city", ["france"], ["paris"]).length, 1);
             });
         });
+    });
+
+    describe('onBoardInfrastructureParser', () => {
+
+        describe('getLocationIdOfReferringAreaInInfrastructure', () => {
+
+            it('Referring area of standard infrastructure', () => {
+                const infrastructurePath = "./test/test-infrastructures/infrastructure-correct.json";
+                const data = fs.readFileSync(infrastructurePath, 'utf8');
+                const infrastructureJson = JSON.parse(data);
+                assert.equal(infrastructureParser.isInfrastructureJsonCorrect(infrastructureJson), true);
+
+                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "nice002", 0), "milan001");
+                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "nice002", 1), "paris001");
+                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "nice002", 2), "nice001");
+
+                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "nice001", 0), "milan001");
+                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "nice001", 1), "paris001");
+                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "nice001", 2), "nice001");
+
+                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "paris002", 0), "milan001");
+                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "paris002", 1), "paris001");
+                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "paris002", 2), "paris001");
+
+                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "milan001", 0), "milan001");
+                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "milan001", 1), "milan001");
+                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "milan001", 2), "milan001");
+            });
+
+            it('Areas of one level infrastructure', () => {
+                const infrastructurePath = "./test/test-infrastructures/one-level-infrastructure-correct.json";
+                const data = fs.readFileSync(infrastructurePath, 'utf8');
+                const infrastructureJson = JSON.parse(data);
+                assert.equal(infrastructureParser.isInfrastructureJsonCorrect(infrastructureJson), true);
+
+                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "milan001", 0), "milan001");
+
+                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "milan002", 0), "milan001");
+            });
+
+            it('Areas of simple infrastructure', () => {
+                const infrastructurePath = "./test/test-infrastructures/simple-infrastructure-correct.json";
+                const data = fs.readFileSync(infrastructurePath, 'utf8');
+                const infrastructureJson = JSON.parse(data);
+                assert.equal(infrastructureParser.isInfrastructureJsonCorrect(infrastructureJson), true);
+
+                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "milan002", 0), "milan001");
+                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "milan002", 1), "milan001");
+                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "milan002", 2), "milan001");
+
+                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "milan001", 0), "milan001");
+                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "milan001", 1), "milan001");
+                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "milan001", 2), "milan001");
+            });
+
+        });
+
     });
 
 });
