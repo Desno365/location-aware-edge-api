@@ -38,6 +38,11 @@ class EdgeDbClientWithDataDomain {
     constructor(referringAreaType, ttl) {
         this.referringAreaType = referringAreaType;
         this.ttl = ttl;
+        this.infrastructureJson = JSON.parse(process.env.EDGE_INFRASTRUCTURE);
+
+        const areaTypesIdentifiers = this.infrastructureJson.areaTypesIdentifiers;
+        const possibleAreaTypesIdentifiers = areaTypesIdentifiers.concat(["location"]);
+        this.referringAreaTypeLevel = possibleAreaTypesIdentifiers.indexOf(referringAreaType);
 
         // Check correctness.
         if(!referringAreaType) {
@@ -58,7 +63,13 @@ class EdgeDbClientWithDataDomain {
         if(ttl < TTL_MIN_VALUE) {
             throw "Field ttl is too small. It must be bigger than " + TTL_MIN_VALUE + ".";
         }
-        console.log("Creating EdgeDbClientWithDataDomain with data domain having referringAreaType: " + referringAreaType + ", ttl: " + ttl + ".");
+
+        // Check that referringAreaType is valid.
+        if(referringAreaTypeLevel === -1) {
+            throw "Field referringAreaType is not a valid area type identifier. Valid identifiers for the infrastructure are: " + possibleAreaTypesIdentifiers + ".";
+        }
+
+        console.log("Creating EdgeDbClientWithDataDomain having referringAreaType: " + referringAreaType + ", ttl: " + ttl + ".");
     }
 
     async set(key, data, onlySetIfKeyDoesNotAlreadyExist, onlySetIfKeyAlreadyExist) {
