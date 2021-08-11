@@ -41,7 +41,7 @@ exports.isDeploymentInputCorrect = function(infrastructureJson, inEvery, inAreas
     // Check that inEvery field is valid.
     const possibleAreaTypesIdentifiers = areaTypesIdentifiers.concat(["location"]);
     const inEveryLevel = possibleAreaTypesIdentifiers.indexOf(inEvery);
-    if(!(possibleAreaTypesIdentifiers.includes(inEvery))) {
+    if(inEveryLevel === -1) {
         console.log(chalk.red("Error: --inEvery is not a valid area type identifier. Valid identifiers for the infrastructure are: " + possibleAreaTypesIdentifiers + "."));
         return false;
     }
