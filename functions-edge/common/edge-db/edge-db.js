@@ -2,6 +2,8 @@
 
 const redis = require("redis");
 const { promisify } = require("util");
+const rp = require('request-promise');
+const onBoardInfrastructureParser = require("./onBoardInfrastructureParser");
 
 // Constants.
 const TTL_MAX_VALUE = 365 * 24 * 60 * 60 * 1000; // 365 days * 24 hours * 60 minutes * 60 seconds * 1000 milliseconds
@@ -11,16 +13,29 @@ const TTL_MIN_VALUE = 100; // 100 milliseconds.
 let localRedisClient;
 
 exports.withDataDomain = function(dataDomain) {
-    createRedisClient();
     const referringAreaType = dataDomain.referringAreaType;
     const ttl = dataDomain.ttl;
     return new EdgeDbClientWithDataDomain(referringAreaType, ttl);
 }
 
-exports.get = function (key) {
+exports.get = function(key) {
+    return performActionLocally("GET", [key]);
+}
+
+let performActionLocally = exports.performActionLocally = function(command, args) {
     createRedisClient();
-    const getAsync = promisify(localRedisClient.get).bind(localRedisClient);
-    return getAsync(key);
+    switch(command) {
+        case "GET":
+            const getAsync = promisify(localRedisClient.get).bind(localRedisClient);
+            console.log("Executing local GET with args: " + args);
+            return getAsync(args);
+        case "SET":
+            const setAsync = promisify(localRedisClient.set).bind(localRedisClient);
+            console.log("Executing local SET with args: " + args);
+            return setAsync(args);
+        default:
+            throw "Command not recognized";
+    }
 }
 
 function createRedisClient() {
@@ -34,16 +49,25 @@ function createRedisClient() {
     }
 }
 
+function performActionRemotely(gateway, command, args) {
+    let options = {
+        uri: gateway + "/function/edge-db-data-receiver",
+        method: 'POST',
+        headers: {
+            'User-Agent': 'Request-Promise',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            'command': command,
+            'args': args,
+        }),
+    };
+
+    return rp(options);
+}
+
 class EdgeDbClientWithDataDomain {
     constructor(referringAreaType, ttl) {
-        this.referringAreaType = referringAreaType;
-        this.ttl = ttl;
-        this.infrastructureJson = JSON.parse(process.env.EDGE_INFRASTRUCTURE);
-
-        const areaTypesIdentifiers = this.infrastructureJson.areaTypesIdentifiers;
-        const possibleAreaTypesIdentifiers = areaTypesIdentifiers.concat(["location"]);
-        this.referringAreaTypeLevel = possibleAreaTypesIdentifiers.indexOf(referringAreaType);
-
         // Check correctness.
         if(!referringAreaType) {
             throw "Field referringAreaType not set.";
@@ -64,12 +88,40 @@ class EdgeDbClientWithDataDomain {
             throw "Field ttl is too small. It must be bigger than " + TTL_MIN_VALUE + ".";
         }
 
-        // Check that referringAreaType is valid.
-        if(referringAreaTypeLevel === -1) {
+        // Initialize variables.
+        this.infrastructureJson = JSON.parse(process.env.EDGE_INFRASTRUCTURE);
+        this.ownLocationId = process.env.LOCATION_ID;
+        this.referringAreaType = referringAreaType;
+        this.referringAreaTypeLevel = -1;
+        this.referringAreaLocationId = null;
+        this.referringAreaLocationObject = null;
+        this.ttl = ttl;
+        this.shouldForwardWrite = null;
+
+        // Save referringAreaType and check that it is valid.
+        const areaTypesIdentifiers = this.infrastructureJson.areaTypesIdentifiers;
+        const possibleAreaTypesIdentifiers = areaTypesIdentifiers.concat(["location"]);
+        this.referringAreaTypeLevel = possibleAreaTypesIdentifiers.indexOf(referringAreaType);
+        if(this.referringAreaTypeLevel === -1) {
             throw "Field referringAreaType is not a valid area type identifier. Valid identifiers for the infrastructure are: " + possibleAreaTypesIdentifiers + ".";
         }
 
         console.log("Creating EdgeDbClientWithDataDomain having referringAreaType: " + referringAreaType + ", ttl: " + ttl + ".");
+        if(referringAreaType === "location") {
+            console.log("Writes will be local.");
+            this.shouldForwardWrite = false;
+        } else {
+            this.referringAreaLocationId = onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(this.infrastructureJson, this.ownLocationId, this.referringAreaTypeLevel);
+            console.log("Found location id of referring area: " + this.referringAreaLocationId + ".");
+            if(this.referringAreaLocationId === this.ownLocationId) {
+                console.log("Writes will be local.");
+                this.shouldForwardWrite = false;
+            } else {
+                this.referringAreaLocationObject = onBoardInfrastructureParser.getLocationObject(this.infrastructureJson, this.referringAreaLocationId);
+                console.log("Writes will be local and remote (forwarded to " + this.referringAreaLocationObject.openfaas_gateway + ").");
+                this.shouldForwardWrite = true;
+            }
+        }
     }
 
     async set(key, data, onlySetIfKeyDoesNotAlreadyExist, onlySetIfKeyAlreadyExist) {
@@ -85,17 +137,16 @@ class EdgeDbClientWithDataDomain {
             args.push("XX");
 
         // Execute action locally.
-        const setAsync = promisify(localRedisClient.set).bind(localRedisClient);
-        const reply = await setAsync(args);
-        console.log("Executed local SET with args: " + args);
+        const localResponse = await performActionLocally("SET", args);
+        console.log("Executed local SET.");
 
         // Propagate action and return.
-        if(reply === 'OK' && this.referringAreaType !== "location") {
-            // TODO: send to other db depending on data domain.
-            console.log("MISSING IMPLEMENTATION.");
-            return 'MISSING_IMPLEMENTATION';
+        if(localResponse === 'OK' && this.shouldForwardWrite) {
+            const remoteResponse = await performActionRemotely(this.referringAreaLocationObject.openfaas_gateway, "SET", args);
+            console.log("Executed remote SET. Response: " + remoteResponse);
+            return 'OK';
         } else {
-            return reply;
+            return localResponse;
         }
     }
 }
