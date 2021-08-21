@@ -13,6 +13,8 @@
   "author": "Desno365",
   "license": "MIT",
   "dependencies": {
-    "redis": "3.1.2"
+    "redis": "3.1.2",
+    "request-promise": "4.2.6",
+    "request": "2.88.2"
   }
 }
