@@ -6,19 +6,6 @@ configuration:
     - ./common
 
 functions:
-  iot-data-reduction:
-    lang: node14
-    handler: ./iot-data-reduction
-    image: desno365/iot-data-reduction:latest
-    copy-common:
-      - ./common/
-    limits:
-      memory: 256Mi
-      cpu: 1000m
-    requests:
-      memory: 4Mi
-      cpu: 0m
-
   cron-tester:
     lang: node14
     handler: ./cron-tester
@@ -34,3 +21,29 @@ functions:
     annotations:
       topic: cron-function
       schedule: "*/2 * * * *"
+
+  edge-db-data-receiver:
+    lang: node14
+    handler: ./edge-db-data-receiver
+    image: desno365/edge-db-data-receiver:latest
+    copy-common:
+      - ./common/
+    limits:
+      memory: 256Mi
+      cpu: 1000m
+    requests:
+      memory: 4Mi
+      cpu: 0m
+
+  iot-data-reduction:
+    lang: node14
+    handler: ./iot-data-reduction
+    image: desno365/iot-data-reduction:latest
+    copy-common:
+      - ./common/
+    limits:
+      memory: 256Mi
+      cpu: 1000m
+    requests:
+      memory: 4Mi
+      cpu: 0m

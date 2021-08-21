@@ -1,0 +1,20 @@
+{
+  "name": "edge-db-data-receiver",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 0",
+    "update": "cd .. && faas-cli publish --filter edge-db-data-receiver --platforms linux/arm/v7,linux/amd64 && deployer deploy edge-db-data-receiver infrastructure.json --inEvery location",
+    "invoke": "curl -X POST http://$(minikube ip --profile p1):31112/function/edge-db-data-receiver -H \"Content-Type:application/json\" -d '{\"command\":\"GET\",\"args\":[\"latest_iot_data\"]}'",
+    "logs": "faas-cli logs edge-db-data-receiver --gateway http://$(minikube ip --profile p1):31112"
+  },
+  "keywords": [],
+  "author": "Desno365",
+  "license": "MIT",
+  "dependencies": {
+    "redis": "3.1.2",
+    "request-promise": "4.2.6",
+    "request": "2.88.2"
+  }
+}
