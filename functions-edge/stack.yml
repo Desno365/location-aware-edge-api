@@ -74,3 +74,30 @@ functions:
     requests:
       memory: 4Mi
       cpu: 0m
+
+
+  search-analytics-data-receiver:
+    lang: node14
+    handler: ./search-analytics-data-receiver
+    image: desno365/search-analytics-data-receiver
+    copy-common:
+      - ./common/
+    limits:
+      memory: 256Mi
+      cpu: 1000m
+    requests:
+      memory: 4Mi
+      cpu: 0m
+
+  search-analytics-performer:
+    lang: node14
+    handler: ./search-analytics-performer
+    image: desno365/search-analytics-performer
+    copy-common:
+      - ./common/
+    limits:
+      memory: 256Mi
+      cpu: 1000m
+    requests:
+      memory: 4Mi
+      cpu: 0m

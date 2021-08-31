@@ -1,0 +1,20 @@
+{
+  "name": "search-analytics-performer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 0",
+    "update": "cd .. && faas-cli publish --filter search-analytics-performer --platforms linux/arm/v7,linux/amd64 && deployer deploy search-analytics-performer infrastructure.json --inEvery country",
+    "invoke": "curl -X POST http://$(minikube ip --profile p1):31112/function/search-analytics-performer",
+    "logs": "faas-cli logs search-analytics-performer --gateway http://$(minikube ip --profile p1):31112"
+  },
+  "keywords": [],
+  "author": "Desno365",
+  "license": "MIT",
+  "dependencies": {
+    "redis": "3.1.2",
+    "request-promise": "4.2.6",
+    "request": "2.88.2"
+  }
+}
