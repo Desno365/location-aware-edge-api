@@ -47,3 +47,30 @@ functions:
     requests:
       memory: 4Mi
       cpu: 0m
+
+
+  get-less-crowded-path:
+    lang: node14
+    handler: ./get-less-crowded-path
+    image: desno365/get-less-crowded-path
+    copy-common:
+      - ./common/
+    limits:
+      memory: 256Mi
+      cpu: 1000m
+    requests:
+      memory: 4Mi
+      cpu: 0m
+
+  video-footage-receiver:
+    lang: node14
+    handler: ./video-footage-receiver
+    image: desno365/video-footage-receiver
+    copy-common:
+      - ./common/
+    limits:
+      memory: 256Mi
+      cpu: 1000m
+    requests:
+      memory: 4Mi
+      cpu: 0m
