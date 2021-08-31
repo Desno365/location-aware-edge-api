@@ -19,7 +19,24 @@ exports.withDataDomain = function(dataDomain) {
 }
 
 exports.get = function(key) {
-    return performActionLocally("GET", [key]);
+    return performActionLocally("GET", [key]); // https://redis.io/commands/get
+}
+
+exports.getList = async function(key) {
+    const currentTimeMS = getCurrentTimeInMilliseconds();
+
+    // Expire items.
+    await performActionLocally("ZREMRANGEBYSCORE", [key, "0", currentTimeMS]); // https://redis.io/commands/zremrangebyscore
+
+    // Return not expired items.
+    const list = await performActionLocally("ZRANGEBYSCORE", [key, currentTimeMS, "+inf"]); // https://redis.io/commands/zrangebyscore
+
+    // Remove timestamp from value.
+    for(let i = 0; i < list.length; i++) {
+        list[i] = list[i].substring(list[i].indexOf(":") + 1);
+    }
+
+    return list;
 }
 
 let performActionLocally = exports.performActionLocally = function(command, args) {
@@ -33,6 +50,18 @@ let performActionLocally = exports.performActionLocally = function(command, args
             const setAsync = promisify(localRedisClient.set).bind(localRedisClient);
             console.log("Executing local SET with args: " + args);
             return setAsync(args);
+        case "ZADD":
+            const zaddAsync = promisify(localRedisClient.zadd).bind(localRedisClient);
+            console.log("Executing local ZADD with args: " + args);
+            return zaddAsync(args);
+        case "ZRANGEBYSCORE":
+            const zrangebyscoreAsync = promisify(localRedisClient.zrangebyscore).bind(localRedisClient);
+            console.log("Executing local ZRANGEBYSCORE with args: " + args);
+            return zrangebyscoreAsync(args);
+        case "ZREMRANGEBYSCORE":
+            const zremrangebyscoreAsync = promisify(localRedisClient.zremrangebyscore).bind(localRedisClient);
+            console.log("Executing local ZREMRANGEBYSCORE with args: " + args);
+            return zremrangebyscoreAsync(args);
         default:
             throw "Command not recognized";
     }
@@ -64,6 +93,11 @@ function performActionRemotely(gateway, command, args) {
     };
 
     return rp(options);
+}
+
+function getCurrentTimeInMilliseconds() {
+    const now = new Date();
+    return now.getTime();
 }
 
 class EdgeDbClientWithDataDomain {
@@ -137,16 +171,44 @@ class EdgeDbClientWithDataDomain {
             args.push("XX");
 
         // Execute action locally.
-        const localResponse = await performActionLocally("SET", args);
+        const localResponse = String(await performActionLocally("SET", args));
         console.log("Executed local SET.");
 
-        // Propagate action and return.
+        // Propagate action.
         if(localResponse === 'OK' && this.shouldForwardWrite) {
             const remoteResponse = await performActionRemotely(this.referringAreaLocationObject.openfaas_gateway, "SET", args);
             console.log("Executed remote SET. Response: " + remoteResponse);
-            return 'OK';
-        } else {
-            return localResponse;
         }
+
+        return localResponse;
+    }
+
+    async addToList(key, data, onlySetIfKeyDoesNotAlreadyExist, onlySetIfKeyAlreadyExist) {
+        if(onlySetIfKeyDoesNotAlreadyExist === true && onlySetIfKeyAlreadyExist === true) {
+            throw "Only one option between onlySetIfKeyDoesNotAlreadyExist and onlySetIfKeyAlreadyExist can be enabled.";
+        }
+
+        // Prepare arguments.
+        const score = getCurrentTimeInMilliseconds() + this.ttl; // The expiration is used as score.
+        const args = []; // https://redis.io/commands/zadd
+        args.push(key);
+        if(onlySetIfKeyDoesNotAlreadyExist === true)
+            args.push("NX");
+        if(onlySetIfKeyAlreadyExist === true)
+            args.push("XX");
+        args.push(score);
+        args.push(score + ":" + data);
+
+        // Execute action locally.
+        const localResponse = String(await performActionLocally("ZADD", args));
+        console.log("Executed local ZADD. Response: " + localResponse);
+
+        // Propagate action.
+        if(this.shouldForwardWrite) {
+            const remoteResponse = await performActionRemotely(this.referringAreaLocationObject.openfaas_gateway, "ZADD", args);
+            console.log("Executed remote ZADD. Response: " + remoteResponse);
+        }
+
+        return localResponse;
     }
 }
