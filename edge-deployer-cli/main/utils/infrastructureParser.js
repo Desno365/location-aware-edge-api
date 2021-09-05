@@ -135,10 +135,8 @@ function isAreasContainerCorrect(areasContainer, areaTypesIdentifiers, level) {
     if(areaTypesIdentifiers.length > level) {
         // It's an areas container.
         const currentAreaTypeIdentifier = areaTypesIdentifiers[level];
-        let mainLocationOfAreaContainer = "";
         for(const areaName in areasContainer) {
             if(areaName === "main-location") {
-                mainLocationOfAreaContainer = areasContainer[areaName];
                 continue;
             }
             console.log("Currently analyzing area: " + areaName + ".");
@@ -156,7 +154,7 @@ function isAreasContainerCorrect(areasContainer, areaTypesIdentifiers, level) {
         if(level === 0)
             return true; // hierarchy field does not need the main-location field.
         else
-            return isMainLocationFieldCorrect(mainLocationOfAreaContainer, areasContainer, areaTypesIdentifiers);
+            return isMainLocationFieldCorrect(areasContainer["main-location"]);
     } else {
         // It's actually a locations container (each field in areasContainer is a location object).
         return isLocationsContainerCorrect(areasContainer, areaTypesIdentifiers);
@@ -164,10 +162,8 @@ function isAreasContainerCorrect(areasContainer, areaTypesIdentifiers, level) {
 }
 
 function isLocationsContainerCorrect(locationsContainer, areaTypesIdentifiers) {
-    let mainLocationOfAreaContainer = "";
     for(const locationName in locationsContainer) {
         if(locationName === "main-location") {
-            mainLocationOfAreaContainer = locationsContainer[locationName];
             continue;
         }
         console.log("Currently analyzing location: " + locationName + ".");
@@ -176,23 +172,19 @@ function isLocationsContainerCorrect(locationsContainer, areaTypesIdentifiers) {
             return false;
         }
         if(!canBeValidLocation(locationsContainer[locationName])) {
-            console.log(chalk.red("Error: location with name \"" + locationName + "\" is not a valid location (the location must contain an ip, a port and a password)."));
+            console.log(chalk.red("Error: location with name \"" + locationName + "\" is not a valid location (the location must contain all the required fields)."));
             return false;
         }
         console.log(chalk.green("Location \"" + locationName + "\" is correct."));
     }
-    return isMainLocationFieldCorrect(mainLocationOfAreaContainer, locationsContainer, areaTypesIdentifiers);
+    return isMainLocationFieldCorrect(locationsContainer["main-location"]);
 }
 
-function isMainLocationFieldCorrect(mainLocationString, areasContainer, areaTypesIdentifiers) {
-    if(mainLocationString.length > 0) {
-        if(checkIfAreaIsInHierarchyAndGetLevel(areasContainer, areaTypesIdentifiers, mainLocationString) !== null) {
-            return true;
-        } else {
-            console.log(chalk.red("Error: the main-location called " + mainLocationString + " is not present in the area container."));
-        }
+function isMainLocationFieldCorrect(mainLocationObject) {
+    if(canBeValidLocation(mainLocationObject)) {
+        return true;
     } else {
-        console.log(chalk.red("Error: there is an area without the required field main-location."));
+        console.log(chalk.red("Error: main-location is not a valid location (the location must contain all the required fields)."));
         return false;
     }
 }
@@ -227,7 +219,15 @@ function canBeValidAreaName(areaName, areaTypesIdentifiers) {
 }
 
 function canBeValidLocation(location) {
-    return location.openfaas_gateway && location.openfaas_password && location.redis_host && location.redis_port && location.redis_password;
+    if(!location) {
+        console.log(chalk.red("Error: the location is undefined."));
+        return false;
+    } else if(!(location.openfaas_gateway && location.openfaas_password && location.redis_host && location.redis_port && location.redis_password)) {
+        console.log(chalk.red("Error: the location has one or more missing fields."));
+        return false;
+    } else {
+        return true;
+    }
 }
 //endregion
 
@@ -287,14 +287,20 @@ function checkIfAreaIsInLocationsContainerAndGetLevel(locationsContainer, level,
 
 function getListOfLocationsInHierarchyObject(hierarchy, areaTypesIdentifiers, inEveryLevel, inAreas, exceptIn) {
     let listOfLocations = [];
-    const subListOfLocations = getListOfLocationsInAreasContainer(hierarchy, areaTypesIdentifiers, inEveryLevel, inAreas, exceptIn, [], 0, null);
+    const subListOfLocations = getListOfLocationsInAreasContainer(hierarchy, areaTypesIdentifiers, inEveryLevel, inAreas, exceptIn, [], 0);
     listOfLocations = listOfLocations.concat(subListOfLocations);
     return listOfLocations;
 }
 
-function getListOfLocationsInAreasContainer(areasContainer, areaTypesIdentifiers, inEveryLevel, inAreas, exceptIn, listOfParents, level, singleMainLocationToGet) {
+function getListOfLocationsInAreasContainer(areasContainer, areaTypesIdentifiers, inEveryLevel, inAreas, exceptIn, listOfParents, level) {
     if(level === inEveryLevel + 1) {
-        singleMainLocationToGet = areasContainer["main-location"];
+        const locationName = listOfParents[listOfParents.length - 1];
+        if(shouldLocationBeIncluded(listOfParents, inAreas) && !shouldLocationBeExcluded(listOfParents, exceptIn)) {
+            const locationObject = areasContainer["main-location"];
+            locationObject.location_id = locationName;
+            console.log("Location " + locationName + " has been added to the list.");
+            return [locationObject];
+        }
     }
 
     // Check if it is an areas container or a locations container (last level).
@@ -305,24 +311,21 @@ function getListOfLocationsInAreasContainer(areasContainer, areaTypesIdentifiers
             if(areaName === "main-location") {
                 continue;
             }
-            const subListOfLocations = getListOfLocationsInAreasContainer(areasContainer[areaName], areaTypesIdentifiers, inEveryLevel, inAreas, exceptIn, listOfParents.concat(areaName), level + 1, singleMainLocationToGet);
+            const subListOfLocations = getListOfLocationsInAreasContainer(areasContainer[areaName], areaTypesIdentifiers, inEveryLevel, inAreas, exceptIn, listOfParents.concat(areaName), level + 1);
             console.log("Area " + areaName + " has " + subListOfLocations.length + " included locations inside.");
             listOfLocations = listOfLocations.concat(subListOfLocations);
         }
         return listOfLocations;
     } else {
         // It's actually a locations container (each field in areasContainer is a location object).
-        return getListOfLocationsInLocationsContainer(areasContainer, inEveryLevel, inAreas, exceptIn, listOfParents, singleMainLocationToGet);
+        return getListOfLocationsInLocationsContainer(areasContainer, inEveryLevel, inAreas, exceptIn, listOfParents);
     }
 }
 
-function getListOfLocationsInLocationsContainer(locationsContainer, inEveryLevel, inAreas, exceptIn, listOfParents, singleMainLocationToGet) {
+function getListOfLocationsInLocationsContainer(locationsContainer, inEveryLevel, inAreas, exceptIn, listOfParents) {
     let listOfLocations = [];
     for(const locationName in locationsContainer) {
         if(locationName === "main-location") {
-            continue;
-        }
-        if(singleMainLocationToGet !== null && singleMainLocationToGet !== locationName) {
             continue;
         }
         const listOfLocationAndItsParents = listOfParents.concat(locationName);
