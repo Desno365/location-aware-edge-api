@@ -101,3 +101,6 @@ functions:
     requests:
       memory: 4Mi
       cpu: 0m
+    annotations:
+      topic: cron-function
+      schedule: "0,30 * * * *"
