@@ -4,6 +4,7 @@ const redis = require("redis");
 const { promisify } = require("util");
 const rp = require('request-promise');
 const onBoardInfrastructureParser = require("./onBoardInfrastructureParser");
+const savingTypeEnum = require("./savingTypeEnum");
 
 // Constants.
 const TTL_MAX_VALUE = 365 * 24 * 60 * 60 * 1000; // 365 days * 24 hours * 60 minutes * 60 seconds * 1000 milliseconds
@@ -13,9 +14,7 @@ const TTL_MIN_VALUE = 100; // 100 milliseconds.
 let localRedisClient;
 
 exports.withDataDomain = function(dataDomain) {
-    const referringAreaType = dataDomain.referringAreaType;
-    const ttl = dataDomain.ttl;
-    return new EdgeDbClientWithDataDomain(referringAreaType, ttl);
+    return new EdgeDbClientWithDataDomain(dataDomain.referringAreaType, dataDomain.ttl, dataDomain.saveAlsoInIntermediateLevels);
 }
 
 exports.get = function(key) {
@@ -39,32 +38,34 @@ exports.getList = async function(key) {
     return list;
 }
 
-let performActionLocally = exports.performActionLocally = function(command, args) {
+let performActionLocally = exports.performActionLocally = async function(command, args) {
     createRedisClient();
+    let asyncCommand;
     switch(command) {
         case "GET":
-            const getAsync = promisify(localRedisClient.get).bind(localRedisClient);
-            console.log("Executing local GET with args: " + args);
-            return getAsync(args);
+            asyncCommand = promisify(localRedisClient.get).bind(localRedisClient);
+            break;
         case "SET":
-            const setAsync = promisify(localRedisClient.set).bind(localRedisClient);
-            console.log("Executing local SET with args: " + args);
-            return setAsync(args);
+            asyncCommand = promisify(localRedisClient.set).bind(localRedisClient);
+            break;
         case "ZADD":
-            const zaddAsync = promisify(localRedisClient.zadd).bind(localRedisClient);
-            console.log("Executing local ZADD with args: " + args);
-            return zaddAsync(args);
+            asyncCommand = promisify(localRedisClient.zadd).bind(localRedisClient);
+            break;
         case "ZRANGEBYSCORE":
-            const zrangebyscoreAsync = promisify(localRedisClient.zrangebyscore).bind(localRedisClient);
-            console.log("Executing local ZRANGEBYSCORE with args: " + args);
-            return zrangebyscoreAsync(args);
+            asyncCommand = promisify(localRedisClient.zrangebyscore).bind(localRedisClient);
+            break;
         case "ZREMRANGEBYSCORE":
-            const zremrangebyscoreAsync = promisify(localRedisClient.zremrangebyscore).bind(localRedisClient);
-            console.log("Executing local ZREMRANGEBYSCORE with args: " + args);
-            return zremrangebyscoreAsync(args);
+            asyncCommand = promisify(localRedisClient.zremrangebyscore).bind(localRedisClient);
+            break;
         default:
             throw "Command not recognized";
     }
+
+    console.log("Executing local " + command + " with args: " + args + ".");
+    const response = String(await asyncCommand(args));
+    console.log("Finished executing local " + command + ". Response: " + response);
+
+    return response;
 }
 
 function createRedisClient() {
@@ -78,7 +79,7 @@ function createRedisClient() {
     }
 }
 
-function performActionRemotely(gateway, command, args) {
+async function performActionRemotely(gateway, command, args) {
     let options = {
         uri: gateway + "/function/edge-db-data-receiver",
         method: 'POST',
@@ -92,7 +93,11 @@ function performActionRemotely(gateway, command, args) {
         }),
     };
 
-    return rp(options);
+    console.log("Executing remote " + command + " with args: " + args + ".");
+    const response = String(await rp(options));
+    console.log("Finished executing remote " + command + ". Response: " + response);
+
+    return response;
 }
 
 function getCurrentTimeInMilliseconds() {
@@ -101,16 +106,10 @@ function getCurrentTimeInMilliseconds() {
 }
 
 class EdgeDbClientWithDataDomain {
-    constructor(referringAreaType, ttl) {
+    constructor(referringAreaType, ttl, saveAlsoInIntermediateLevels) {
         // Check correctness.
-        if(!referringAreaType) {
-            throw "Field referringAreaType not set.";
-        }
         if(!(typeof referringAreaType === 'string' || referringAreaType instanceof String)) {
             throw "Field referringAreaType is not a string.";
-        }
-        if(!ttl) {
-            throw "Field ttl not set.";
         }
         if(!Number.isInteger(ttl)) {
             throw "Field ttl is not an integer.";
@@ -121,16 +120,22 @@ class EdgeDbClientWithDataDomain {
         if(ttl < TTL_MIN_VALUE) {
             throw "Field ttl is too small. It must be bigger than " + TTL_MIN_VALUE + ".";
         }
+        if(referringAreaType !== "location") {
+            // If referringAreaType is different than location then the user must also define if enabling saving also in intermediate locations.
+            if(!(saveAlsoInIntermediateLevels === true || saveAlsoInIntermediateLevels === false)) {
+                throw "Field saveAlsoInIntermediateLevels must be specified and must be a boolean.";
+            }
+        }
 
         // Initialize variables.
         this.infrastructureJson = JSON.parse(process.env.EDGE_INFRASTRUCTURE);
         this.ownLocationId = process.env.LOCATION_ID;
         this.referringAreaType = referringAreaType;
         this.referringAreaTypeLevel = -1;
-        this.referringAreaLocationId = null;
-        this.referringAreaLocationObject = null;
         this.ttl = ttl;
-        this.shouldForwardWrite = null;
+        this.saveAlsoInLowerLevels = saveAlsoInIntermediateLevels;
+        this.savingLocationsList = [];
+        this.savingType = null;
 
         // Save referringAreaType and check that it is valid.
         const areaTypesIdentifiers = this.infrastructureJson.areaTypesIdentifiers;
@@ -140,20 +145,28 @@ class EdgeDbClientWithDataDomain {
             throw "Field referringAreaType is not a valid area type identifier. Valid identifiers for the infrastructure are: " + possibleAreaTypesIdentifiers + ".";
         }
 
-        console.log("Creating EdgeDbClientWithDataDomain having referringAreaType: " + referringAreaType + ", ttl: " + ttl + ".");
+        console.log("Creating EdgeDbClientWithDataDomain having referringAreaType: " + referringAreaType + ", ttl: " + ttl + ", saveAlsoInIntermediateLevels: " + saveAlsoInIntermediateLevels + ".");
+
         if(referringAreaType === "location") {
             console.log("Writes will be local.");
-            this.shouldForwardWrite = false;
+            this.savingType = savingTypeEnum.ONLY_LOCAL;
         } else {
-            this.referringAreaLocationId = onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(this.infrastructureJson, this.ownLocationId, this.referringAreaTypeLevel);
-            console.log("Found location id of referring area: " + this.referringAreaLocationId + ".");
-            if(this.referringAreaLocationId === this.ownLocationId) {
-                console.log("Writes will be local.");
-                this.shouldForwardWrite = false;
+            if(this.saveAlsoInLowerLevels) {
+                console.log("Writes will be saved also in intermediate levels.");
+                this.savingType = savingTypeEnum.SAVE_ALSO_IN_INTERMEDIATE_LEVELS;
+                // TODO
             } else {
-                this.referringAreaLocationObject = onBoardInfrastructureParser.getLocationObject(this.infrastructureJson, this.referringAreaLocationId);
-                console.log("Writes will be local and remote (forwarded to " + this.referringAreaLocationObject.openfaas_gateway + ").");
-                this.shouldForwardWrite = true;
+                const referringAreaLocationId = onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(this.infrastructureJson, this.ownLocationId, this.referringAreaTypeLevel);
+                console.log("Found location id of referring area: " + referringAreaLocationId + ".");
+                if(referringAreaLocationId === this.ownLocationId) {
+                    console.log("The single referring area is the current location. So writes will be only local");
+                    this.savingType = savingTypeEnum.ONLY_LOCAL;
+                } else {
+                    const referringAreaLocationObject = onBoardInfrastructureParser.getLocationObject(this.infrastructureJson, referringAreaLocationId);
+                    this.savingLocationsList.push(referringAreaLocationObject);
+                    console.log("Writes will be remote to a single location (forwarded to " + referringAreaLocationObject.openfaas_gateway + ").");
+                    this.savingType = savingTypeEnum.SINGLE_REMOTE;
+                }
             }
         }
     }
@@ -170,17 +183,8 @@ class EdgeDbClientWithDataDomain {
         if(onlySetIfKeyAlreadyExist === true)
             args.push("XX");
 
-        // Execute action locally.
-        const localResponse = String(await performActionLocally("SET", args));
-        console.log("Executed local SET.");
-
-        // Propagate action.
-        if(localResponse === 'OK' && this.shouldForwardWrite) {
-            const remoteResponse = await performActionRemotely(this.referringAreaLocationObject.openfaas_gateway, "SET", args);
-            console.log("Executed remote SET. Response: " + remoteResponse);
-        }
-
-        return localResponse;
+        // Write.
+        return this.performWrite("SET", args);
     }
 
     async addToList(key, data, onlySetIfKeyDoesNotAlreadyExist, onlySetIfKeyAlreadyExist) {
@@ -199,16 +203,24 @@ class EdgeDbClientWithDataDomain {
         args.push(score);
         args.push(score + ":" + data);
 
-        // Execute action locally.
-        const localResponse = String(await performActionLocally("ZADD", args));
-        console.log("Executed local ZADD. Response: " + localResponse);
+        // Write.
+        return this.performWrite("ZADD", args);
+    }
 
-        // Propagate action.
-        if(this.shouldForwardWrite) {
-            const remoteResponse = await performActionRemotely(this.referringAreaLocationObject.openfaas_gateway, "ZADD", args);
-            console.log("Executed remote ZADD. Response: " + remoteResponse);
+    performWrite(command, args) {
+        if(this.savingType === savingTypeEnum.ONLY_LOCAL) { // Only local write.
+            return performActionLocally(command, args);
+        } else if(this.savingType === savingTypeEnum.SINGLE_REMOTE) { // Single remote saving.
+            return performActionRemotely(this.savingLocationsList[0].openfaas_gateway, command, args);
+        } else if(this.savingType === savingTypeEnum.SAVE_ALSO_IN_INTERMEDIATE_LEVELS) { // Remote write + intermediate.
+            const listOfPromises = [];
+            listOfPromises.push(performActionLocally(command, args));
+            for(const locationObject of this.savingLocationsList) {
+                listOfPromises.push(performActionRemotely(locationObject.openfaas_gateway, command, args));
+            }
+            return Promise.all(listOfPromises);
+        } else {
+            throw "Unrecognized savingType";
         }
-
-        return localResponse;
     }
 }
