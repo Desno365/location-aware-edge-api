@@ -2,20 +2,38 @@
   "areaTypesIdentifiers": ["continent", "country", "city"],
   "hierarchy": {
     "europe": {
-      "main-location": "milan001",
+      "main-location": {
+        "openfaas_gateway": "http://10.211.55.10:31112",
+        "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
+        "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
+        "redis_port": 6379,
+        "redis_password": "658f28bb7ec61e93ebaa"
+      },
       "italy": {
-        "main-location": "milan001",
+        "main-location": {
+          "openfaas_gateway": "http://10.211.55.11:31112",
+          "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
+          "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
+          "redis_port": 6379,
+          "redis_password": "658f28bb7ec61e93ebaa"
+        },
         "milan": {
-          "main-location": "milan001",
+          "main-location": {
+            "openfaas_gateway": "http://10.211.55.12:31112",
+            "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
+            "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
+            "redis_port": 6379,
+            "redis_password": "658f28bb7ec61e93ebaa"
+          },
           "milan001": {
-            "openfaas_gateway": "http://10.211.55.22:31112",
+            "openfaas_gateway": "http://10.211.55.13:31112",
             "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
             "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
             "redis_port": 6379,
             "redis_password": "658f28bb7ec61e93ebaa"
           },
           "milan002": {
-            "openfaas_gateway": "http://10.211.55.23:31112",
+            "openfaas_gateway": "http://10.211.55.14:31112",
             "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
             "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
             "redis_port": 6379,
@@ -23,16 +41,22 @@
           }
         },
         "turin": {
-          "main-location": "turin001",
+          "main-location": {
+            "openfaas_gateway": "http://10.211.55.15:31112",
+            "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
+            "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
+            "redis_port": 6379,
+            "redis_password": "658f28bb7ec61e93ebaa"
+          },
           "turin001": {
-            "openfaas_gateway": "http://10.211.55.24:31112",
+            "openfaas_gateway": "http://10.211.55.16:31112",
             "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
             "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
             "redis_port": 6379,
             "redis_password": "658f28bb7ec61e93ebaa"
           },
           "turin002": {
-            "openfaas_gateway": "http://10.211.55.25:31112",
+            "openfaas_gateway": "http://10.211.55.17:31112",
             "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
             "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
             "redis_port": 6379,
@@ -41,18 +65,30 @@
         }
       },
       "france": {
-        "main-location": "paris001",
+        "main-location": {
+          "openfaas_gateway": "http://10.211.55.18:31112",
+          "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
+          "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
+          "redis_port": 6379,
+          "redis_password": "658f28bb7ec61e93ebaa"
+        },
         "paris": {
-          "main-location": "paris001",
+          "main-location": {
+            "openfaas_gateway": "http://10.211.55.19:31112",
+            "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
+            "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
+            "redis_port": 6379,
+            "redis_password": "658f28bb7ec61e93ebaa"
+          },
           "paris001": {
-            "openfaas_gateway": "http://10.211.55.26:31112",
+            "openfaas_gateway": "http://10.211.55.20:31112",
             "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
             "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
             "redis_port": 6379,
             "redis_password": "658f28bb7ec61e93ebaa"
           },
           "paris002": {
-            "openfaas_gateway": "http://10.211.55.27:31112",
+            "openfaas_gateway": "http://10.211.55.21:31112",
             "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
             "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
             "redis_port": 6379,
@@ -60,16 +96,22 @@
           }
         },
         "nice": {
-          "main-location": "nice001",
+          "main-location": {
+            "openfaas_gateway": "http://10.211.55.22:31112",
+            "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
+            "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
+            "redis_port": 6379,
+            "redis_password": "658f28bb7ec61e93ebaa"
+          },
           "nice001": {
-            "openfaas_gateway": "http://10.211.55.28:31112",
+            "openfaas_gateway": "http://10.211.55.23:31112",
             "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
             "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
             "redis_port": 6379,
             "redis_password": "658f28bb7ec61e93ebaa"
           },
           "nice002": {
-            "openfaas_gateway": "http://10.211.55.29:31112",
+            "openfaas_gateway": "http://10.211.55.24:31112",
             "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
             "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
             "redis_port": 6379,

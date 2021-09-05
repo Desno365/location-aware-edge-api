@@ -2,7 +2,13 @@
   "areaTypesIdentifiers": "city",
   "hierarchy": {
     "milan": {
-      "main-location": "milan001",
+      "main-location": {
+        "openfaas_gateway": "http://10.211.55.21:31112",
+        "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
+        "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
+        "redis_port": 6379,
+        "redis_password": "658f28bb7ec61e93ebaa"
+      },
       "milan001": {
         "openfaas_gateway": "http://10.211.55.22:31112",
         "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",

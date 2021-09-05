@@ -1,26 +1,35 @@
 {
-  "areaTypesIdentifiers": ["continent", "country", "city"],
+  "areaTypesIdentifiers": ["country", "city"],
   "hierarchy": {
-    "europe": {
-      "main-location": "milan001",
-      "italy": {
-        "main-location": "milan001",
-        "milan": {
-          "main-location": "milan001",
-          "milan001": {
-            "openfaas_gateway": "http://10.211.55.31:31112",
-            "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
-            "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
-            "redis_port": 6379,
-            "redis_password": "658f28bb7ec61e93ebaa"
-          },
-          "milan002": {
-            "openfaas_gateway": "http://10.211.55.32:31112",
-            "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
-            "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
-            "redis_port": 6379,
-            "redis_password": "658f28bb7ec61e93ebaa"
-          }
+    "italy": {
+      "main-location": {
+        "openfaas_gateway": "http://10.211.55.33:31112",
+        "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
+        "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
+        "redis_port": 6379,
+        "redis_password": "658f28bb7ec61e93ebaa"
+      },
+      "milan": {
+        "main-location": {
+          "openfaas_gateway": "http://10.211.55.34:31112",
+          "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
+          "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
+          "redis_port": 6379,
+          "redis_password": "658f28bb7ec61e93ebaa"
+        },
+        "milan001": {
+          "openfaas_gateway": "http://10.211.55.35:31112",
+          "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
+          "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
+          "redis_port": 6379,
+          "redis_password": "658f28bb7ec61e93ebaa"
+        },
+        "milan002": {
+          "openfaas_gateway": "http://10.211.55.36:31112",
+          "openfaas_password": "936af6e5370686ce2ddad6ab03891e471ccd5969",
+          "redis_host": "my-openfaas-redis-master.openfaas-fn.svc.cluster.local",
+          "redis_port": 6379,
+          "redis_password": "658f28bb7ec61e93ebaa"
         }
       }
     }
