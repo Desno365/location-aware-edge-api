@@ -157,11 +157,11 @@ function isAreasContainerCorrect(areasContainer, areaTypesIdentifiers, level) {
             return isMainLocationFieldCorrect(areasContainer["main-location"]);
     } else {
         // It's actually a locations container (each field in areasContainer is a location object).
-        return isLocationsContainerCorrect(areasContainer, areaTypesIdentifiers);
+        return isLocationsContainerCorrect(areasContainer, areaTypesIdentifiers, level);
     }
 }
 
-function isLocationsContainerCorrect(locationsContainer, areaTypesIdentifiers) {
+function isLocationsContainerCorrect(locationsContainer, areaTypesIdentifiers, level) {
     for(const locationName in locationsContainer) {
         if(locationName === "main-location") {
             continue;
@@ -177,7 +177,10 @@ function isLocationsContainerCorrect(locationsContainer, areaTypesIdentifiers) {
         }
         console.log(chalk.green("Location \"" + locationName + "\" is correct."));
     }
-    return isMainLocationFieldCorrect(locationsContainer["main-location"]);
+    if(level === 0)
+        return true; // hierarchy field does not need the main-location field.
+    else
+        return isMainLocationFieldCorrect(locationsContainer["main-location"]);
 }
 
 function isMainLocationFieldCorrect(mainLocationObject) {
