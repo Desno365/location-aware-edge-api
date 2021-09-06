@@ -263,7 +263,9 @@ describe('Tests', () => {
                 const data = fs.readFileSync(infrastructurePath, 'utf8');
                 const infrastructureJson = JSON.parse(data);
                 assert.equal(infrastructureParser.isInfrastructureJsonCorrect(infrastructureJson), true);
-                assert.equal(infrastructureParser.getAllLocations(infrastructureJson, "location", undefined, undefined).length, 8);
+
+                const locationObjects = infrastructureParser.getAllLocations(infrastructureJson, "location", undefined, undefined);
+                assert.equal(locationObjects.length, 8);
             });
 
             it('All locations of one level infrastructure', () => {
@@ -271,7 +273,11 @@ describe('Tests', () => {
                 const data = fs.readFileSync(infrastructurePath, 'utf8');
                 const infrastructureJson = JSON.parse(data);
                 assert.equal(infrastructureParser.isInfrastructureJsonCorrect(infrastructureJson), true);
-                assert.equal(infrastructureParser.getAllLocations(infrastructureJson, "location", undefined, undefined).length, 2);
+
+                const locationObjects = infrastructureParser.getAllLocations(infrastructureJson, "location", undefined, undefined);
+                assert.equal(locationObjects.length, 2);
+                assert.isTrue(locationObjects[0].location_id === "milan001" || locationObjects[1].location_id === "milan001");
+                assert.isTrue(locationObjects[0].location_id === "milan002" || locationObjects[1].location_id === "milan002");
             });
 
             it('All locations of simple infrastructure', () => {
@@ -279,7 +285,11 @@ describe('Tests', () => {
                 const data = fs.readFileSync(infrastructurePath, 'utf8');
                 const infrastructureJson = JSON.parse(data);
                 assert.equal(infrastructureParser.isInfrastructureJsonCorrect(infrastructureJson), true);
-                assert.equal(infrastructureParser.getAllLocations(infrastructureJson, "location", undefined, undefined).length, 2);
+
+                const locationObjects = infrastructureParser.getAllLocations(infrastructureJson, "location", undefined, undefined);
+                assert.equal(locationObjects.length, 2);
+                assert.isTrue(locationObjects[0].location_id === "milan001" || locationObjects[1].location_id === "milan001");
+                assert.isTrue(locationObjects[0].location_id === "milan002" || locationObjects[1].location_id === "milan002");
             });
 
             it('Some locations of standard infrastructure', () => {
@@ -337,9 +347,18 @@ describe('Tests', () => {
                 const data = fs.readFileSync(infrastructurePath, 'utf8');
                 const infrastructureJson = JSON.parse(data);
                 assert.equal(infrastructureParser.isInfrastructureJsonCorrect(infrastructureJson), true);
-                assert.equal(infrastructureParser.getAllLocations(infrastructureJson, "continent", undefined, undefined).length, 1);
-                assert.equal(infrastructureParser.getAllLocations(infrastructureJson, "country", undefined, undefined).length, 2);
+
+                const locationObjectsContinent = infrastructureParser.getAllLocations(infrastructureJson, "continent", undefined, undefined);
+                assert.equal(locationObjectsContinent.length, 1);
+                assert.isTrue(locationObjectsContinent[0].location_id === "europe" && locationObjectsContinent[0].openfaas_gateway === "http://10.211.55.10:31112");
+
+                const locationObjectsCountry = infrastructureParser.getAllLocations(infrastructureJson, "country", undefined, undefined);
+                assert.equal(locationObjectsCountry.length, 2);
+                assert.isTrue(locationObjectsCountry[0].location_id === "italy" || locationObjectsCountry[1].location_id === "italy");
+                assert.isTrue(locationObjectsCountry[0].location_id === "france" || locationObjectsCountry[1].location_id === "france");
+
                 assert.equal(infrastructureParser.getAllLocations(infrastructureJson, "city", undefined, undefined).length, 4);
+
                 assert.equal(infrastructureParser.getAllLocations(infrastructureJson, "location", undefined, undefined).length, 8);
             });
 
@@ -348,19 +367,38 @@ describe('Tests', () => {
                 const data = fs.readFileSync(infrastructurePath, 'utf8');
                 const infrastructureJson = JSON.parse(data);
                 assert.equal(infrastructureParser.isInfrastructureJsonCorrect(infrastructureJson), true);
-                assert.equal(infrastructureParser.getAllLocations(infrastructureJson, "continent", ["europe"], undefined).length, 1);
-                assert.equal(infrastructureParser.getAllLocations(infrastructureJson, "country", ["italy"], undefined).length, 1);
-                assert.equal(infrastructureParser.getAllLocations(infrastructureJson, "country", ["europe"], ["france"]).length, 1);
-                assert.equal(infrastructureParser.getAllLocations(infrastructureJson, "city", ["italy"], ["milan"]).length, 1);
-                assert.equal(infrastructureParser.getAllLocations(infrastructureJson, "city", ["europe"], ["nice", "paris"]).length, 2);
-                assert.equal(infrastructureParser.getAllLocations(infrastructureJson, "city", ["france"], ["paris"]).length, 1);
+
+                const locationObjects1 = infrastructureParser.getAllLocations(infrastructureJson, "continent", ["europe"], undefined);
+                assert.equal(locationObjects1.length, 1);
+                assert.isTrue(locationObjects1[0].location_id === "europe" && locationObjects1[0].openfaas_gateway === "http://10.211.55.10:31112");
+
+                const locationObjects2 = infrastructureParser.getAllLocations(infrastructureJson, "country", ["italy"], undefined);
+                assert.equal(locationObjects2.length, 1);
+                assert.isTrue(locationObjects2[0].location_id === "italy" && locationObjects2[0].openfaas_gateway === "http://10.211.55.11:31112");
+
+                const locationObjects3 = infrastructureParser.getAllLocations(infrastructureJson, "country", ["europe"], ["france"]);
+                assert.equal(locationObjects3.length, 1);
+                assert.isTrue(locationObjects3[0].location_id === "italy" && locationObjects3[0].openfaas_gateway === "http://10.211.55.11:31112");
+
+                const locationObjects4 = infrastructureParser.getAllLocations(infrastructureJson, "city", ["italy"], ["milan"]);
+                assert.equal(locationObjects4.length, 1);
+                assert.isTrue(locationObjects4[0].location_id === "turin" && locationObjects4[0].openfaas_gateway === "http://10.211.55.15:31112");
+
+                const locationObjects5 = infrastructureParser.getAllLocations(infrastructureJson, "city", ["europe"], ["nice", "paris"]);
+                assert.equal(locationObjects5.length, 2);
+                assert.isTrue(locationObjects5[0].location_id === "milan" || locationObjects5[1].location_id === "milan");
+                assert.isTrue(locationObjects5[0].location_id === "turin" || locationObjects5[1].location_id === "turin");
+
+                const locationObjects6 = infrastructureParser.getAllLocations(infrastructureJson, "city", ["france"], ["paris"]);
+                assert.equal(locationObjects6.length, 1);
+                assert.isTrue(locationObjects6[0].location_id === "nice" && locationObjects6[0].openfaas_gateway === "http://10.211.55.22:31112");
             });
         });
     });
 
     describe('onBoardInfrastructureParser', () => {
 
-        describe('getLocationIdOfReferringAreaInInfrastructure', () => {
+        describe('getLocationObjectOfReferringAreaInInfrastructure', () => {
 
             it('Referring area of standard infrastructure', () => {
                 const infrastructurePath = "./test/test-infrastructures/infrastructure-correct.json";
@@ -368,21 +406,41 @@ describe('Tests', () => {
                 const infrastructureJson = JSON.parse(data);
                 assert.equal(infrastructureParser.isInfrastructureJsonCorrect(infrastructureJson), true);
 
-                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "nice002", 0), "milan001");
-                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "nice002", 1), "paris001");
-                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "nice002", 2), "nice001");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "nice002", 0).location_id, "europe");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "nice002", 0).openfaas_gateway, "http://10.211.55.10:31112");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "nice002", 1).location_id, "france");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "nice002", 1).openfaas_gateway, "http://10.211.55.18:31112");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "nice002", 2).location_id, "nice");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "nice002", 2).openfaas_gateway, "http://10.211.55.22:31112");
 
-                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "nice001", 0), "milan001");
-                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "nice001", 1), "paris001");
-                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "nice001", 2), "nice001");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "nice001", 0).location_id, "europe");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "nice001", 0).openfaas_gateway, "http://10.211.55.10:31112");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "nice001", 1).location_id, "france");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "nice001", 1).openfaas_gateway, "http://10.211.55.18:31112");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "nice001", 2).location_id, "nice");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "nice001", 2).openfaas_gateway, "http://10.211.55.22:31112");
 
-                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "paris002", 0), "milan001");
-                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "paris002", 1), "paris001");
-                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "paris002", 2), "paris001");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "milan001", 0).location_id, "europe");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "milan001", 0).openfaas_gateway, "http://10.211.55.10:31112");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "milan001", 1).location_id, "italy");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "milan001", 1).openfaas_gateway, "http://10.211.55.11:31112");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "milan001", 2).location_id, "milan");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "milan001", 2).openfaas_gateway, "http://10.211.55.12:31112");
 
-                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "milan001", 0), "milan001");
-                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "milan001", 1), "milan001");
-                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "milan001", 2), "milan001");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "nice", 0).location_id, "europe");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "nice", 0).openfaas_gateway, "http://10.211.55.10:31112");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "nice", 1).location_id, "france");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "nice", 1).openfaas_gateway, "http://10.211.55.18:31112");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "nice", 2).location_id, "nice");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "nice", 2).openfaas_gateway, "http://10.211.55.22:31112");
+
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "france", 0).location_id, "europe");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "france", 0).openfaas_gateway, "http://10.211.55.10:31112");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "france", 1).location_id, "france");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "france", 1).openfaas_gateway, "http://10.211.55.18:31112");
+
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "europe", 0).location_id, "europe");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "europe", 0).openfaas_gateway, "http://10.211.55.10:31112");
             });
 
             it('Referring area of one level infrastructure', () => {
@@ -391,9 +449,11 @@ describe('Tests', () => {
                 const infrastructureJson = JSON.parse(data);
                 assert.equal(infrastructureParser.isInfrastructureJsonCorrect(infrastructureJson), true);
 
-                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "milan001", 0), "milan001");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "milan001", 0).location_id, "milan001");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "milan001", 0).openfaas_gateway, "http://10.211.55.22:31112");
 
-                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "milan002", 0), "milan001");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "milan002", 0).location_id, "milan002");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "milan002", 0).openfaas_gateway, "http://10.211.55.23:31112");
             });
 
             it('Referring area of simple infrastructure', () => {
@@ -402,59 +462,34 @@ describe('Tests', () => {
                 const infrastructureJson = JSON.parse(data);
                 assert.equal(infrastructureParser.isInfrastructureJsonCorrect(infrastructureJson), true);
 
-                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "milan002", 0), "milan001");
-                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "milan002", 1), "milan001");
-                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "milan002", 2), "milan001");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "milan001", 0).location_id, "europe");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "milan001", 0).openfaas_gateway, "http://10.211.55.20:31112");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "milan001", 1).location_id, "italy");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "milan001", 1).openfaas_gateway, "http://10.211.55.21:31112");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "milan001", 2).location_id, "milan");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "milan001", 2).openfaas_gateway, "http://10.211.55.22:31112");
 
-                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "milan001", 0), "milan001");
-                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "milan001", 1), "milan001");
-                assert.equal(onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(infrastructureJson, "milan001", 2), "milan001");
-            });
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "milan002", 0).location_id, "europe");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "milan002", 0).openfaas_gateway, "http://10.211.55.20:31112");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "milan002", 1).location_id, "italy");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "milan002", 1).openfaas_gateway, "http://10.211.55.21:31112");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "milan002", 2).location_id, "milan");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "milan002", 2).openfaas_gateway, "http://10.211.55.22:31112");
 
-        });
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "milan", 0).location_id, "europe");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "milan", 0).openfaas_gateway, "http://10.211.55.20:31112");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "milan", 1).location_id, "italy");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "milan", 1).openfaas_gateway, "http://10.211.55.21:31112");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "milan", 2).location_id, "milan");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "milan", 2).openfaas_gateway, "http://10.211.55.22:31112");
 
-        describe('getLocationObject', () => {
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "italy", 0).location_id, "europe");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "italy", 0).openfaas_gateway, "http://10.211.55.20:31112");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "italy", 1).location_id, "italy");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "italy", 1).openfaas_gateway, "http://10.211.55.21:31112");
 
-            it('getLocationObject of standard infrastructure', () => {
-                const infrastructurePath = "./test/test-infrastructures/infrastructure-correct.json";
-                const data = fs.readFileSync(infrastructurePath, 'utf8');
-                const infrastructureJson = JSON.parse(data);
-                assert.equal(infrastructureParser.isInfrastructureJsonCorrect(infrastructureJson), true);
-
-                assert.equal(onBoardInfrastructureParser.getLocationObject(infrastructureJson, "nice002").location_id, "nice002");
-                assert.equal(onBoardInfrastructureParser.getLocationObject(infrastructureJson, "nice002").openfaas_gateway, "http://10.211.55.29:31112");
-
-                assert.equal(onBoardInfrastructureParser.getLocationObject(infrastructureJson, "milan001").location_id, "milan001");
-                assert.equal(onBoardInfrastructureParser.getLocationObject(infrastructureJson, "milan001").openfaas_gateway, "http://10.211.55.22:31112");
-
-                assert.equal(onBoardInfrastructureParser.getLocationObject(infrastructureJson, "turin002").location_id, "turin002");
-                assert.equal(onBoardInfrastructureParser.getLocationObject(infrastructureJson, "turin002").openfaas_gateway, "http://10.211.55.25:31112");
-            });
-
-            it('getLocationObject of one level infrastructure', () => {
-                const infrastructurePath = "./test/test-infrastructures/one-level-infrastructure-correct.json";
-                const data = fs.readFileSync(infrastructurePath, 'utf8');
-                const infrastructureJson = JSON.parse(data);
-                assert.equal(infrastructureParser.isInfrastructureJsonCorrect(infrastructureJson), true);
-
-                assert.equal(onBoardInfrastructureParser.getLocationObject(infrastructureJson, "milan001").location_id, "milan001");
-                assert.equal(onBoardInfrastructureParser.getLocationObject(infrastructureJson, "milan001").openfaas_gateway, "http://10.211.55.22:31112");
-
-                assert.equal(onBoardInfrastructureParser.getLocationObject(infrastructureJson, "milan002").location_id, "milan002");
-                assert.equal(onBoardInfrastructureParser.getLocationObject(infrastructureJson, "milan002").openfaas_gateway, "http://10.211.55.23:31112");
-            });
-
-            it('getLocationObject of simple infrastructure', () => {
-                const infrastructurePath = "./test/test-infrastructures/simple-infrastructure-correct.json";
-                const data = fs.readFileSync(infrastructurePath, 'utf8');
-                const infrastructureJson = JSON.parse(data);
-                assert.equal(infrastructureParser.isInfrastructureJsonCorrect(infrastructureJson), true);
-
-                assert.equal(onBoardInfrastructureParser.getLocationObject(infrastructureJson, "milan001").location_id, "milan001");
-                assert.equal(onBoardInfrastructureParser.getLocationObject(infrastructureJson, "milan001").openfaas_gateway, "http://10.211.55.22:31112");
-
-                assert.equal(onBoardInfrastructureParser.getLocationObject(infrastructureJson, "milan002").location_id, "milan002");
-                assert.equal(onBoardInfrastructureParser.getLocationObject(infrastructureJson, "milan002").openfaas_gateway, "http://10.211.55.23:31112");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "europe", 0).location_id, "europe");
+                assert.equal(onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(infrastructureJson, "europe", 0).openfaas_gateway, "http://10.211.55.20:31112");
             });
 
         });
