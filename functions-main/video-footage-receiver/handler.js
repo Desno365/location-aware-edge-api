@@ -1,7 +1,7 @@
 "use strict";
 
 // Dependencies.
-const edgeDb = require("./common/edge-db/edge-db");
+const edgeDb = require("./common/edge-db/edgeDb");
 
 // Constants.
 const crowdStatusDataDomain = { referringAreaType: "city", ttl: 30*60*1000 }; // 30 minutes TTL.

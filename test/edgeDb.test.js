@@ -5,7 +5,7 @@
 const chai = require('chai');
 const assert = chai.assert;
 const fs = require('fs');
-const edgeDb = require('../functions-main/common/edge-db/edge-db');
+const edgeDb = require('../functions-main/common/edge-db/edgeDb');
 const savingTypeEnum = require('../functions-main/common/edge-db/savingTypeEnum');
 
 describe('edgeDb', () => {

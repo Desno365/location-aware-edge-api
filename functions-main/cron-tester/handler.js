@@ -1,7 +1,7 @@
 "use strict";
 
 // Dependencies.
-const edgeDb = require("./common/edge-db/edge-db");
+const edgeDb = require("./common/edge-db/edgeDb");
 
 module.exports = async (event, context) => {
   const latestData = await edgeDb.get("latest_iot_data");
