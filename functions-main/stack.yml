@@ -10,8 +10,6 @@ functions:
     lang: node14
     handler: ./cron-tester
     image: desno365/cron-tester:latest
-    copy-common:
-      - ./common/
     limits:
       memory: 256Mi
       cpu: 1000m
@@ -26,8 +24,6 @@ functions:
     lang: node14
     handler: ./edge-db-data-receiver
     image: desno365/edge-db-data-receiver:latest
-    copy-common:
-      - ./common/
     limits:
       memory: 256Mi
       cpu: 1000m
@@ -39,8 +35,6 @@ functions:
     lang: node14
     handler: ./iot-data-reduction
     image: desno365/iot-data-reduction:latest
-    copy-common:
-      - ./common/
     limits:
       memory: 256Mi
       cpu: 1000m
@@ -53,8 +47,6 @@ functions:
     lang: node14
     handler: ./get-less-crowded-path
     image: desno365/get-less-crowded-path
-    copy-common:
-      - ./common/
     limits:
       memory: 256Mi
       cpu: 1000m
@@ -66,8 +58,6 @@ functions:
     lang: node14
     handler: ./video-footage-receiver
     image: desno365/video-footage-receiver
-    copy-common:
-      - ./common/
     limits:
       memory: 256Mi
       cpu: 1000m
@@ -80,8 +70,6 @@ functions:
     lang: node14
     handler: ./search-analytics-data-receiver
     image: desno365/search-analytics-data-receiver
-    copy-common:
-      - ./common/
     limits:
       memory: 256Mi
       cpu: 1000m
@@ -93,8 +81,6 @@ functions:
     lang: node14
     handler: ./search-analytics-performer
     image: desno365/search-analytics-performer
-    copy-common:
-      - ./common/
     limits:
       memory: 256Mi
       cpu: 1000m
