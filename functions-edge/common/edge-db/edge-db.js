@@ -1,8 +1,6 @@
 "use strict";
 
-const redis = require("redis");
 const { promisify } = require("util");
-const rp = require('request-promise');
 const onBoardInfrastructureParser = require("./onBoardInfrastructureParser");
 const savingTypeEnum = require("./savingTypeEnum");
 
@@ -71,7 +69,7 @@ let performActionLocally = exports.performActionLocally = async function(command
 function createRedisClient() {
     if(!localRedisClient) {
         console.log("Creating redis client, using host \"" + process.env.REDIS_HOST + "\" and port \"" + process.env.REDIS_PORT + "\".");
-        localRedisClient = redis.createClient({
+        localRedisClient = require("redis").createClient({
             host: process.env.REDIS_HOST,
             port: process.env.REDIS_PORT,
             password: process.env.REDIS_PASSWORD
@@ -94,6 +92,7 @@ async function performActionRemotely(gateway, command, args) {
     };
 
     console.log("Executing remote " + command + " with args: " + args + ".");
+    const rp = require('request-promise');
     const response = String(await rp(options));
     console.log("Finished executing remote " + command + ". Response: " + response);
 
@@ -120,8 +119,9 @@ class EdgeDbClientWithDataDomain {
         if(ttl < TTL_MIN_VALUE) {
             throw "Field ttl is too small. It must be bigger than " + TTL_MIN_VALUE + ".";
         }
-        if(referringAreaType !== "location") {
-            // If referringAreaType is different than location then the user must also define if enabling saving also in intermediate locations.
+        if(referringAreaType !== "location" && process.env.EDGE_DEPLOYMENT_IN_EVERY !== referringAreaType) {
+            // If referringAreaType is different than location and the deployment area level is different than the referringAreaType:
+            // then the user must also define if enabling saving also in intermediate locations.
             if(!(saveAlsoInIntermediateLevels === true || saveAlsoInIntermediateLevels === false)) {
                 throw "Field saveAlsoInIntermediateLevels must be specified and must be a boolean.";
             }
@@ -130,16 +130,18 @@ class EdgeDbClientWithDataDomain {
         // Initialize variables.
         this.infrastructureJson = JSON.parse(process.env.EDGE_INFRASTRUCTURE);
         this.ownLocationId = process.env.LOCATION_ID;
+        this.ownAreaTypeLevel = null;
         this.referringAreaType = referringAreaType;
         this.referringAreaTypeLevel = -1;
         this.ttl = ttl;
-        this.saveAlsoInLowerLevels = saveAlsoInIntermediateLevels;
+        this.saveAlsoInIntermediateLevels = saveAlsoInIntermediateLevels;
         this.savingLocationsList = [];
         this.savingType = null;
 
         // Save referringAreaType and check that it is valid.
         const areaTypesIdentifiers = this.infrastructureJson.areaTypesIdentifiers;
         const possibleAreaTypesIdentifiers = areaTypesIdentifiers.concat(["location"]);
+        this.ownAreaTypeLevel = possibleAreaTypesIdentifiers.indexOf(process.env.EDGE_DEPLOYMENT_IN_EVERY);
         this.referringAreaTypeLevel = possibleAreaTypesIdentifiers.indexOf(referringAreaType);
         if(this.referringAreaTypeLevel === -1) {
             throw "Field referringAreaType is not a valid area type identifier. Valid identifiers for the infrastructure are: " + possibleAreaTypesIdentifiers + ".";
@@ -147,22 +149,26 @@ class EdgeDbClientWithDataDomain {
 
         console.log("Creating EdgeDbClientWithDataDomain having referringAreaType: " + referringAreaType + ", ttl: " + ttl + ", saveAlsoInIntermediateLevels: " + saveAlsoInIntermediateLevels + ".");
 
-        if(referringAreaType === "location") {
+        if(referringAreaType === "location" || process.env.EDGE_DEPLOYMENT_IN_EVERY === referringAreaType) {
             console.log("Writes will be local.");
             this.savingType = savingTypeEnum.ONLY_LOCAL;
         } else {
-            if(this.saveAlsoInLowerLevels) {
+            if(this.saveAlsoInIntermediateLevels) {
                 console.log("Writes will be saved also in intermediate levels.");
                 this.savingType = savingTypeEnum.SAVE_ALSO_IN_INTERMEDIATE_LEVELS;
-                // TODO
+                for(let level = this.referringAreaTypeLevel; level <= this.ownAreaTypeLevel; level++) {
+                    const locationObject = onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(this.infrastructureJson, this.ownLocationId, level);
+                    if(locationObject.location_id !== this.ownLocationId) {
+                        this.savingLocationsList.push(locationObject);
+                    }
+                }
             } else {
-                const referringAreaLocationId = onBoardInfrastructureParser.getLocationIdOfReferringAreaInInfrastructure(this.infrastructureJson, this.ownLocationId, this.referringAreaTypeLevel);
-                console.log("Found location id of referring area: " + referringAreaLocationId + ".");
-                if(referringAreaLocationId === this.ownLocationId) {
+                const referringAreaLocationObject = onBoardInfrastructureParser.getLocationObjectOfReferringAreaInInfrastructure(this.infrastructureJson, this.ownLocationId, this.referringAreaTypeLevel);
+                console.log("Location id of referring area: " + referringAreaLocationObject.location_id + ".");
+                if(referringAreaLocationObject.location_id === this.ownLocationId) {
                     console.log("The single referring area is the current location. So writes will be only local");
                     this.savingType = savingTypeEnum.ONLY_LOCAL;
                 } else {
-                    const referringAreaLocationObject = onBoardInfrastructureParser.getLocationObject(this.infrastructureJson, referringAreaLocationId);
                     this.savingLocationsList.push(referringAreaLocationObject);
                     console.log("Writes will be remote to a single location (forwarded to " + referringAreaLocationObject.openfaas_gateway + ").");
                     this.savingType = savingTypeEnum.SINGLE_REMOTE;
