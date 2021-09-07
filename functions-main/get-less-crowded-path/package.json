@@ -9,12 +9,12 @@
     "invoke": "curl -X POST http://$(minikube ip --profile p1):31112/function/get-less-crowded-path -H \"Content-Type:application/json\" -d '{\"starting_point\":\"1234\",\"destination_point\":\"2345\"}'",
     "logs": "faas-cli logs get-less-crowded-path --gateway http://$(minikube ip --profile p1):31112"
   },
-  "keywords": [],
   "author": "Desno365",
   "license": "MIT",
   "dependencies": {
     "redis": "3.1.2",
     "request-promise": "4.2.6",
     "request": "2.88.2"
-  }
+  },
+  "private": true
 }
