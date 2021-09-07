@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0",
     "update": "cd .. && faas-cli publish --filter get-less-crowded-path --platforms linux/arm/v7,linux/amd64 && deployer deploy get-less-crowded-path infrastructure.json --inEvery city --inAreas milan",
-    "invoke": "curl -X POST http://$(minikube ip --profile p1):31112/function/get-less-crowded-path -H \"Content-Type:application/json\" -d '{\"starting_point\":\"1234\",\"destination_point\":\"2345\"}'",
-    "logs": "faas-cli logs get-less-crowded-path --gateway http://$(minikube ip --profile p1):31112"
+    "invoke": "curl -X POST http://$(minikube ip --profile p2):31112/function/get-less-crowded-path -H \"Content-Type:application/json\" -d '{\"starting_point\":\"1234\",\"destination_point\":\"2345\"}'",
+    "logs": "faas-cli logs get-less-crowded-path --gateway http://$(minikube ip --profile p2):31112"
   },
   "author": "Desno365",
   "license": "MIT",

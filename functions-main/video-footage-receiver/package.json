@@ -6,10 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0",
     "update": "cd .. && faas-cli publish --filter video-footage-receiver --platforms linux/arm/v7,linux/amd64 && deployer deploy video-footage-receiver infrastructure.json --inEvery location --inAreas milan",
-    "invoke1": "curl -X POST http://$(minikube ip --profile p1):31112/function/video-footage-receiver -H \"Content-Type:application/json\" -d '{\"footage_data\":\"0.3\",\"camera_id\":\"camera1\"}'",
-    "invoke2": "curl -X POST http://$(minikube ip --profile p2):31112/function/video-footage-receiver -H \"Content-Type:application/json\" -d '{\"footage_data\":\"0.1\",\"camera_id\":\"camera2\"}'",
-    "invoke3": "curl -X POST http://$(minikube ip --profile p1):31112/function/video-footage-receiver -H \"Content-Type:application/json\" -d '{\"footage_data\":\"0.8\",\"camera_id\":\"camera3\"}'",
-    "logs": "faas-cli logs video-footage-receiver --gateway http://$(minikube ip --profile p1):31112"
+    "invoke1": "curl -X POST http://$(minikube ip --profile p3):31112/function/video-footage-receiver -H \"Content-Type:application/json\" -d '{\"footage_data\":\"0.3\",\"camera_id\":\"camera1\"}'",
+    "invoke2": "curl -X POST http://$(minikube ip --profile p4):31112/function/video-footage-receiver -H \"Content-Type:application/json\" -d '{\"footage_data\":\"0.1\",\"camera_id\":\"camera2\"}'",
+    "invoke3": "curl -X POST http://$(minikube ip --profile p3):31112/function/video-footage-receiver -H \"Content-Type:application/json\" -d '{\"footage_data\":\"0.8\",\"camera_id\":\"camera3\"}'",
+    "logs": "faas-cli logs video-footage-receiver --gateway http://$(minikube ip --profile p3):31112"
   },
   "author": "Desno365",
   "license": "MIT",
