@@ -4,7 +4,6 @@
 // Dependencies
 const chai = require('chai');
 const assert = chai.assert;
-const sinon = require('sinon');
 const fs = require('fs');
 const infrastructureParser = require('../main/utils/infrastructureParser');
 const onBoardInfrastructureParser = require('../../functions-edge/common/edge-db/onBoardInfrastructureParser');
