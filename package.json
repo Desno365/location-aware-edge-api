@@ -1,0 +1,28 @@
+{
+  "name": "location-aware-edge-api",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "mocha --timeout 10000",
+    "coverage": "nyc npm run test"
+  },
+  "author": "Desno365",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "4.1.1",
+    "commander": "8.0.0",
+    "conf": "10.0.1",
+    "shelljs": "0.8.4",
+    "redis": "3.1.2",
+    "request-promise": "4.2.6",
+    "request": "2.88.2"
+  },
+  "devDependencies": {
+    "chai": "^4.3.4",
+    "eslint": "^7.23.0",
+    "eslint-plugin-promise": "^4.3.1",
+    "mocha": "^8.3.2",
+    "nyc": "^15.1.0"
+  },
+  "private": true
+}
