@@ -6,7 +6,7 @@ const chai = require('chai');
 const assert = chai.assert;
 const fs = require('fs');
 const infrastructureParser = require('../main/utils/infrastructureParser');
-const onBoardInfrastructureParser = require('../../functions-edge/common/edge-db/onBoardInfrastructureParser');
+const onBoardInfrastructureParser = require('../../functions-main/common/edge-db/onBoardInfrastructureParser');
 
 describe('onBoardInfrastructureParser', () => {
 
