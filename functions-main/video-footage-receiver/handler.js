@@ -4,7 +4,7 @@
 const edgeDb = require("./common/edge-db/edgeDb");
 
 // Constants.
-const crowdStatusDataDomain = { referringAreaType: "city", ttl: 30*60*1000 }; // 30 minutes TTL.
+const crowdStatusDataDomain = { referringAreaType: "city", ttl: 30*60*1000, saveAlsoInIntermediateLevels: false }; // 30 minutes TTL.
 
 module.exports = async (event, context) => {
   const videoFootageData = event.body.footage_data;
