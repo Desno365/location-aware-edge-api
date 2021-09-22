@@ -43,34 +43,3 @@ class EdgeReceiver(object):
             processed_time = self.simpy_env.now
             if Utils.PRINT_TIME_MESSAGES:
                 print(f"{self.name} processed at {processed_time}, processing time: {processed_time - ready_time}")
-
-            time_to_aggregate = get_latency_edge_from_location_to_city()
-            yield self.simpy_env.timeout(time_to_aggregate)
-            finish_time = self.simpy_env.now
-            if Utils.PRINT_TIME_MESSAGES:
-                print(f"{self.name} finished at {finish_time}, delta time {finish_time - arrive_time}")
-
-
-# 50 ms latency from 95% of the world’s Internet-connected population. 95% = 2*std + mean
-def get_latency_edge_from_client_to_location():
-    return Utils.get_random_positive_gaussian_value(mean=30.0, std=10.0)
-
-
-# Faster connection than client-location, so also less std.
-def get_latency_edge_from_location_to_city():
-    return Utils.get_random_positive_gaussian_value(mean=15.0, std=3.3)
-
-
-# Faster connection than client-location but more spread apart
-def get_latency_edge_from_city_to_territory():
-    return Utils.get_random_positive_gaussian_value(mean=30.0, std=6.6)
-
-
-# Faster connection than client-location but a lot more spread apart
-def get_latency_edge_from_territory_to_country():
-    return Utils.get_random_positive_gaussian_value(mean=40.0, std=8.8)
-
-
-# Faster connection than client-location but a lot more spread apart
-def get_latency_edge_from_country_to_continent():
-    return Utils.get_random_positive_gaussian_value(mean=60.0, std=13.2)
