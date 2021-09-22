@@ -3,7 +3,7 @@ from typing import Any
 import simpy
 
 from processing_unit import ProcessingUnit
-
+from utils import Utils
 
 EDGE_AGGREGATOR_CAPACITY = 8  # Number of processes an edge aggregator can handle simultaneously (number of cores).
 EDGE_AGGREGATOR_BANDWIDTH_CAPABILITY = 2/1000  # MB that an edge aggregator core can process in a millisecond.
@@ -25,4 +25,4 @@ class EdgeAggregator(ProcessingUnit):
         return megabytes_of_data / EDGE_AGGREGATOR_BANDWIDTH_CAPABILITY
 
     def on_processing_ended(self, incoming_message: Any):
-        pass
+        Utils.total_number_of_data_packages_processed += 1
