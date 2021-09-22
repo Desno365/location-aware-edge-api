@@ -19,6 +19,11 @@ EXTRA_STD_DELAY_FOR_ROBUST_NETWORK = 1.0
 
 class Transmission(object):
     def __init__(self, simpy_env: simpy.Environment, mean_distance_km: float, std_distance_km: float, is_weak_network: bool):
+        assert simpy_env is not None
+        assert mean_distance_km > 0.0
+        assert std_distance_km > 0.0
+        assert is_weak_network is True or is_weak_network is False
+
         self.simpy_env = simpy_env
         self.mean_distance_km = mean_distance_km
         self.std_distance_km = std_distance_km
