@@ -56,3 +56,9 @@ node_modules/
 # OpenFaas related
 template/
 build/
+
+# Python Simulator
+__pycache__/
+.pytest_cache/
+*.py[cod]
+*$py.class
