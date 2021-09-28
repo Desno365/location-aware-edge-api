@@ -1,3 +1,5 @@
+from typing import Tuple
+
 import simpy
 from simpy.resources.store import StoreGet
 
@@ -6,7 +8,7 @@ from utils import Utils
 
 SPEED_OF_LIGHT_M_PER_S: float = 299792458.0  # In m/s
 SPEED_OF_LIGHT_KM_PER_MS: float = (SPEED_OF_LIGHT_M_PER_S / 1000) / 1000  # In kilometers per millisecond
-SPEED_OF_SIGNAL_KM_PER_MS: float = 0.67 * SPEED_OF_LIGHT_KM_PER_MS  # Speed of signal in optical fibers is 67% of the speed of light in vacuum. Ref: https://www.commscope.com/globalassets/digizuite/2799-latency-in-optical-fiber-systems-wp-111432-en.pdf?r=1
+SPEED_OF_SIGNAL_KM_PER_MS: float = 0.25 * 0.67 * SPEED_OF_LIGHT_KM_PER_MS  # Speed of signal in optical fibers is 67% of the speed of light in vacuum. Ref: https://www.commscope.com/globalassets/digizuite/2799-latency-in-optical-fiber-systems-wp-111432-en.pdf?r=1
 
 # The network near the client is not as fast as the backbone network.
 # The wireless connections increase the latency, and it's easy to miss a packet.
@@ -18,28 +20,28 @@ EXTRA_STD_DELAY_FOR_ROBUST_NETWORK = 1.0
 
 
 class Transmission(object):
-    def __init__(self, simpy_env: simpy.Environment, mean_distance_km: float, std_distance_km: float, is_weak_network: bool):
+    def __init__(self, simpy_env: simpy.Environment, mean_distance_km: float, std_distance_km: float, has_weak_network_initial_delay: bool):
         assert simpy_env is not None
         assert mean_distance_km > 0.0
         assert std_distance_km > 0.0
-        assert is_weak_network is True or is_weak_network is False
+        assert has_weak_network_initial_delay is True or has_weak_network_initial_delay is False
 
         self.simpy_env = simpy_env
         self.mean_distance_km = mean_distance_km
         self.std_distance_km = std_distance_km
-        self.is_weak_network = is_weak_network
+        self.is_weak_network = has_weak_network_initial_delay
         self.store = simpy.Store(simpy_env, capacity=simpy.core.Infinity)
 
-    def put_in_cable(self, megabytes_of_data: float):
-        self.simpy_env.process(self.put_with_latency(megabytes_of_data))
+    def put_in_cable(self, megabytes_of_data_with_creation_time: Tuple[float, simpy.core.SimTime]):
+        self.simpy_env.process(self.put_with_latency(megabytes_of_data_with_creation_time))
 
     def get_from_cable(self) -> StoreGet:
         return self.store.get()
 
-    def put_with_latency(self, megabytes_of_data: float):
+    def put_with_latency(self, megabytes_of_data_with_creation_time: Tuple[float, simpy.core.SimTime]):
         delay = self.get_random_cable_delay()
         yield self.simpy_env.timeout(delay)
-        self.store.put(megabytes_of_data)
+        self.store.put(megabytes_of_data_with_creation_time)
 
     def get_random_cable_delay(self) -> float:
         distance = Utils.get_random_positive_gaussian_value(mean=self.mean_distance_km, std=self.std_distance_km)

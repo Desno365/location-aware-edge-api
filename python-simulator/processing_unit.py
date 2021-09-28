@@ -3,28 +3,31 @@ from typing import Any
 
 import simpy
 
+from results_container import ResultsContainer
 from transmission import Transmission
 from utils import Utils
 
 
 class ProcessingUnit(metaclass=abc.ABCMeta):
 
-    def __init__(self, simpy_env: simpy.Environment, name: str, number_of_cores: int, mean_distance_km: float, std_distance_km: float, is_weak_network: bool):
+    def __init__(self, simpy_env: simpy.Environment, results_container: ResultsContainer, name: str, number_of_cores: int, mean_distance_km: float, std_distance_km: float, has_weak_network_initial_delay: bool):
         assert simpy_env is not None
+        assert results_container is not None
         assert name is not None
         assert number_of_cores > 0
         assert mean_distance_km > 0.0
         assert std_distance_km > 0.0
-        assert is_weak_network is True or is_weak_network is False
+        assert has_weak_network_initial_delay is True or has_weak_network_initial_delay is False
 
         self.simpy_env = simpy_env
+        self.results_container = results_container
         self.name = name
         self.cores_resource = simpy.Resource(env=simpy_env, capacity=number_of_cores)
         self.incoming_transmission = Transmission(
             simpy_env=simpy_env,
             mean_distance_km=mean_distance_km,
             std_distance_km=std_distance_km,
-            is_weak_network=is_weak_network
+            has_weak_network_initial_delay=has_weak_network_initial_delay
         )
 
     def get_incoming_transmission(self) -> Transmission:
@@ -48,7 +51,7 @@ class ProcessingUnit(metaclass=abc.ABCMeta):
         with self.cores_resource.request() as req:
             yield req
             ready_time = self.simpy_env.now
-            if (ready_time - arrive_time) > 0.0:
+            if Utils.PRINT_CORE_BUSY_MESSAGES and (ready_time - arrive_time) > 0.0:
                 print(f'Cores in {self.name} where not free, waiting time: {ready_time - arrive_time}')
 
             time_to_process = self.get_processing_time(incoming_message=incoming_message)
