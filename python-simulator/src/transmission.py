@@ -19,6 +19,9 @@ EXTRA_MEAN_DELAY_FOR_ROBUST_NETWORK = 5.0
 EXTRA_STD_DELAY_FOR_ROBUST_NETWORK = 1.0
 
 
+DataMessageType = Tuple[float, simpy.core.SimTime, simpy.core.SimTime]
+
+
 class Transmission(object):
     def __init__(self, simpy_env: simpy.Environment, mean_distance_km: float, std_distance_km: float, has_weak_network_initial_delay: bool):
         assert simpy_env is not None
@@ -32,13 +35,13 @@ class Transmission(object):
         self.is_weak_network = has_weak_network_initial_delay
         self.store = simpy.Store(simpy_env, capacity=simpy.core.Infinity)
 
-    def put_in_cable(self, megabytes_of_data_with_creation_time: Tuple[float, simpy.core.SimTime]):
+    def put_in_cable(self, megabytes_of_data_with_creation_time: DataMessageType):
         self.simpy_env.process(self.put_with_latency(megabytes_of_data_with_creation_time))
 
     def get_from_cable(self) -> StoreGet:
         return self.store.get()
 
-    def put_with_latency(self, megabytes_of_data_with_creation_time: Tuple[float, simpy.core.SimTime]):
+    def put_with_latency(self, megabytes_of_data_with_creation_time: DataMessageType):
         delay = self.get_random_cable_delay()
         yield self.simpy_env.timeout(delay)
         self.store.put(megabytes_of_data_with_creation_time)

@@ -1,18 +1,17 @@
 import abc
-from typing import Any
 
 import simpy
 
-from results_container import ResultsContainer
-from transmission import Transmission
-from utils import Utils
+from src.result_container import ResultContainer
+from src.transmission import Transmission, DataMessageType
+from src.utils import Utils
 
 
 class ProcessingUnit(metaclass=abc.ABCMeta):
 
-    def __init__(self, simpy_env: simpy.Environment, results_container: ResultsContainer, name: str, number_of_cores: int, mean_distance_km: float, std_distance_km: float, has_weak_network_initial_delay: bool):
+    def __init__(self, simpy_env: simpy.Environment, result_container: ResultContainer, name: str, number_of_cores: int, mean_distance_km: float, std_distance_km: float, has_weak_network_initial_delay: bool):
         assert simpy_env is not None
-        assert results_container is not None
+        assert result_container is not None
         assert name is not None
         assert number_of_cores > 0
         assert mean_distance_km > 0.0
@@ -20,7 +19,7 @@ class ProcessingUnit(metaclass=abc.ABCMeta):
         assert has_weak_network_initial_delay is True or has_weak_network_initial_delay is False
 
         self.simpy_env = simpy_env
-        self.results_container = results_container
+        self.result_container = result_container
         self.name = name
         self.cores_resource = simpy.Resource(env=simpy_env, capacity=number_of_cores)
         self.incoming_transmission = Transmission(
@@ -45,9 +44,11 @@ class ProcessingUnit(metaclass=abc.ABCMeta):
             if Utils.PRINT_TIME_MESSAGES:
                 print(f'{self.name} received message {message} at {arrive_time}')
 
+            self.on_data_message_received(incoming_message=message)
+
             self.simpy_env.process(self.single_core_process(incoming_message=message, arrive_time=arrive_time))
 
-    def single_core_process(self, incoming_message: Any, arrive_time: simpy.core.SimTime):
+    def single_core_process(self, incoming_message: DataMessageType, arrive_time: simpy.core.SimTime):
         with self.cores_resource.request() as req:
             yield req
             ready_time = self.simpy_env.now
@@ -60,12 +61,16 @@ class ProcessingUnit(metaclass=abc.ABCMeta):
             if Utils.PRINT_TIME_MESSAGES:
                 print(f"{self.name} processed at {processed_time}, processing time: {processed_time - ready_time}")
 
-            self.on_processing_ended(incoming_message=incoming_message)
+            self.on_processing_ended(incoming_message=incoming_message, total_processing_time=processed_time-arrive_time)
 
     @abc.abstractmethod
-    def get_processing_time(self, incoming_message: Any):
+    def on_data_message_received(self, incoming_message: DataMessageType) -> None:
         pass
 
     @abc.abstractmethod
-    def on_processing_ended(self, incoming_message: Any):
+    def get_processing_time(self, incoming_message: DataMessageType) -> float:
+        pass
+
+    @abc.abstractmethod
+    def on_processing_ended(self, incoming_message: DataMessageType, total_processing_time: float) -> None:
         pass

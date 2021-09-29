@@ -2,13 +2,15 @@ import multiprocessing
 import random
 from typing import Dict
 
+import numpy as np
 import simpy
+from matplotlib import pyplot as plt
 
-from cloud_receiver_and_aggregator import CloudReceiverAndAggregator
+from src.processing_units.cloud_receiver_and_aggregator import CloudReceiverAndAggregator
 from data_producer import DataProducer
-from edge_aggregator import EdgeAggregator
-from edge_receiver import EdgeReceiver
-from results_container import ResultsContainer
+from src.processing_units.edge_aggregator import EdgeAggregator
+from src.processing_units.edge_receiver import EdgeReceiver
+from result_container import ResultContainer
 
 '''
 https://www.cloudping.info/
@@ -48,7 +50,7 @@ Then it can become:
 - Only computation performed locally (ex: publishing videos on social network to avoid modded client)
 '''
 
-SIMULATION_DURATION = 2*60*1000  # In milliseconds.
+SIMULATION_DURATION = 2*60*100  # In milliseconds.
 RANDOM_SEED = 42
 TOTAL_NUMBER_OF_PRODUCER_CLIENTS = 10000
 
@@ -112,11 +114,11 @@ CONFIGURATIONS = [
 ]
 
 
-def run_configuration(config: Dict) -> ResultsContainer:
+def run_configuration(config: Dict) -> ResultContainer:
     print(f"################## Running configuration: {config['configuration_name']}")
 
     # Setup the simulation.
-    results_container = ResultsContainer(config['configuration_name'])
+    result_container = ResultContainer(simulation_name=config['configuration_name'], simulation_type=config['type'])
     random.seed(RANDOM_SEED)
     env = simpy.Environment()
 
@@ -124,7 +126,7 @@ def run_configuration(config: Dict) -> ResultsContainer:
     if config["type"] == "edge":  # If edge, setup edge_aggregators, edge_receivers and data_producers
         edge_aggregators = []
         for i in range(config["#edge_aggregators"]):
-            edge_aggregator = EdgeAggregator(simpy_env=env, results_container=results_container, name=f'EdgeAggregator{i}', mean_distance_km=config['mean_distance_receiver_aggregator'], std_distance_km=config['std_distance_receiver_aggregator'])
+            edge_aggregator = EdgeAggregator(simpy_env=env, result_container=result_container, name=f'EdgeAggregator{i}', mean_distance_km=config['mean_distance_receiver_aggregator'], std_distance_km=config['std_distance_receiver_aggregator'])
             edge_aggregator.start_listening_for_incoming_data()
             edge_aggregators.append(edge_aggregator)
 
@@ -132,22 +134,22 @@ def run_configuration(config: Dict) -> ResultsContainer:
         for i in range(config["#edge_receivers"]):
             connected_edge_aggregator = random.choice(edge_aggregators)
             transmission = connected_edge_aggregator.get_incoming_transmission()
-            edge_receiver = EdgeReceiver(simpy_env=env, results_container=results_container, name=f'EdgeReceiver{i}', transmission_to_aggregator=transmission,  mean_distance_km=config['mean_distance_producer_receiver'], std_distance_km=config['std_distance_producer_receiver'])
+            edge_receiver = EdgeReceiver(simpy_env=env, result_container=result_container, name=f'EdgeReceiver{i}', transmission_to_aggregator=transmission, mean_distance_km=config['mean_distance_producer_receiver'], std_distance_km=config['std_distance_producer_receiver'])
             edge_receiver.start_listening_for_incoming_data()
             edge_receivers.append(edge_receiver)
 
         for i in range(TOTAL_NUMBER_OF_PRODUCER_CLIENTS):
             connected_edge_receiver = random.choice(edge_receivers)
             transmission = connected_edge_receiver.get_incoming_transmission()
-            data_producer = DataProducer(simpy_env=env, results_container=results_container, name=f'DataProducer{i}', transmission_to_data_collector=transmission)
+            data_producer = DataProducer(simpy_env=env, result_container=result_container, name=f'DataProducer{i}', transmission_to_data_collector=transmission)
             data_producer.start_producing_data()
     elif config["type"] == "cloud":  # If cloud, setup the cloud and data_producers
-        cloud = CloudReceiverAndAggregator(simpy_env=env, results_container=results_container, name='Cloud', mean_distance_km=config['mean_distance_receiver_cloud'], std_distance_km=config['std_distance_receiver_cloud'])
+        cloud = CloudReceiverAndAggregator(simpy_env=env, result_container=result_container, name='Cloud', mean_distance_km=config['mean_distance_receiver_cloud'], std_distance_km=config['std_distance_receiver_cloud'])
         cloud.start_listening_for_incoming_data()
 
         for i in range(TOTAL_NUMBER_OF_PRODUCER_CLIENTS):
             transmission = cloud.get_incoming_transmission()
-            data_producer = DataProducer(simpy_env=env, results_container=results_container, name=f'DataProducer{i}', transmission_to_data_collector=transmission)
+            data_producer = DataProducer(simpy_env=env, result_container=result_container, name=f'DataProducer{i}', transmission_to_data_collector=transmission)
             data_producer.start_producing_data()
     else:
         raise Exception('Type not recognized')
@@ -155,9 +157,44 @@ def run_configuration(config: Dict) -> ResultsContainer:
     # Run simulation.
     env.run(until=SIMULATION_DURATION)
 
-    results_container.print_results()
-    return results_container
+    result_container.print_result()
+    return result_container
 
 
 pool = multiprocessing.Pool()
 results = pool.map(run_configuration, CONFIGURATIONS)
+
+# Prepare plot variables
+total_latencies = [result.get_average_total_latency() for result in results]
+first_latencies = [result.get_average_first_link_latency() for result in results]
+first_processing_latencies = [result.get_average_first_processing_latency() for result in results]
+second_latencies = [result.get_average_second_link_latency() for result in results]
+second_processing_latencies = [result.get_average_second_processing_latency() for result in results]
+bars1 = first_latencies
+bars2 = first_processing_latencies
+bars3 = second_latencies
+bars4 = second_processing_latencies
+bars_1_plus_2 = np.add(bars1, bars2).tolist()
+bars_1_plus_2_plus_3 = np.add(bars_1_plus_2, bars3).tolist()
+names = [result.simulation_name.replace(" ", "\n") for result in results]
+colors = ['green' if result.simulation_type == 'edge' else 'red' for result in results]
+x_positions = (range(len(results)))
+
+# Plot total latency.
+plt.figure(figsize=(8, 6))
+plt.bar(x_positions, total_latencies, color=colors)
+plt.axes().yaxis.grid()  # horizontal lines
+plt.xticks(x_positions, names)
+plt.ylabel("Latency")
+plt.show()
+
+# Plot sum of latencies.
+plt.figure(figsize=(8, 6))
+plt.bar(x_positions, bars1, color='#7f6d5f', edgecolor='white')
+plt.bar(x_positions, bars2, bottom=bars1, color='#557f2d', edgecolor='white')
+plt.bar(x_positions, bars3, bottom=bars_1_plus_2, color='#2d7f5e', edgecolor='white')
+plt.bar(x_positions, bars4, bottom=bars_1_plus_2_plus_3, color='#34e363', edgecolor='white')
+plt.xticks(x_positions, names)
+plt.ylabel("Latency")
+plt.legend(["First link", "Processing", "Second Link", "Aggregation"])
+plt.show()

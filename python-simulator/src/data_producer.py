@@ -1,6 +1,6 @@
 import simpy
 
-from results_container import ResultsContainer
+from result_container import ResultContainer
 from transmission import Transmission
 from utils import Utils
 
@@ -12,9 +12,9 @@ STD_SIZE_FOR_NEW_DATA_PRODUCED = 0.200  # In MB.
 
 class DataProducer(object):
 
-    def __init__(self, simpy_env: simpy.Environment, results_container: ResultsContainer, name: str, transmission_to_data_collector: Transmission):
+    def __init__(self, simpy_env: simpy.Environment, result_container: ResultContainer, name: str, transmission_to_data_collector: Transmission):
         self.simpy_env = simpy_env
-        self.results_container = results_container
+        self.result_container = result_container
         self.name = name
         self.transmission_to_data_collector = transmission_to_data_collector
 
@@ -31,8 +31,9 @@ class DataProducer(object):
             # Send random data size.
             created_data_size = Utils.get_random_positive_gaussian_value(mean=MEAN_SIZE_FOR_NEW_DATA_PRODUCED, std=STD_SIZE_FOR_NEW_DATA_PRODUCED)
             data_creation_timestamp = self.simpy_env.now
-            message = (created_data_size, data_creation_timestamp)
+            data_sent_timestamp = self.simpy_env.now
+            message = (created_data_size, data_creation_timestamp, data_sent_timestamp)
             if Utils.PRINT_TIME_MESSAGES:
                 print(f'{self.name} has waited {time_to_wait_for_next_data} and now is sending {created_data_size} MB of data.')
             self.transmission_to_data_collector.put_in_cable(message)
-            self.results_container.data_packages_produced += 1
+            self.result_container.data_packages_produced += 1
