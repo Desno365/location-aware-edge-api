@@ -6,7 +6,7 @@ class ResultContainer:
 
         self.data_packages_produced = 0
 
-        # Latencies variables.
+        # Write latencies variables.
         
         self.data_packages_passing_first_link = 0
         self.total_latency_first_link = 0.0
@@ -24,8 +24,14 @@ class ResultContainer:
         self.total_latency_from_creation_to_aggregation = 0.0
 
         # Traffic variables.
+
         self.traffic_per_distance_first_link = 0.0
         self.traffic_per_distance_second_link = 0.0
+
+        # Read latencies variables.
+
+        self.total_read_distance = 0.0
+        self.total_read_latency = 0.0
         
     def print_result(self) -> None:
         total_as_sum = self.get_average_first_link_latency() + self.get_average_first_processing_latency() + self.get_average_second_link_latency() + self.get_average_second_processing_latency()

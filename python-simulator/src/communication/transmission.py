@@ -39,19 +39,22 @@ class Transmission(object):
         return self.store.get()
 
     def put_with_latency(self, message: DataMessage):
-        distance, delay = self.get_cable_distance_and_delay()
+        distance, delay = Transmission.get_cable_distance_and_delay(mean_distance_km=self.mean_distance_km, std_distance_km=self.std_distance_km, is_weak_network=self.is_weak_network)
         message.set_distance_traveled(distance)
         message.set_latency_acquired(delay)
         yield self.simpy_env.timeout(delay)
         self.store.put(message)
 
-    def get_cable_distance_and_delay(self) -> Tuple[float, float]:
-        if self.is_weak_network:
-            network_delay = Utils.get_random_positive_gaussian_value(mean=EXTRA_MEAN_DELAY_FOR_WEAK_NETWORK, std=EXTRA_STD_DELAY_FOR_WEAK_NETWORK)
+    @staticmethod
+    def get_cable_distance_and_delay(mean_distance_km: float, std_distance_km: float, is_weak_network: bool) -> Tuple[float, float]:
+        if is_weak_network:
+            network_delay = Utils.get_random_positive_gaussian_value(mean=EXTRA_MEAN_DELAY_FOR_WEAK_NETWORK,
+                                                                     std=EXTRA_STD_DELAY_FOR_WEAK_NETWORK)
         else:
-            network_delay = Utils.get_random_positive_gaussian_value(mean=EXTRA_MEAN_DELAY_FOR_ROBUST_NETWORK, std=EXTRA_STD_DELAY_FOR_ROBUST_NETWORK)
+            network_delay = Utils.get_random_positive_gaussian_value(mean=EXTRA_MEAN_DELAY_FOR_ROBUST_NETWORK,
+                                                                     std=EXTRA_STD_DELAY_FOR_ROBUST_NETWORK)
 
-        distance = Utils.get_random_positive_gaussian_value(mean=self.mean_distance_km, std=self.std_distance_km)
+        distance = Utils.get_random_positive_gaussian_value(mean=mean_distance_km, std=std_distance_km)
         distance_delay = distance / SPEED_OF_SIGNAL_KM_PER_MS  # time = distance / speed
 
         return distance, (network_delay + distance_delay)

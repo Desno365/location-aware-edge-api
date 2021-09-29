@@ -119,7 +119,7 @@ def run_configuration(config: Dict) -> ResultContainer:
 
     # Setup the simulation.
     result_container = ResultContainer(simulation_name=config['configuration_name'], simulation_type=config['type'])
-    random.seed(RANDOM_SEED)
+    # random.seed(RANDOM_SEED)
     env = simpy.Environment()
 
     # Setup processes in the simulation.
