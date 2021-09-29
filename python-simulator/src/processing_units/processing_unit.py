@@ -2,8 +2,9 @@ import abc
 
 import simpy
 
+from src.communication.data_message import DataMessage
 from src.result_container import ResultContainer
-from src.transmission import Transmission, DataMessageType
+from src.communication.transmission import Transmission
 from src.utils import Utils
 
 
@@ -48,7 +49,7 @@ class ProcessingUnit(metaclass=abc.ABCMeta):
 
             self.simpy_env.process(self.single_core_process(incoming_message=message, arrive_time=arrive_time))
 
-    def single_core_process(self, incoming_message: DataMessageType, arrive_time: simpy.core.SimTime):
+    def single_core_process(self, incoming_message: DataMessage, arrive_time: simpy.core.SimTime):
         with self.cores_resource.request() as req:
             yield req
             ready_time = self.simpy_env.now
@@ -64,13 +65,13 @@ class ProcessingUnit(metaclass=abc.ABCMeta):
             self.on_processing_ended(incoming_message=incoming_message, total_processing_time=processed_time-arrive_time)
 
     @abc.abstractmethod
-    def on_data_message_received(self, incoming_message: DataMessageType) -> None:
+    def on_data_message_received(self, incoming_message: DataMessage) -> None:
         pass
 
     @abc.abstractmethod
-    def get_processing_time(self, incoming_message: DataMessageType) -> float:
+    def get_processing_time(self, incoming_message: DataMessage) -> float:
         pass
 
     @abc.abstractmethod
-    def on_processing_ended(self, incoming_message: DataMessageType, total_processing_time: float) -> None:
+    def on_processing_ended(self, incoming_message: DataMessage, total_processing_time: float) -> None:
         pass

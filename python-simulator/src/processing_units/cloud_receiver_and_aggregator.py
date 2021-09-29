@@ -1,8 +1,8 @@
 import simpy
 
+from src.communication.data_message import DataMessage
 from src.processing_units.processing_unit import ProcessingUnit
 from src.result_container import ResultContainer
-from src.transmission import DataMessageType
 from src.utils import Utils
 
 CLOUD_CAPACITY = 1000  # Number of processes the cloud can handle simultaneously (number of cores).
@@ -24,26 +24,24 @@ class CloudReceiverAndAggregator(ProcessingUnit):
             has_weak_network_initial_delay=True
         )
 
-    def on_data_message_received(self, incoming_message: DataMessageType) -> None:
-        data_sent_timestamp = incoming_message[2]
-        first_link_latency = self.simpy_env.now - data_sent_timestamp
+    def on_data_message_received(self, incoming_message: DataMessage) -> None:
         self.result_container.data_packages_passing_first_link += 1
-        self.result_container.total_latency_first_link += first_link_latency
+        self.result_container.total_latency_first_link += incoming_message.latency_acquired
+        self.result_container.traffic_per_distance_first_link += (incoming_message.megabytes_of_data * incoming_message.distance_traveled)
 
-    def get_processing_time(self, incoming_message: DataMessageType) -> float:
-        megabytes_of_data = incoming_message[0]
+    def get_processing_time(self, incoming_message: DataMessage) -> float:
+        megabytes_of_data = incoming_message.megabytes_of_data
         start_delay = Utils.get_random_positive_gaussian_value(mean=MEAN_PROCESSING_START_DELAY, std=STD_PROCESSING_START_DELAY)
         time_to_process = start_delay + (megabytes_of_data / CLOUD_BANDWIDTH_CAPABILITY)
 
         return time_to_process
 
-    def on_processing_ended(self, incoming_message: DataMessageType, total_processing_time: float) -> None:
+    def on_processing_ended(self, incoming_message: DataMessage, total_processing_time: float) -> None:
         # Add processing time to results.
         self.result_container.data_packages_passing_first_processing += 1
         self.result_container.total_latency_first_processing += total_processing_time
 
         # Add start-to-finish time to results.
-        data_creation_timestamp = incoming_message[1]
-        total_latency = self.simpy_env.now - data_creation_timestamp
+        total_latency = self.simpy_env.now - incoming_message.original_data_creation_time
         self.result_container.data_packages_aggregated += 1
         self.result_container.total_latency_from_creation_to_aggregation += total_latency

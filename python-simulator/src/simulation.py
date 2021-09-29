@@ -50,7 +50,7 @@ Then it can become:
 - Only computation performed locally (ex: publishing videos on social network to avoid modded client)
 '''
 
-SIMULATION_DURATION = 2*60*100  # In milliseconds.
+SIMULATION_DURATION = 2*60*1000  # In milliseconds.
 RANDOM_SEED = 42
 TOTAL_NUMBER_OF_PRODUCER_CLIENTS = 10000
 
@@ -60,18 +60,18 @@ CONFIGURATIONS = [
         "type": "edge",
         "#edge_receivers": 5000,
         "#edge_aggregators": 1000,
-        "mean_distance_producer_receiver": 5.0,
-        "std_distance_producer_receiver": 2.0,
-        "mean_distance_receiver_aggregator": 20.0,
-        "std_distance_receiver_aggregator": 7.0,
+        "mean_distance_producer_receiver": 20.0,
+        "std_distance_producer_receiver": 8.0,
+        "mean_distance_receiver_aggregator": 50.0,
+        "std_distance_receiver_aggregator": 15.0,
     },
     {
         "configuration_name": "Territory Aggregation",
         "type": "edge",
         "#edge_receivers": 5000,
         "#edge_aggregators": 400,
-        "mean_distance_producer_receiver": 5.0,
-        "std_distance_producer_receiver": 2.0,
+        "mean_distance_producer_receiver": 20.0,
+        "std_distance_producer_receiver": 8.0,
         "mean_distance_receiver_aggregator": 300.0,
         "std_distance_receiver_aggregator": 100.0,
     },
@@ -80,8 +80,8 @@ CONFIGURATIONS = [
         "type": "edge",
         "#edge_receivers": 5000,
         "#edge_aggregators": 150,
-        "mean_distance_producer_receiver": 5.0,
-        "std_distance_producer_receiver": 2.0,
+        "mean_distance_producer_receiver": 20.0,
+        "std_distance_producer_receiver": 8.0,
         "mean_distance_receiver_aggregator": 700.0,
         "std_distance_receiver_aggregator": 300.0,
     },
@@ -90,8 +90,8 @@ CONFIGURATIONS = [
         "type": "edge",
         "#edge_receivers": 5000,
         "#edge_aggregators": 7,
-        "mean_distance_producer_receiver": 5.0,
-        "std_distance_producer_receiver": 2.0,
+        "mean_distance_producer_receiver": 20.0,
+        "std_distance_producer_receiver": 8.0,
         "mean_distance_receiver_aggregator": 1500.0,
         "std_distance_receiver_aggregator": 500.0,
     },
@@ -100,8 +100,8 @@ CONFIGURATIONS = [
         "type": "edge",
         "#edge_receivers": 5000,
         "#edge_aggregators": 1,
-        "mean_distance_producer_receiver": 5.0,
-        "std_distance_producer_receiver": 2.0,
+        "mean_distance_producer_receiver": 20.0,
+        "std_distance_producer_receiver": 8.0,
         "mean_distance_receiver_aggregator": 5000.0,
         "std_distance_receiver_aggregator": 2000.0,
     },
@@ -166,35 +166,65 @@ results = pool.map(run_configuration, CONFIGURATIONS)
 
 # Prepare plot variables
 total_latencies = [result.get_average_total_latency() for result in results]
-first_latencies = [result.get_average_first_link_latency() for result in results]
+first_link_latencies = [result.get_average_first_link_latency() for result in results]
 first_processing_latencies = [result.get_average_first_processing_latency() for result in results]
-second_latencies = [result.get_average_second_link_latency() for result in results]
+second_link_latencies = [result.get_average_second_link_latency() for result in results]
 second_processing_latencies = [result.get_average_second_processing_latency() for result in results]
-bars1 = first_latencies
-bars2 = first_processing_latencies
-bars3 = second_latencies
-bars4 = second_processing_latencies
-bars_1_plus_2 = np.add(bars1, bars2).tolist()
-bars_1_plus_2_plus_3 = np.add(bars_1_plus_2, bars3).tolist()
+first_traffic_per_distance = [result.get_average_first_link_traffic_per_distance() for result in results]
+second_traffic_per_distance = [result.get_average_second_link_traffic_per_distance() for result in results]
 names = [result.simulation_name.replace(" ", "\n") for result in results]
 colors = ['green' if result.simulation_type == 'edge' else 'red' for result in results]
 x_positions = (range(len(results)))
 
 # Plot total latency.
 plt.figure(figsize=(8, 6))
+plt.title('Write Latencies')
 plt.bar(x_positions, total_latencies, color=colors)
 plt.axes().yaxis.grid()  # horizontal lines
 plt.xticks(x_positions, names)
-plt.ylabel("Latency")
+plt.ylabel("Average Write Latency")
 plt.show()
 
 # Plot sum of latencies.
 plt.figure(figsize=(8, 6))
-plt.bar(x_positions, bars1, color='#7f6d5f', edgecolor='white')
-plt.bar(x_positions, bars2, bottom=bars1, color='#557f2d', edgecolor='white')
-plt.bar(x_positions, bars3, bottom=bars_1_plus_2, color='#2d7f5e', edgecolor='white')
-plt.bar(x_positions, bars4, bottom=bars_1_plus_2_plus_3, color='#34e363', edgecolor='white')
+plt.title('Write Latencies in details')
+bars1 = first_link_latencies
+bars2 = first_processing_latencies
+bars3 = second_link_latencies
+bars4 = second_processing_latencies
+bars_1_plus_2 = np.add(bars1, bars2).tolist()
+bars_1_plus_2_plus_3 = np.add(bars_1_plus_2, bars3).tolist()
+plt.bar(x_positions, bars1, color='#7f6d5f')
+plt.bar(x_positions, bars2, bottom=bars1, color='#557f2d')
+plt.bar(x_positions, bars3, bottom=bars_1_plus_2, color='#2d7f5e')
+plt.bar(x_positions, bars4, bottom=bars_1_plus_2_plus_3, color='#34e363')
 plt.xticks(x_positions, names)
-plt.ylabel("Latency")
+plt.ylabel("Average Write Latency")
 plt.legend(["First link", "Processing", "Second Link", "Aggregation"])
+plt.show()
+
+# Plot sum of traffic uncut.
+plt.figure(figsize=(8, 6))
+plt.title('Traffic * Distance')
+bars1 = first_traffic_per_distance
+bars2 = second_traffic_per_distance
+plt.bar(x_positions, bars1, color='#7f6d5f')
+plt.bar(x_positions, bars2, bottom=bars1, color='#557f2d')
+plt.xticks(x_positions, names)
+plt.ylabel("Average Traffic in MB * distance in Km")
+plt.legend(["First link", "Second Link"])
+plt.show()
+
+# Plot sum of traffic cut.
+plt.figure(figsize=(8, 6))
+cut_limit = int(1.5 * (first_traffic_per_distance[-2] + second_traffic_per_distance[-2]))
+plt.title(f'Traffic * Distance (cut at {cut_limit})')
+bars1 = first_traffic_per_distance
+bars2 = second_traffic_per_distance
+plt.bar(x_positions, bars1, color='#7f6d5f')
+plt.bar(x_positions, bars2, bottom=bars1, color='#557f2d')
+plt.axes().set_ylim([None, cut_limit])
+plt.xticks(x_positions, names)
+plt.ylabel("Average Traffic in MB * distance in Km")
+plt.legend(["First link", "Second Link"])
 plt.show()

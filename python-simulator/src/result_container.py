@@ -5,6 +5,8 @@ class ResultContainer:
         self.simulation_type = simulation_type
 
         self.data_packages_produced = 0
+
+        # Latencies variables.
         
         self.data_packages_passing_first_link = 0
         self.total_latency_first_link = 0.0
@@ -20,6 +22,10 @@ class ResultContainer:
 
         self.data_packages_aggregated = 0
         self.total_latency_from_creation_to_aggregation = 0.0
+
+        # Traffic variables.
+        self.traffic_per_distance_first_link = 0.0
+        self.traffic_per_distance_second_link = 0.0
         
     def print_result(self) -> None:
         total_as_sum = self.get_average_first_link_latency() + self.get_average_first_processing_latency() + self.get_average_second_link_latency() + self.get_average_second_processing_latency()
@@ -36,7 +42,12 @@ class ResultContainer:
               f"Average first link latency: {self.get_average_first_link_latency()}\n"
               f"Average first processing latency: {self.get_average_first_processing_latency()}\n"
               f"Average second link latency: {self.get_average_second_link_latency()}\n"
-              f"Average second processing latency: {self.get_average_second_processing_latency()}\n")
+              f"Average second processing latency: {self.get_average_second_processing_latency()}\n"
+              f"\n"
+              f"Average first link traffic per distance: {self.get_average_first_link_traffic_per_distance()}\n"
+              f"Average second link traffic per distance: {self.get_average_second_link_traffic_per_distance()}\n"
+        )
+
 
     def get_average_total_latency(self) -> float:
         return self.total_latency_from_creation_to_aggregation / self.data_packages_aggregated
@@ -58,3 +69,13 @@ class ResultContainer:
             return 0.0
         else:
             return self.total_latency_second_processing / self.data_packages_passing_second_processing
+
+
+    def get_average_first_link_traffic_per_distance(self) -> float:
+        return self.traffic_per_distance_first_link / self.data_packages_passing_first_link
+
+    def get_average_second_link_traffic_per_distance(self) -> float:
+        if self.data_packages_passing_second_link <= 0:
+            return 0.0
+        else:
+            return self.traffic_per_distance_second_link / self.data_packages_passing_second_link
