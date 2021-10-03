@@ -31,9 +31,11 @@ class EdgeReceiver(ProcessingUnit):
         self.transmission_to_aggregator = transmission_to_aggregator
 
     def on_data_message_received(self, incoming_message: DataMessage) -> None:
-        self.result_container.data_packages_passing_first_link += 1
-        self.result_container.total_latency_first_link += incoming_message.latency_acquired
-        self.result_container.traffic_per_distance_first_link += (incoming_message.megabytes_of_data * incoming_message.distance_traveled)
+        self.result_container.report_first_link_latency_traffic_and_distance(
+            latency=incoming_message.latency_acquired,
+            traffic=incoming_message.megabytes_of_data,
+            distance=incoming_message.distance_traveled,
+        )
 
     def get_processing_time(self, incoming_message: DataMessage) -> float:
         megabytes_of_data = incoming_message.megabytes_of_data
@@ -44,8 +46,7 @@ class EdgeReceiver(ProcessingUnit):
 
     def on_processing_ended(self, incoming_message: DataMessage, total_processing_time: float) -> None:
         # Add processing time to results.
-        self.result_container.data_packages_passing_first_processing += 1
-        self.result_container.total_latency_first_processing += total_processing_time
+        self.result_container.report_first_processing_latency(latency=total_processing_time)
 
         # Send processed message to aggregator.
         processed_data_size = Utils.get_random_positive_gaussian_value(mean=MEAN_SIZE_FOR_PROCESSED_DATA, std=STD_SIZE_FOR_PROCESSED_DATA)
