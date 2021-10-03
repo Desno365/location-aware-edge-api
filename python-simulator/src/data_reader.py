@@ -23,7 +23,7 @@ class DataReader(object):
             result_container: ResultContainer,
             name: str,
             probabilities: List[float],
-            transmission_to_location: Transmission,
+            transmission_to_district: Transmission,
             transmission_to_city: Transmission,
             transmission_to_territory: Transmission,
             transmission_to_country: Transmission,
@@ -35,7 +35,7 @@ class DataReader(object):
         self.result_container = result_container
         self.name = name
         self.probabilities = probabilities
-        self.transmission_to_location = transmission_to_location
+        self.transmission_to_district = transmission_to_district
         self.transmission_to_city = transmission_to_city
         self.transmission_to_territory = transmission_to_territory
         self.transmission_to_country = transmission_to_country
@@ -55,7 +55,7 @@ class DataReader(object):
             # Chose level to send.
             extraction = random.uniform(0.0, 1.0)
             if extraction - (self.probabilities[0]) <= 0.0:
-                transmission = self.transmission_to_location
+                transmission = self.transmission_to_district
             elif extraction - (self.probabilities[0] + self.probabilities[1]) <= 0.0:
                 transmission = self.transmission_to_city
             elif extraction - (self.probabilities[0] + self.probabilities[1] + self.probabilities[2]) <= 0.0:

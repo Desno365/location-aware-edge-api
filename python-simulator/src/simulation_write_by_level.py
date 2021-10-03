@@ -6,12 +6,16 @@ import numpy as np
 import simpy
 from matplotlib import pyplot as plt
 
+from data_producer import DataProducer
+from result_container import ResultContainer
 from src import architecture_parameters
 from src.processing_units.cloud_receiver_and_aggregator import CloudReceiverAndAggregator
-from data_producer import DataProducer
-from src.processing_units.edge_aggregator import EdgeAggregator
-from src.processing_units.edge_receiver import EdgeReceiver
-from result_container import ResultContainer
+from src.processing_units.edge_location_central import EdgeLocationCentral
+from src.processing_units.edge_location_city import EdgeLocationCity
+from src.processing_units.edge_location_continent import EdgeLocationContinent
+from src.processing_units.edge_location_country import EdgeLocationCountry
+from src.processing_units.edge_location_district import EdgeLocationDistrict
+from src.processing_units.edge_location_territory import EdgeLocationTerritory
 
 '''
 https://www.cloudping.info/
@@ -59,6 +63,7 @@ CONFIGURATIONS = [
     {
         "configuration_name": "City Aggregation",
         "type": "edge",
+        "aggregation_level": "city",
         "#edge_receivers": architecture_parameters.NUMBER_OF_DISTRICTS,
         "#edge_aggregators": architecture_parameters.NUMBER_OF_CITIES,
         "mean_distance_producer_receiver": architecture_parameters.MEAN_DISTANCE_CLIENT_DISTRICT,
@@ -69,6 +74,7 @@ CONFIGURATIONS = [
     {
         "configuration_name": "Territory Aggregation",
         "type": "edge",
+        "aggregation_level": "territory",
         "#edge_receivers": architecture_parameters.NUMBER_OF_DISTRICTS,
         "#edge_aggregators": architecture_parameters.NUMBER_OF_TERRITORIES,
         "mean_distance_producer_receiver": architecture_parameters.MEAN_DISTANCE_CLIENT_DISTRICT,
@@ -79,6 +85,7 @@ CONFIGURATIONS = [
     {
         "configuration_name": "Country Aggregation",
         "type": "edge",
+        "aggregation_level": "country",
         "#edge_receivers": architecture_parameters.NUMBER_OF_DISTRICTS,
         "#edge_aggregators": architecture_parameters.NUMBER_OF_COUNTRIES,
         "mean_distance_producer_receiver": architecture_parameters.MEAN_DISTANCE_CLIENT_DISTRICT,
@@ -89,6 +96,7 @@ CONFIGURATIONS = [
     {
         "configuration_name": "Continent Aggregation",
         "type": "edge",
+        "aggregation_level": "continent",
         "#edge_receivers": architecture_parameters.NUMBER_OF_DISTRICTS,
         "#edge_aggregators": architecture_parameters.NUMBER_OF_CONTINENTS,
         "mean_distance_producer_receiver": architecture_parameters.MEAN_DISTANCE_CLIENT_DISTRICT,
@@ -99,6 +107,7 @@ CONFIGURATIONS = [
     {
         "configuration_name": "Central Aggregation",
         "type": "edge",
+        "aggregation_level": "central",
         "#edge_receivers": architecture_parameters.NUMBER_OF_DISTRICTS,
         "#edge_aggregators": 1,
         "mean_distance_producer_receiver": architecture_parameters.MEAN_DISTANCE_CLIENT_DISTRICT,
@@ -127,7 +136,58 @@ def run_configuration(config: Dict) -> ResultContainer:
     if config["type"] == "edge":  # If edge, setup edge_aggregators, edge_receivers and data_producers
         edge_aggregators = []
         for i in range(config["#edge_aggregators"]):
-            edge_aggregator = EdgeAggregator(simpy_env=env, result_container=result_container, name=f'EdgeAggregator{i}', mean_distance_km=config['mean_distance_receiver_aggregator'], std_distance_km=config['std_distance_receiver_aggregator'])
+            if config["aggregation_level"] == "city":
+                edge_aggregator = EdgeLocationCity(
+                    simpy_env=env,
+                    result_container=result_container,
+                    name=f'EdgeAggregator{i}',
+                    is_data_coming_from_first_link=False,
+                    mean_distance_km=config['mean_distance_receiver_aggregator'],
+                    std_distance_km=config['std_distance_receiver_aggregator'],
+                    should_send_processed_data_to_aggregator=False,
+                )
+            elif config["aggregation_level"] == "territory":
+                edge_aggregator = EdgeLocationTerritory(
+                    simpy_env=env,
+                    result_container=result_container,
+                    name=f'EdgeAggregator{i}',
+                    is_data_coming_from_first_link=False,
+                    mean_distance_km=config['mean_distance_receiver_aggregator'],
+                    std_distance_km=config['std_distance_receiver_aggregator'],
+                    should_send_processed_data_to_aggregator=False,
+                )
+            elif config["aggregation_level"] == "country":
+                edge_aggregator = EdgeLocationCountry(
+                    simpy_env=env,
+                    result_container=result_container,
+                    name=f'EdgeAggregator{i}',
+                    is_data_coming_from_first_link=False,
+                    mean_distance_km=config['mean_distance_receiver_aggregator'],
+                    std_distance_km=config['std_distance_receiver_aggregator'],
+                    should_send_processed_data_to_aggregator=False,
+                )
+            elif config["aggregation_level"] == "continent":
+                edge_aggregator = EdgeLocationContinent(
+                    simpy_env=env,
+                    result_container=result_container,
+                    name=f'EdgeAggregator{i}',
+                    is_data_coming_from_first_link=False,
+                    mean_distance_km=config['mean_distance_receiver_aggregator'],
+                    std_distance_km=config['std_distance_receiver_aggregator'],
+                    should_send_processed_data_to_aggregator=False,
+                )
+            elif config["aggregation_level"] == "central":
+                edge_aggregator = EdgeLocationCentral(
+                    simpy_env=env,
+                    result_container=result_container,
+                    name=f'EdgeAggregator{i}',
+                    is_data_coming_from_first_link=False,
+                    mean_distance_km=config['mean_distance_receiver_aggregator'],
+                    std_distance_km=config['std_distance_receiver_aggregator'],
+                    should_send_processed_data_to_aggregator=False,
+                )
+            else:
+                raise Exception('Aggregation not recognized')
             edge_aggregator.start_listening_for_incoming_data()
             edge_aggregators.append(edge_aggregator)
 
@@ -135,7 +195,15 @@ def run_configuration(config: Dict) -> ResultContainer:
         for i in range(config["#edge_receivers"]):
             connected_edge_aggregator = random.choice(edge_aggregators)
             transmission = connected_edge_aggregator.get_incoming_transmission()
-            edge_receiver = EdgeReceiver(simpy_env=env, result_container=result_container, name=f'EdgeReceiver{i}', transmission_to_aggregator=transmission, mean_distance_km=config['mean_distance_producer_receiver'], std_distance_km=config['std_distance_producer_receiver'])
+            edge_receiver = EdgeLocationDistrict(
+                simpy_env=env,
+                result_container=result_container,
+                name=f'EdgeReceiver{i}',
+                mean_distance_km=config['mean_distance_producer_receiver'],
+                std_distance_km=config['std_distance_producer_receiver'],
+                should_send_processed_data_to_aggregator=True,
+                transmission_to_aggregator=transmission,
+            )
             edge_receiver.start_listening_for_incoming_data()
             edge_receivers.append(edge_receiver)
 

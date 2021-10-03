@@ -8,7 +8,12 @@ from matplotlib import pyplot as plt
 from result_container import ResultContainer
 from src import architecture_parameters
 from src.data_reader import DataReader
-from src.processing_units.edge_reader import EdgeReader
+from src.processing_units.edge_location_central import EdgeLocationCentral
+from src.processing_units.edge_location_city import EdgeLocationCity
+from src.processing_units.edge_location_continent import EdgeLocationContinent
+from src.processing_units.edge_location_country import EdgeLocationCountry
+from src.processing_units.edge_location_district import EdgeLocationDistrict
+from src.processing_units.edge_location_territory import EdgeLocationTerritory
 
 SIMULATION_DURATION = 2*60*100  # In milliseconds.
 RANDOM_SEED = 42
@@ -53,76 +58,84 @@ def run_configuration(config: Dict) -> ResultContainer:
     # random.seed(RANDOM_SEED)
     env = simpy.Environment()
 
-    edge_locations = []
+    edge_districts = []
     for i in range(architecture_parameters.NUMBER_OF_DISTRICTS):
-        edge_aggregator = EdgeReader(
+        edge_district = EdgeLocationDistrict(
             simpy_env=env,
             result_container=result_container,
             name=f'Location{i}',
             mean_distance_km=architecture_parameters.MEAN_DISTANCE_CLIENT_DISTRICT,
             std_distance_km=architecture_parameters.STD_DISTANCE_CLIENT_DISTRICT,
-            overwrite_number_of_cores=2,
+            should_send_processed_data_to_aggregator=False,
         )
-        edge_aggregator.start_listening_for_incoming_data()
-        edge_locations.append(edge_aggregator)
+        edge_district.start_listening_for_incoming_data()
+        edge_districts.append(edge_district)
 
     edge_cities = []
     for i in range(architecture_parameters.NUMBER_OF_CITIES):
-        edge_aggregator = EdgeReader(
+        edge_city = EdgeLocationCity(
             simpy_env=env,
             result_container=result_container,
             name=f'City{i}',
+            is_data_coming_from_first_link=True,
             mean_distance_km=architecture_parameters.MEAN_DISTANCE_CLIENT_CITY,
             std_distance_km=architecture_parameters.STD_DISTANCE_CLIENT_CITY,
+            should_send_processed_data_to_aggregator=False,
         )
-        edge_aggregator.start_listening_for_incoming_data()
-        edge_cities.append(edge_aggregator)
+        edge_city.start_listening_for_incoming_data()
+        edge_cities.append(edge_city)
 
     edge_territories = []
     for i in range(architecture_parameters.NUMBER_OF_TERRITORIES):
-        edge_aggregator = EdgeReader(
+        edge_territory = EdgeLocationTerritory(
             simpy_env=env,
             result_container=result_container,
             name=f'Territory{i}',
+            is_data_coming_from_first_link=True,
             mean_distance_km=architecture_parameters.MEAN_DISTANCE_CLIENT_TERRITORY,
             std_distance_km=architecture_parameters.STD_DISTANCE_CLIENT_TERRITORY,
+            should_send_processed_data_to_aggregator=False,
         )
-        edge_aggregator.start_listening_for_incoming_data()
-        edge_territories.append(edge_aggregator)
+        edge_territory.start_listening_for_incoming_data()
+        edge_territories.append(edge_territory)
 
     edge_countries = []
     for i in range(architecture_parameters.NUMBER_OF_COUNTRIES):
-        edge_aggregator = EdgeReader(
+        edge_country = EdgeLocationCountry(
             simpy_env=env,
             result_container=result_container,
             name=f'Country{i}',
+            is_data_coming_from_first_link=True,
             mean_distance_km=architecture_parameters.MEAN_DISTANCE_CLIENT_COUNTRY,
             std_distance_km=architecture_parameters.STD_DISTANCE_CLIENT_COUNTRY,
+            should_send_processed_data_to_aggregator=False,
         )
-        edge_aggregator.start_listening_for_incoming_data()
-        edge_countries.append(edge_aggregator)
+        edge_country.start_listening_for_incoming_data()
+        edge_countries.append(edge_country)
 
     edge_continents = []
     for i in range(architecture_parameters.NUMBER_OF_CONTINENTS):
-        edge_aggregator = EdgeReader(
+        edge_continent = EdgeLocationContinent(
             simpy_env=env,
             result_container=result_container,
             name=f'Continent{i}',
+            is_data_coming_from_first_link=True,
             mean_distance_km=architecture_parameters.MEAN_DISTANCE_CLIENT_CONTINENT,
             std_distance_km=architecture_parameters.STD_DISTANCE_CLIENT_CONTINENT,
-            overwrite_number_of_cores=1000,
+            should_send_processed_data_to_aggregator=False,
         )
-        edge_aggregator.start_listening_for_incoming_data()
-        edge_continents.append(edge_aggregator)
+        edge_continent.start_listening_for_incoming_data()
+        edge_continents.append(edge_continent)
 
-    central = EdgeReader(
-            simpy_env=env,
-            result_container=result_container,
-            name=f'Central',
-            mean_distance_km=architecture_parameters.MEAN_DISTANCE_CLIENT_CENTRAL,
-            std_distance_km=architecture_parameters.STD_DISTANCE_CLIENT_CENTRAL,
-            overwrite_number_of_cores=1000,
-        )
+    central = EdgeLocationCentral(
+        simpy_env=env,
+        result_container=result_container,
+        name=f'Central',
+        is_data_coming_from_first_link=True,
+        mean_distance_km=architecture_parameters.MEAN_DISTANCE_CLIENT_CENTRAL,
+        std_distance_km=architecture_parameters.STD_DISTANCE_CLIENT_CENTRAL,
+        should_send_processed_data_to_aggregator=False,
+    )
     central.start_listening_for_incoming_data()
 
     for i in range(TOTAL_NUMBER_OF_READER_CLIENTS):
@@ -131,7 +144,7 @@ def run_configuration(config: Dict) -> ResultContainer:
             result_container=result_container,
             name=f'DataProducer{i}',
             probabilities=probabilities,
-            transmission_to_location=random.choice(edge_locations).get_incoming_transmission(),
+            transmission_to_district=random.choice(edge_districts).get_incoming_transmission(),
             transmission_to_city=random.choice(edge_cities).get_incoming_transmission(),
             transmission_to_territory=random.choice(edge_territories).get_incoming_transmission(),
             transmission_to_country=random.choice(edge_countries).get_incoming_transmission(),
