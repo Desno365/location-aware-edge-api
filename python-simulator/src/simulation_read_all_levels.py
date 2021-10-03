@@ -15,7 +15,7 @@ from src.processing_units.edge_location_country import EdgeLocationCountry
 from src.processing_units.edge_location_district import EdgeLocationDistrict
 from src.processing_units.edge_location_territory import EdgeLocationTerritory
 
-SIMULATION_DURATION = 2*60*100  # In milliseconds.
+SIMULATION_DURATION = 2*60*1000  # In milliseconds.
 RANDOM_SEED = 42
 TOTAL_NUMBER_OF_READER_CLIENTS = 10000
 
@@ -165,7 +165,7 @@ results = pool.map(run_configuration, CONFIGURATIONS)
 
 # Prepare plot variables
 latencies = [result.get_average_total_latency() for result in results]
-# distances = [result.total_read_distance / TOTAL_NUMBER_OF_READER_CLIENTS for result in results]
+distances = [result.get_average_first_link_distance() + result.get_average_second_link_distance() for result in results]
 x_positions_true = range(len(results))
 x_positions_scaled = [x / (len(results)-1) for x in range(len(results))]
 
@@ -177,7 +177,7 @@ plt.bar(x_positions_true, latencies, color="green")
 plt.axes().yaxis.grid()  # horizontal lines
 plt.ylabel("Average Read Latency")
 plt.show()
-'''
+
 # Plot total distance.
 plt.figure(figsize=(8, 6))
 plt.title('Read Distances')
@@ -185,7 +185,7 @@ plt.bar(x_positions_true, distances, color="green")
 plt.axes().yaxis.grid()  # horizontal lines
 plt.ylabel("Average Read Distance")
 plt.show()
-'''
+
 # Plot total latency.
 plt.figure(figsize=(8, 6))
 plt.title('Read Latencies')
@@ -193,7 +193,7 @@ plt.fill_between(x_positions_scaled, latencies)
 plt.axes().yaxis.grid()  # horizontal lines
 plt.ylabel("Average Read Latency")
 plt.show()
-'''
+
 # Plot total distance.
 plt.figure(figsize=(8, 6))
 plt.title('Read Distances')
@@ -201,4 +201,3 @@ plt.fill_between(x_positions_scaled, distances)
 plt.axes().yaxis.grid()  # horizontal lines
 plt.ylabel("Average Read Distance")
 plt.show()
-'''

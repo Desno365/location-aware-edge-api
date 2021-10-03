@@ -54,7 +54,7 @@ Then it can become:
 - Only computation performed locally (ex: publishing videos on social network to avoid modded client)
 '''
 
-SIMULATION_DURATION = 2*60*100  # In milliseconds.
+SIMULATION_DURATION = 2*60*1000  # In milliseconds.
 RANDOM_SEED = 42
 TOTAL_NUMBER_OF_PRODUCER_CLIENTS = 10000
 
@@ -118,7 +118,7 @@ CONFIGURATIONS = [
         "configuration_name": "Cloud solution",
         "type": "cloud",
         "mean_distance_receiver_cloud": architecture_parameters.MEAN_DISTANCE_CLIENT_CENTRAL,
-        "std_distance_receiver_cloud":architecture_parameters.STD_DISTANCE_CLIENT_CENTRAL,
+        "std_distance_receiver_cloud": architecture_parameters.STD_DISTANCE_CLIENT_CENTRAL,
     },
 ]
 

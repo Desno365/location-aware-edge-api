@@ -9,7 +9,7 @@ class ResultContainer:
 
         self.data_packages_produced = 0
 
-        # Write latencies variables.
+        # Latencies variables.
         self.latency_first_link_list = []
         self.latency_first_processing_list = []
         self.latency_second_link_list = []
@@ -20,6 +20,10 @@ class ResultContainer:
         self.traffic_per_distance_first_link_list = []
         self.traffic_per_distance_second_link_list = []
 
+        # Distance variables.
+        self.distance_first_link_list = []
+        self.distance_second_link_list = []
+
         # Read latencies variables.
         self.total_read_distance = 0.0
         self.total_read_latency = 0.0
@@ -28,6 +32,7 @@ class ResultContainer:
         self.latency_first_link_list.append(latency)
         traffic_per_distance = (traffic * distance)
         self.traffic_per_distance_first_link_list.append(traffic_per_distance)
+        self.distance_first_link_list.append(distance)
 
     def report_first_processing_latency(self, latency: float) -> None:
         self.latency_first_processing_list.append(latency)
@@ -36,6 +41,7 @@ class ResultContainer:
         self.latency_second_link_list.append(latency)
         traffic_per_distance = (traffic * distance)
         self.traffic_per_distance_second_link_list.append(traffic_per_distance)
+        self.distance_second_link_list.append(distance)
 
     def report_second_processing_latency(self, latency: float) -> None:
         self.latency_second_processing_list.append(latency)
@@ -99,3 +105,13 @@ class ResultContainer:
         if len(self.latency_total_finished_list) == 0:
             return 0.0
         return statistics.mean(self.latency_total_finished_list)
+
+    def get_average_first_link_distance(self) -> float:
+        if len(self.distance_first_link_list) == 0:
+            return 0.0
+        return statistics.mean(self.distance_first_link_list)
+
+    def get_average_second_link_distance(self) -> float:
+        if len(self.distance_second_link_list) == 0:
+            return 0.0
+        return statistics.mean(self.distance_second_link_list)
