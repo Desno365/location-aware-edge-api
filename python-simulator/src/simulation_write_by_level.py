@@ -6,7 +6,7 @@ import numpy as np
 import simpy
 from matplotlib import pyplot as plt
 
-from data_producer import DataProducer
+from src.clients.data_producer import DataProducer
 from result_container import ResultContainer
 from src import architecture_parameters
 from src.processing_units.edge_location_central import EdgeLocationCentral

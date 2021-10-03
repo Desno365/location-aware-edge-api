@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 
 from result_container import ResultContainer
 from src import architecture_parameters
-from src.data_reader import DataReader
+from src.clients.data_reader import DataReader
 from src.processing_units.edge_location_central import EdgeLocationCentral
 from src.processing_units.edge_location_city import EdgeLocationCity
 from src.processing_units.edge_location_continent import EdgeLocationContinent

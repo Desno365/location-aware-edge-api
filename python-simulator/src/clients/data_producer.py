@@ -1,9 +1,9 @@
 import simpy
 
-from result_container import ResultContainer
 from src.communication.data_message import DataMessage
 from src.communication.transmission import Transmission
-from utils import Utils
+from src.result_container import ResultContainer
+from src.utils import Utils
 
 MEAN_TIME_FOR_NEW_DATA_PRODUCED = 10000.0  # In milliseconds.
 STD_TIME_FOR_NEW_DATA_PRODUCED = 3000.0  # In milliseconds.
