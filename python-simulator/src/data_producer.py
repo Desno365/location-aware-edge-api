@@ -7,8 +7,9 @@ from utils import Utils
 
 MEAN_TIME_FOR_NEW_DATA_PRODUCED = 10000.0  # In milliseconds.
 STD_TIME_FOR_NEW_DATA_PRODUCED = 3000.0  # In milliseconds.
-MEAN_SIZE_FOR_NEW_DATA_PRODUCED = 0.500  # In MB.
-STD_SIZE_FOR_NEW_DATA_PRODUCED = 0.200  # In MB.
+
+MEAN_SIZE_FOR_NEW_DATA_PRODUCED = 0.423  # In MB. Average Full HD JPG 100% quality: 423.41 KB. For average size used this tool https://toolstud.io/photo/megapixel.php
+STD_SIZE_FOR_NEW_DATA_PRODUCED = 0.150  # In MB.
 
 
 class DataProducer(object):

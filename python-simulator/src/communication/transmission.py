@@ -1,3 +1,4 @@
+import math
 from typing import Tuple
 
 import simpy
@@ -8,7 +9,10 @@ from src.utils import Utils
 
 SPEED_OF_LIGHT_M_PER_S: float = 299792458.0  # In m/s
 SPEED_OF_LIGHT_KM_PER_MS: float = (SPEED_OF_LIGHT_M_PER_S / 1000) / 1000  # In kilometers per millisecond
-SPEED_OF_SIGNAL_KM_PER_MS: float = 0.25 * 0.67 * SPEED_OF_LIGHT_KM_PER_MS  # Speed of signal in optical fibers is 67% of the speed of light in vacuum. Ref: https://www.commscope.com/globalassets/digizuite/2799-latency-in-optical-fiber-systems-wp-111432-en.pdf?r=1
+OPTICAL_FIBER_OFFSET = 0.67  # Speed of signal in optical fibers is 67% of the speed of light in vacuum. Ref: https://www.commscope.com/globalassets/digizuite/2799-latency-in-optical-fiber-systems-wp-111432-en.pdf?r=1
+ROUND_TRIP_OFFSET = 0.50  # Round trip makes the signal go back and forth.
+NO_LINE_OF_SIGHT_OFFSET = 1 / math.sqrt(2)  # ≈0.707  # The cables cannot make a direct path.
+SPEED_OF_SIGNAL_KM_PER_MS: float = SPEED_OF_LIGHT_KM_PER_MS * NO_LINE_OF_SIGHT_OFFSET * ROUND_TRIP_OFFSET * OPTICAL_FIBER_OFFSET
 
 # The network near the client is not as fast as the backbone network.
 # The wireless connections increase the latency, and it's easy to miss a packet.
