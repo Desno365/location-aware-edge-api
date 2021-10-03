@@ -20,8 +20,8 @@ class ResultContainer:
         self.data_packages_passing_second_processing = 0
         self.total_latency_second_processing = 0.0
 
-        self.data_packages_aggregated = 0
-        self.total_latency_from_creation_to_aggregation = 0.0
+        self.data_packages_finished = 0
+        self.total_latency_from_creation_to_end = 0.0
 
         # Traffic variables.
 
@@ -35,7 +35,7 @@ class ResultContainer:
         
     def print_result(self) -> None:
         total_as_sum = self.get_average_first_link_latency() + self.get_average_first_processing_latency() + self.get_average_second_link_latency() + self.get_average_second_processing_latency()
-        assert abs(self.get_average_total_latency() - total_as_sum) < 0.5  # Total should be almost equal to sum of parts (note: if too few time or data then it may be false).
+        assert abs(self.get_average_total_latency() - total_as_sum) < 0.5  # Total should be almost equal to sum of parts (note: if too few simulation-time or data then it may be false).
 
         print(f"Finished simulation {self.simulation_name}.\n"
               f"Created packages: {self.data_packages_produced}, "
@@ -43,7 +43,7 @@ class ResultContainer:
               f"first processed packages {self.data_packages_passing_first_processing}, "
               f"second link packages {self.data_packages_passing_second_link}, "
               f"second processed packages {self.data_packages_passing_second_processing}, "
-              f"aggregated packages {self.data_packages_aggregated}\n"
+              f"aggregated packages {self.data_packages_finished}\n"
               f"Average total latency: {self.get_average_total_latency()}\n"
               f"Average first link latency: {self.get_average_first_link_latency()}\n"
               f"Average first processing latency: {self.get_average_first_processing_latency()}\n"
@@ -56,13 +56,22 @@ class ResultContainer:
 
 
     def get_average_total_latency(self) -> float:
-        return self.total_latency_from_creation_to_aggregation / self.data_packages_aggregated
+        if self.data_packages_finished <= 0:
+            return 0.0
+        else:
+            return self.total_latency_from_creation_to_end / self.data_packages_finished
 
     def get_average_first_link_latency(self) -> float:
-        return self.total_latency_first_link / self.data_packages_passing_first_link
+        if self.data_packages_passing_first_link <= 0:
+            return 0.0
+        else:
+            return self.total_latency_first_link / self.data_packages_passing_first_link
 
     def get_average_first_processing_latency(self) -> float:
-        return self.total_latency_first_processing / self.data_packages_passing_first_processing
+        if self.data_packages_passing_first_processing <= 0:
+            return 0.0
+        else:
+            return self.total_latency_first_processing / self.data_packages_passing_first_processing
 
     def get_average_second_link_latency(self) -> float:
         if self.data_packages_passing_second_link <= 0:
@@ -78,7 +87,10 @@ class ResultContainer:
 
 
     def get_average_first_link_traffic_per_distance(self) -> float:
-        return self.traffic_per_distance_first_link / self.data_packages_passing_first_link
+        if self.data_packages_passing_first_link <= 0:
+            return 0.0
+        else:
+            return self.traffic_per_distance_first_link / self.data_packages_passing_first_link
 
     def get_average_second_link_traffic_per_distance(self) -> float:
         if self.data_packages_passing_second_link <= 0:

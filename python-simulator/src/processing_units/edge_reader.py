@@ -5,20 +5,20 @@ from src.processing_units.processing_unit import ProcessingUnit
 from src.result_container import ResultContainer
 from src.utils import Utils
 
-CLOUD_CAPACITY = 1000  # Number of processes the cloud can handle simultaneously (number of cores).
-CLOUD_BANDWIDTH_CAPABILITY = 20/1000  # MB that a cloud core can process in a millisecond.
+EDGE_AGGREGATOR_CAPACITY = 8  # Number of processes an edge aggregator can handle simultaneously (number of cores).
+EDGE_AGGREGATOR_BANDWIDTH_CAPABILITY = 15/1000  # MB that an edge aggregator core can process in a millisecond.
 
 MEAN_PROCESSING_START_DELAY = 4.0
 STD_PROCESSING_START_DELAY = 1.0
 
 
-class CloudReceiverAndAggregator(ProcessingUnit):
-    def __init__(self, simpy_env: simpy.Environment, result_container: ResultContainer, name: str, mean_distance_km: float, std_distance_km: float):
+class EdgeReader(ProcessingUnit):
+    def __init__(self, simpy_env: simpy.Environment, result_container: ResultContainer, name: str, mean_distance_km: float, std_distance_km: float, overwrite_number_of_cores: int = EDGE_AGGREGATOR_CAPACITY):
         super().__init__(
             simpy_env=simpy_env,
             result_container=result_container,
             name=name,
-            number_of_cores=CLOUD_CAPACITY,
+            number_of_cores=overwrite_number_of_cores,
             mean_distance_km=mean_distance_km,
             std_distance_km=std_distance_km,
             has_weak_network_initial_delay=True
@@ -32,7 +32,7 @@ class CloudReceiverAndAggregator(ProcessingUnit):
     def get_processing_time(self, incoming_message: DataMessage) -> float:
         megabytes_of_data = incoming_message.megabytes_of_data
         start_delay = Utils.get_random_positive_gaussian_value(mean=MEAN_PROCESSING_START_DELAY, std=STD_PROCESSING_START_DELAY)
-        time_to_process = start_delay + (megabytes_of_data / CLOUD_BANDWIDTH_CAPABILITY)
+        time_to_process = start_delay + (megabytes_of_data / EDGE_AGGREGATOR_BANDWIDTH_CAPABILITY)
 
         return time_to_process
 

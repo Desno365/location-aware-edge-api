@@ -43,5 +43,5 @@ class EdgeAggregator(ProcessingUnit):
 
         # Add start-to-finish time to results.
         total_latency = self.simpy_env.now - incoming_message.original_data_creation_time
-        self.result_container.data_packages_aggregated += 1
-        self.result_container.total_latency_from_creation_to_aggregation += total_latency
+        self.result_container.data_packages_finished += 1
+        self.result_container.total_latency_from_creation_to_end += total_latency

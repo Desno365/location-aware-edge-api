@@ -9,6 +9,9 @@ from src.utils import Utils
 EDGE_RECEIVER_CAPACITY = 2  # Number of processes an edge receiver can handle simultaneously (number of cores).
 EDGE_RECEIVER_BANDWIDTH_CAPABILITY = 10/1000  # MB that an edge receiver core can process in a millisecond.
 
+MEAN_SIZE_FOR_PROCESSED_DATA = 0.010  # In MB.
+STD_SIZE_FOR_PROCESSED_DATA = 0.001  # In MB.
+
 MEAN_PROCESSING_START_DELAY = 4.0
 STD_PROCESSING_START_DELAY = 1.0
 
@@ -45,7 +48,7 @@ class EdgeReceiver(ProcessingUnit):
         self.result_container.total_latency_first_processing += total_processing_time
 
         # Send processed message to aggregator.
-        processed_data_size = Utils.get_random_positive_gaussian_value(mean=0.010, std=0.001)
+        processed_data_size = Utils.get_random_positive_gaussian_value(mean=MEAN_SIZE_FOR_PROCESSED_DATA, std=STD_SIZE_FOR_PROCESSED_DATA)
         message = DataMessage(
             megabytes_of_data=processed_data_size,
             original_data_creation_time=incoming_message.original_data_creation_time,

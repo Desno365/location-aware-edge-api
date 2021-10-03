@@ -2,18 +2,11 @@ import multiprocessing
 import random
 from typing import Dict
 
-import numpy as np
-import simpy
 from matplotlib import pyplot as plt
 
-from src.communication.transmission import Transmission
-from src.processing_units.cloud_receiver_and_aggregator import CloudReceiverAndAggregator
-from data_producer import DataProducer
-from src.processing_units.edge_aggregator import EdgeAggregator
-from src.processing_units.edge_receiver import EdgeReceiver
 from result_container import ResultContainer
+from src.communication.transmission import Transmission
 
-SIMULATION_DURATION = 2*60*1000  # In milliseconds.
 RANDOM_SEED = 42
 TOTAL_NUMBER_OF_READER_CLIENTS = 10000
 
