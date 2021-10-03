@@ -5,33 +5,11 @@ from typing import Dict
 from matplotlib import pyplot as plt
 
 from result_container import ResultContainer
+from src import architecture_parameters
 from src.communication.transmission import Transmission
 
 RANDOM_SEED = 42
 TOTAL_NUMBER_OF_READER_CLIENTS = 10000
-
-NUMBER_OF_LOCATIONS = 5000
-MEAN_DISTANCE_READER_LOCATION = 20.0
-STD_DISTANCE_READER_LOCATION = 8.0
-
-NUMBER_OF_CITIES = 1000
-MEAN_DISTANCE_READER_CITY = 60.0
-STD_DISTANCE_READER_CITY = 15.0
-
-NUMBER_OF_TERRITORIES = 400
-MEAN_DISTANCE_READER_TERRITORY = 300.0
-STD_DISTANCE_READER_TERRITORY = 100.0
-
-NUMBER_OF_COUNTRIES = 150
-MEAN_DISTANCE_READER_COUNTRY = 700.0
-STD_DISTANCE_READER_COUNTRY = 300.0
-
-NUMBER_OF_CONTINENTS = 7
-MEAN_DISTANCE_READER_CONTINENT = 1500.0
-STD_DISTANCE_READER_CONTINENT = 500.0
-
-MEAN_DISTANCE_READER_CENTRAL = 5000.0
-STD_DISTANCE_READER_CENTRAL = 2000.0
 
 CONFIGURATIONS = [
     {"probabilities": [1.0, 0.0, 0.0, 0.0, 0.0, 0.0]},
@@ -77,23 +55,23 @@ def run_configuration(config: Dict) -> ResultContainer:
         std_distance_km = None
         extraction = random.uniform(0.0, 1.0)
         if extraction - (probabilities[0]) <= 0.0:
-            mean_distance_km = MEAN_DISTANCE_READER_LOCATION
-            std_distance_km = STD_DISTANCE_READER_LOCATION
+            mean_distance_km = architecture_parameters.MEAN_DISTANCE_CLIENT_DISTRICT
+            std_distance_km = architecture_parameters.STD_DISTANCE_CLIENT_DISTRICT
         elif extraction - (probabilities[0]+probabilities[1]) <= 0.0:
-            mean_distance_km = MEAN_DISTANCE_READER_CITY
-            std_distance_km = STD_DISTANCE_READER_CITY
+            mean_distance_km = architecture_parameters.MEAN_DISTANCE_CLIENT_CITY
+            std_distance_km = architecture_parameters.STD_DISTANCE_CLIENT_CITY
         elif extraction - (probabilities[0]+probabilities[1]+probabilities[2]) <= 0.0:
-            mean_distance_km = MEAN_DISTANCE_READER_TERRITORY
-            std_distance_km = STD_DISTANCE_READER_TERRITORY
+            mean_distance_km = architecture_parameters.MEAN_DISTANCE_CLIENT_TERRITORY
+            std_distance_km = architecture_parameters.STD_DISTANCE_CLIENT_TERRITORY
         elif extraction - (probabilities[0]+probabilities[1]+probabilities[2]+probabilities[3]) <= 0.0:
-            mean_distance_km = MEAN_DISTANCE_READER_COUNTRY
-            std_distance_km = STD_DISTANCE_READER_COUNTRY
+            mean_distance_km = architecture_parameters.MEAN_DISTANCE_CLIENT_COUNTRY
+            std_distance_km = architecture_parameters.STD_DISTANCE_CLIENT_COUNTRY
         elif extraction - (probabilities[0]+probabilities[1]+probabilities[2]+probabilities[3]+probabilities[4]) <= 0.0:
-            mean_distance_km = MEAN_DISTANCE_READER_CONTINENT
-            std_distance_km = STD_DISTANCE_READER_CONTINENT
+            mean_distance_km = architecture_parameters.MEAN_DISTANCE_CLIENT_CONTINENT
+            std_distance_km = architecture_parameters.STD_DISTANCE_CLIENT_CONTINENT
         elif extraction - (probabilities[0]+probabilities[1]+probabilities[2]+probabilities[3]+probabilities[4]+probabilities[5]) <= 0.0:
-            mean_distance_km = MEAN_DISTANCE_READER_CENTRAL
-            std_distance_km = STD_DISTANCE_READER_CENTRAL
+            mean_distance_km = architecture_parameters.MEAN_DISTANCE_CLIENT_CENTRAL
+            std_distance_km = architecture_parameters.STD_DISTANCE_CLIENT_CENTRAL
 
         distance, delay = Transmission.get_cable_distance_and_delay(mean_distance_km=mean_distance_km, std_distance_km=std_distance_km, is_weak_network=True)
         result_container.total_read_distance += distance

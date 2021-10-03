@@ -6,35 +6,13 @@ import simpy
 from matplotlib import pyplot as plt
 
 from result_container import ResultContainer
+from src import architecture_parameters
 from src.data_reader import DataReader
 from src.processing_units.edge_reader import EdgeReader
 
 SIMULATION_DURATION = 2*60*100  # In milliseconds.
 RANDOM_SEED = 42
 TOTAL_NUMBER_OF_READER_CLIENTS = 10000
-
-NUMBER_OF_LOCATIONS = 5000
-MEAN_DISTANCE_READER_LOCATION = 20.0
-STD_DISTANCE_READER_LOCATION = 8.0
-
-NUMBER_OF_CITIES = 1000
-MEAN_DISTANCE_READER_CITY = 60.0
-STD_DISTANCE_READER_CITY = 15.0
-
-NUMBER_OF_TERRITORIES = 400
-MEAN_DISTANCE_READER_TERRITORY = 300.0
-STD_DISTANCE_READER_TERRITORY = 100.0
-
-NUMBER_OF_COUNTRIES = 150
-MEAN_DISTANCE_READER_COUNTRY = 700.0
-STD_DISTANCE_READER_COUNTRY = 300.0
-
-NUMBER_OF_CONTINENTS = 7
-MEAN_DISTANCE_READER_CONTINENT = 1500.0
-STD_DISTANCE_READER_CONTINENT = 500.0
-
-MEAN_DISTANCE_READER_CENTRAL = 5000.0
-STD_DISTANCE_READER_CENTRAL = 2000.0
 
 CONFIGURATIONS = [
     {"probabilities": [1.0, 0.0, 0.0, 0.0, 0.0, 0.0]},
@@ -76,62 +54,62 @@ def run_configuration(config: Dict) -> ResultContainer:
     env = simpy.Environment()
 
     edge_locations = []
-    for i in range(NUMBER_OF_LOCATIONS):
+    for i in range(architecture_parameters.NUMBER_OF_DISTRICTS):
         edge_aggregator = EdgeReader(
             simpy_env=env,
             result_container=result_container,
             name=f'Location{i}',
-            mean_distance_km=MEAN_DISTANCE_READER_LOCATION,
-            std_distance_km=STD_DISTANCE_READER_LOCATION,
+            mean_distance_km=architecture_parameters.MEAN_DISTANCE_CLIENT_DISTRICT,
+            std_distance_km=architecture_parameters.STD_DISTANCE_CLIENT_DISTRICT,
             overwrite_number_of_cores=2,
         )
         edge_aggregator.start_listening_for_incoming_data()
         edge_locations.append(edge_aggregator)
 
     edge_cities = []
-    for i in range(NUMBER_OF_CITIES):
+    for i in range(architecture_parameters.NUMBER_OF_CITIES):
         edge_aggregator = EdgeReader(
             simpy_env=env,
             result_container=result_container,
             name=f'City{i}',
-            mean_distance_km=MEAN_DISTANCE_READER_CITY,
-            std_distance_km=STD_DISTANCE_READER_CITY,
+            mean_distance_km=architecture_parameters.MEAN_DISTANCE_CLIENT_CITY,
+            std_distance_km=architecture_parameters.STD_DISTANCE_CLIENT_CITY,
         )
         edge_aggregator.start_listening_for_incoming_data()
         edge_cities.append(edge_aggregator)
 
     edge_territories = []
-    for i in range(NUMBER_OF_TERRITORIES):
+    for i in range(architecture_parameters.NUMBER_OF_TERRITORIES):
         edge_aggregator = EdgeReader(
             simpy_env=env,
             result_container=result_container,
             name=f'Territory{i}',
-            mean_distance_km=MEAN_DISTANCE_READER_TERRITORY,
-            std_distance_km=STD_DISTANCE_READER_TERRITORY,
+            mean_distance_km=architecture_parameters.MEAN_DISTANCE_CLIENT_TERRITORY,
+            std_distance_km=architecture_parameters.STD_DISTANCE_CLIENT_TERRITORY,
         )
         edge_aggregator.start_listening_for_incoming_data()
         edge_territories.append(edge_aggregator)
 
     edge_countries = []
-    for i in range(NUMBER_OF_COUNTRIES):
+    for i in range(architecture_parameters.NUMBER_OF_COUNTRIES):
         edge_aggregator = EdgeReader(
             simpy_env=env,
             result_container=result_container,
             name=f'Country{i}',
-            mean_distance_km=MEAN_DISTANCE_READER_COUNTRY,
-            std_distance_km=STD_DISTANCE_READER_COUNTRY,
+            mean_distance_km=architecture_parameters.MEAN_DISTANCE_CLIENT_COUNTRY,
+            std_distance_km=architecture_parameters.STD_DISTANCE_CLIENT_COUNTRY,
         )
         edge_aggregator.start_listening_for_incoming_data()
         edge_countries.append(edge_aggregator)
 
     edge_continents = []
-    for i in range(NUMBER_OF_CONTINENTS):
+    for i in range(architecture_parameters.NUMBER_OF_CONTINENTS):
         edge_aggregator = EdgeReader(
             simpy_env=env,
             result_container=result_container,
             name=f'Continent{i}',
-            mean_distance_km=MEAN_DISTANCE_READER_CONTINENT,
-            std_distance_km=STD_DISTANCE_READER_CONTINENT,
+            mean_distance_km=architecture_parameters.MEAN_DISTANCE_CLIENT_CONTINENT,
+            std_distance_km=architecture_parameters.STD_DISTANCE_CLIENT_CONTINENT,
             overwrite_number_of_cores=1000,
         )
         edge_aggregator.start_listening_for_incoming_data()
@@ -141,8 +119,8 @@ def run_configuration(config: Dict) -> ResultContainer:
             simpy_env=env,
             result_container=result_container,
             name=f'Central',
-            mean_distance_km=MEAN_DISTANCE_READER_CENTRAL,
-            std_distance_km=STD_DISTANCE_READER_CENTRAL,
+            mean_distance_km=architecture_parameters.MEAN_DISTANCE_CLIENT_CENTRAL,
+            std_distance_km=architecture_parameters.STD_DISTANCE_CLIENT_CENTRAL,
             overwrite_number_of_cores=1000,
         )
     central.start_listening_for_incoming_data()
