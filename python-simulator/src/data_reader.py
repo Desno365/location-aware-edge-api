@@ -66,6 +66,8 @@ class DataReader(object):
                 transmission = self.transmission_to_continent
             elif extraction - (self.probabilities[0] + self.probabilities[1] + self.probabilities[2] + self.probabilities[3] + self.probabilities[4] + self.probabilities[5]) <= 0.0:
                 transmission = self.transmission_to_central
+            else:
+                raise Exception("Probabilities not summing to one")
 
             # Send random data size.
             created_data_size = Utils.get_random_positive_gaussian_value(mean=MEAN_SIZE_FOR_NEW_DATA_READ_REQUEST, std=STD_SIZE_FOR_NEW_DATA_READ_REQUEST)

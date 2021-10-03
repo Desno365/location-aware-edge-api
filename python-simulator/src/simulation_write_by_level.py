@@ -9,7 +9,6 @@ from matplotlib import pyplot as plt
 from data_producer import DataProducer
 from result_container import ResultContainer
 from src import architecture_parameters
-from src.processing_units.cloud_receiver_and_aggregator import CloudReceiverAndAggregator
 from src.processing_units.edge_location_central import EdgeLocationCentral
 from src.processing_units.edge_location_city import EdgeLocationCity
 from src.processing_units.edge_location_continent import EdgeLocationContinent
@@ -213,7 +212,15 @@ def run_configuration(config: Dict) -> ResultContainer:
             data_producer = DataProducer(simpy_env=env, result_container=result_container, name=f'DataProducer{i}', transmission_to_data_collector=transmission)
             data_producer.start_producing_data()
     elif config["type"] == "cloud":  # If cloud, setup the cloud and data_producers
-        cloud = CloudReceiverAndAggregator(simpy_env=env, result_container=result_container, name='Cloud', mean_distance_km=config['mean_distance_receiver_cloud'], std_distance_km=config['std_distance_receiver_cloud'])
+        cloud = EdgeLocationCentral(
+            simpy_env=env,
+            result_container=result_container,
+            name="Cloud",
+            is_data_coming_from_first_link=True,
+            mean_distance_km=config['mean_distance_receiver_cloud'],
+            std_distance_km=config['std_distance_receiver_cloud'],
+            should_send_processed_data_to_aggregator=False,
+        )
         cloud.start_listening_for_incoming_data()
 
         for i in range(TOTAL_NUMBER_OF_PRODUCER_CLIENTS):
