@@ -55,7 +55,6 @@ Then it can become:
 '''
 
 SIMULATION_DURATION = 2*60*1000  # In milliseconds.
-RANDOM_SEED = 42
 TOTAL_NUMBER_OF_PRODUCER_CLIENTS = 10000
 
 CONFIGURATIONS = [
@@ -128,7 +127,6 @@ def run_configuration(config: Dict) -> ResultContainer:
 
     # Setup the simulation.
     result_container = ResultContainer(simulation_name=config['configuration_name'], simulation_type=config['type'])
-    # random.seed(RANDOM_SEED)
     env = simpy.Environment()
 
     # Setup processes in the simulation.

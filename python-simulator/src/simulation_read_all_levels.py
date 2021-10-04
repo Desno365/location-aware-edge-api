@@ -16,7 +16,6 @@ from src.processing_units.edge_location_district import EdgeLocationDistrict
 from src.processing_units.edge_location_territory import EdgeLocationTerritory
 
 SIMULATION_DURATION = 2*60*1000  # In milliseconds.
-RANDOM_SEED = 42
 TOTAL_NUMBER_OF_READER_CLIENTS = 10000
 
 CONFIGURATIONS = [
@@ -55,7 +54,6 @@ def run_configuration(config: Dict) -> ResultContainer:
 
     # Setup the simulation.
     result_container = ResultContainer(simulation_name=config['probabilities'], simulation_type="read")
-    # random.seed(RANDOM_SEED)
     env = simpy.Environment()
 
     edge_districts = []
