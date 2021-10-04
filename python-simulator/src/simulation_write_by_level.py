@@ -15,6 +15,7 @@ from src.processing_units.edge_location_continent import EdgeLocationContinent
 from src.processing_units.edge_location_country import EdgeLocationCountry
 from src.processing_units.edge_location_district import EdgeLocationDistrict
 from src.processing_units.edge_location_territory import EdgeLocationTerritory
+from src.processing_units.on_processing_ended_enum import OnProcessingEndedEnum
 
 '''
 https://www.cloudping.info/
@@ -141,7 +142,7 @@ def run_configuration(config: Dict) -> ResultContainer:
                     is_data_coming_from_first_link=False,
                     mean_distance_km=config['mean_distance_receiver_aggregator'],
                     std_distance_km=config['std_distance_receiver_aggregator'],
-                    should_send_processed_data_to_aggregator=False,
+                    on_processing_ended_specification=OnProcessingEndedEnum.SAVE_TOTAL_LATENCY,
                 )
             elif config["aggregation_level"] == "territory":
                 edge_aggregator = EdgeLocationTerritory(
@@ -151,7 +152,7 @@ def run_configuration(config: Dict) -> ResultContainer:
                     is_data_coming_from_first_link=False,
                     mean_distance_km=config['mean_distance_receiver_aggregator'],
                     std_distance_km=config['std_distance_receiver_aggregator'],
-                    should_send_processed_data_to_aggregator=False,
+                    on_processing_ended_specification=OnProcessingEndedEnum.SAVE_TOTAL_LATENCY,
                 )
             elif config["aggregation_level"] == "country":
                 edge_aggregator = EdgeLocationCountry(
@@ -161,7 +162,7 @@ def run_configuration(config: Dict) -> ResultContainer:
                     is_data_coming_from_first_link=False,
                     mean_distance_km=config['mean_distance_receiver_aggregator'],
                     std_distance_km=config['std_distance_receiver_aggregator'],
-                    should_send_processed_data_to_aggregator=False,
+                    on_processing_ended_specification=OnProcessingEndedEnum.SAVE_TOTAL_LATENCY,
                 )
             elif config["aggregation_level"] == "continent":
                 edge_aggregator = EdgeLocationContinent(
@@ -171,7 +172,7 @@ def run_configuration(config: Dict) -> ResultContainer:
                     is_data_coming_from_first_link=False,
                     mean_distance_km=config['mean_distance_receiver_aggregator'],
                     std_distance_km=config['std_distance_receiver_aggregator'],
-                    should_send_processed_data_to_aggregator=False,
+                    on_processing_ended_specification=OnProcessingEndedEnum.SAVE_TOTAL_LATENCY,
                 )
             elif config["aggregation_level"] == "central":
                 edge_aggregator = EdgeLocationCentral(
@@ -181,7 +182,7 @@ def run_configuration(config: Dict) -> ResultContainer:
                     is_data_coming_from_first_link=False,
                     mean_distance_km=config['mean_distance_receiver_aggregator'],
                     std_distance_km=config['std_distance_receiver_aggregator'],
-                    should_send_processed_data_to_aggregator=False,
+                    on_processing_ended_specification=OnProcessingEndedEnum.SAVE_TOTAL_LATENCY,
                 )
             else:
                 raise Exception('Aggregation not recognized')
@@ -198,8 +199,8 @@ def run_configuration(config: Dict) -> ResultContainer:
                 name=f'EdgeReceiver{i}',
                 mean_distance_km=config['mean_distance_producer_receiver'],
                 std_distance_km=config['std_distance_producer_receiver'],
-                should_send_processed_data_to_aggregator=True,
-                transmission_to_aggregator=transmission,
+                on_processing_ended_specification=OnProcessingEndedEnum.SEND_TO_AGGREGATOR,
+                transmissions_to_aggregators=[transmission],
             )
             edge_receiver.start_listening_for_incoming_data()
             edge_receivers.append(edge_receiver)
@@ -217,7 +218,7 @@ def run_configuration(config: Dict) -> ResultContainer:
             is_data_coming_from_first_link=True,
             mean_distance_km=config['mean_distance_receiver_cloud'],
             std_distance_km=config['std_distance_receiver_cloud'],
-            should_send_processed_data_to_aggregator=False,
+            on_processing_ended_specification=OnProcessingEndedEnum.SAVE_TOTAL_LATENCY,
         )
         cloud.start_listening_for_incoming_data()
 

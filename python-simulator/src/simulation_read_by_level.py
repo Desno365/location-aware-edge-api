@@ -14,6 +14,7 @@ from src.processing_units.edge_location_continent import EdgeLocationContinent
 from src.processing_units.edge_location_country import EdgeLocationCountry
 from src.processing_units.edge_location_district import EdgeLocationDistrict
 from src.processing_units.edge_location_territory import EdgeLocationTerritory
+from src.processing_units.on_processing_ended_enum import OnProcessingEndedEnum
 
 SIMULATION_DURATION = 2*60*1000  # In milliseconds.
 TOTAL_NUMBER_OF_READER_CLIENTS = 10000
@@ -64,7 +65,7 @@ def run_configuration(config: Dict) -> ResultContainer:
                 name=f'Location{i}',
                 mean_distance_km=architecture_parameters.MEAN_DISTANCE_CLIENT_DISTRICT,
                 std_distance_km=architecture_parameters.STD_DISTANCE_CLIENT_DISTRICT,
-                should_send_processed_data_to_aggregator=False,
+                on_processing_ended_specification=OnProcessingEndedEnum.SAVE_TOTAL_LATENCY,
             )
             edge_district.start_listening_for_incoming_data()
             edge_locations.append(edge_district)
@@ -77,7 +78,7 @@ def run_configuration(config: Dict) -> ResultContainer:
                 is_data_coming_from_first_link=True,
                 mean_distance_km=architecture_parameters.MEAN_DISTANCE_CLIENT_CITY,
                 std_distance_km=architecture_parameters.STD_DISTANCE_CLIENT_CITY,
-                should_send_processed_data_to_aggregator=False,
+                on_processing_ended_specification=OnProcessingEndedEnum.SAVE_TOTAL_LATENCY,
             )
             edge_city.start_listening_for_incoming_data()
             edge_locations.append(edge_city)
@@ -90,7 +91,7 @@ def run_configuration(config: Dict) -> ResultContainer:
                 is_data_coming_from_first_link=True,
                 mean_distance_km=architecture_parameters.MEAN_DISTANCE_CLIENT_TERRITORY,
                 std_distance_km=architecture_parameters.STD_DISTANCE_CLIENT_TERRITORY,
-                should_send_processed_data_to_aggregator=False,
+                on_processing_ended_specification=OnProcessingEndedEnum.SAVE_TOTAL_LATENCY,
             )
             edge_territory.start_listening_for_incoming_data()
             edge_locations.append(edge_territory)
@@ -103,7 +104,7 @@ def run_configuration(config: Dict) -> ResultContainer:
                 is_data_coming_from_first_link=True,
                 mean_distance_km=architecture_parameters.MEAN_DISTANCE_CLIENT_COUNTRY,
                 std_distance_km=architecture_parameters.STD_DISTANCE_CLIENT_COUNTRY,
-                should_send_processed_data_to_aggregator=False,
+                on_processing_ended_specification=OnProcessingEndedEnum.SAVE_TOTAL_LATENCY,
             )
             edge_country.start_listening_for_incoming_data()
             edge_locations.append(edge_country)
@@ -116,7 +117,7 @@ def run_configuration(config: Dict) -> ResultContainer:
                 is_data_coming_from_first_link=True,
                 mean_distance_km=architecture_parameters.MEAN_DISTANCE_CLIENT_CONTINENT,
                 std_distance_km=architecture_parameters.STD_DISTANCE_CLIENT_CONTINENT,
-                should_send_processed_data_to_aggregator=False,
+                on_processing_ended_specification=OnProcessingEndedEnum.SAVE_TOTAL_LATENCY,
             )
             edge_continent.start_listening_for_incoming_data()
             edge_locations.append(edge_continent)
@@ -128,7 +129,7 @@ def run_configuration(config: Dict) -> ResultContainer:
             is_data_coming_from_first_link=True,
             mean_distance_km=architecture_parameters.MEAN_DISTANCE_CLIENT_CENTRAL,
             std_distance_km=architecture_parameters.STD_DISTANCE_CLIENT_CENTRAL,
-            should_send_processed_data_to_aggregator=False,
+            on_processing_ended_specification=OnProcessingEndedEnum.SAVE_TOTAL_LATENCY,
         )
         central.start_listening_for_incoming_data()
         edge_locations.append(central)

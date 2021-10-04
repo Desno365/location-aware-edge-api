@@ -1,8 +1,11 @@
+from typing import List
+
 import simpy
 
 from src import architecture_parameters
 from src.communication.transmission import Transmission
 from src.processing_units.edge_location import EdgeLocation
+from src.processing_units.on_processing_ended_enum import OnProcessingEndedEnum
 from src.result_container import ResultContainer
 
 NUMBER_OF_CORES = 4
@@ -23,8 +26,8 @@ class EdgeLocationCountry(EdgeLocation):
             mean_distance_km: float,
             std_distance_km: float,
 
-            should_send_processed_data_to_aggregator: bool,
-            transmission_to_aggregator: Transmission = None,
+            on_processing_ended_specification: OnProcessingEndedEnum,
+            transmissions_to_aggregators: List[Transmission] = None,
     ):
         super().__init__(
             simpy_env=simpy_env,
@@ -40,6 +43,6 @@ class EdgeLocationCountry(EdgeLocation):
             mean_distance_km=mean_distance_km,
             std_distance_km=std_distance_km,
 
-            should_send_processed_data_to_aggregator=should_send_processed_data_to_aggregator,
-            transmission_to_aggregator=transmission_to_aggregator,
+            on_processing_ended_specification=on_processing_ended_specification,
+            transmissions_to_aggregators=transmissions_to_aggregators,
         )

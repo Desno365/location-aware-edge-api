@@ -49,9 +49,11 @@ class ResultContainer:
     def report_total_finished_latency(self, latency: float) -> None:
         self.latency_total_finished_list.append(latency)
         
-    def print_result(self) -> None:
-        total_as_sum = self.get_average_first_link_latency() + self.get_average_first_processing_latency() + self.get_average_second_link_latency() + self.get_average_second_processing_latency()
-        assert abs(self.get_average_total_latency() - total_as_sum) < 0.5  # Total should be almost equal to sum of parts (note: if too few simulation-time or data then it may be false).
+    def print_result(self, should_total_be_equal_to_sum_of_parts: bool = True) -> None:
+        if should_total_be_equal_to_sum_of_parts:
+            # Total should be almost equal to sum of parts (note: also if too few simulation-time or data then it may be false).
+            total_as_sum = self.get_average_first_link_latency() + self.get_average_first_processing_latency() + self.get_average_second_link_latency() + self.get_average_second_processing_latency()
+            assert abs(self.get_average_total_latency() - total_as_sum) < 0.5
 
         print(
             f"Finished simulation {self.simulation_name}.\n"
