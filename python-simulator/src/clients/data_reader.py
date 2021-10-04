@@ -22,18 +22,22 @@ class DataReader(object):
             simpy_env: simpy.Environment,
             result_container: ResultContainer,
             name: str,
-            probabilities: List[float],
-            transmission_to_district: Transmission,
-            transmission_to_city: Transmission,
-            transmission_to_territory: Transmission,
-            transmission_to_country: Transmission,
-            transmission_to_continent: Transmission,
-            transmission_to_central: Transmission,
+            use_single_transmission: bool,  # If true it will use "transmission", otherwise it will use "probabilities" to get the correct transmission.
+            transmission: Transmission = None,
+            probabilities: List[float] = None,
+            transmission_to_district: Transmission = None,
+            transmission_to_city: Transmission = None,
+            transmission_to_territory: Transmission = None,
+            transmission_to_country: Transmission = None,
+            transmission_to_continent: Transmission = None,
+            transmission_to_central: Transmission = None,
     ):
-        assert len(probabilities) == 6
+        assert (use_single_transmission and transmission is not None) or (not use_single_transmission and probabilities is not None and len(probabilities) == 6)
         self.simpy_env = simpy_env
         self.result_container = result_container
         self.name = name
+        self.use_single_transmission = use_single_transmission
+        self.transmission = transmission
         self.probabilities = probabilities
         self.transmission_to_district = transmission_to_district
         self.transmission_to_city = transmission_to_city
@@ -53,21 +57,24 @@ class DataReader(object):
             yield self.simpy_env.timeout(time_to_wait_for_next_data)
             
             # Chose level to send.
-            extraction = random.uniform(0.0, 1.0)
-            if extraction - (self.probabilities[0]) <= 0.0:
-                transmission = self.transmission_to_district
-            elif extraction - (self.probabilities[0] + self.probabilities[1]) <= 0.0:
-                transmission = self.transmission_to_city
-            elif extraction - (self.probabilities[0] + self.probabilities[1] + self.probabilities[2]) <= 0.0:
-                transmission = self.transmission_to_territory
-            elif extraction - (self.probabilities[0] + self.probabilities[1] + self.probabilities[2] + self.probabilities[3]) <= 0.0:
-                transmission = self.transmission_to_country
-            elif extraction - (self.probabilities[0] + self.probabilities[1] + self.probabilities[2] + self.probabilities[3] + self.probabilities[4]) <= 0.0:
-                transmission = self.transmission_to_continent
-            elif extraction - (self.probabilities[0] + self.probabilities[1] + self.probabilities[2] + self.probabilities[3] + self.probabilities[4] + self.probabilities[5]) <= 0.0:
-                transmission = self.transmission_to_central
+            if self.use_single_transmission:
+                transmission = self.transmission
             else:
-                raise Exception("Probabilities not summing to one")
+                extraction = random.uniform(0.0, 1.0)
+                if extraction - (self.probabilities[0]) <= 0.0:
+                    transmission = self.transmission_to_district
+                elif extraction - (self.probabilities[0] + self.probabilities[1]) <= 0.0:
+                    transmission = self.transmission_to_city
+                elif extraction - (self.probabilities[0] + self.probabilities[1] + self.probabilities[2]) <= 0.0:
+                    transmission = self.transmission_to_territory
+                elif extraction - (self.probabilities[0] + self.probabilities[1] + self.probabilities[2] + self.probabilities[3]) <= 0.0:
+                    transmission = self.transmission_to_country
+                elif extraction - (self.probabilities[0] + self.probabilities[1] + self.probabilities[2] + self.probabilities[3] + self.probabilities[4]) <= 0.0:
+                    transmission = self.transmission_to_continent
+                elif extraction - (self.probabilities[0] + self.probabilities[1] + self.probabilities[2] + self.probabilities[3] + self.probabilities[4] + self.probabilities[5]) <= 0.0:
+                    transmission = self.transmission_to_central
+                else:
+                    raise Exception("Probabilities not summing to one")
 
             # Send random data size.
             created_data_size = Utils.get_random_positive_gaussian_value(mean=MEAN_SIZE_FOR_NEW_DATA_READ_REQUEST, std=STD_SIZE_FOR_NEW_DATA_READ_REQUEST)

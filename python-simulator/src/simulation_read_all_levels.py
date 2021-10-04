@@ -141,6 +141,7 @@ def run_configuration(config: Dict) -> ResultContainer:
             simpy_env=env,
             result_container=result_container,
             name=f'DataProducer{i}',
+            use_single_transmission=False,
             probabilities=probabilities,
             transmission_to_district=random.choice(edge_districts).get_incoming_transmission(),
             transmission_to_city=random.choice(edge_cities).get_incoming_transmission(),
