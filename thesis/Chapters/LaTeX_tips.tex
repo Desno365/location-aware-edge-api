@@ -1,0 +1,134 @@
+\chapter*{\LaTeX~ suggestions}
+
+\begin{center}
+\bfseries 
+\color{red}{REMOVE THIS CHAPTER BEFORE SUBMISSION}
+\end{center}
+
+\noindent In this file there are listed some tips you may find useful. Some of the shortcuts shown are custom, so I suggest you to have a look at what's next even if you are expert in LaTeX.
+
+\section*{Math}
+
+All the fonts supported by the template provide a math variant for the formulas. You can use the standard math commands of LaTeX plus the following additions:
+\begin{itemize}
+\item Argmin/max: $\argmin_i$, $\argmax_i$, and their rendering in centered equations
+$$\argmin_i \quad \argmax_i$$
+\item Variance: $\var$, $\Var{p}$
+\item Expected value: $\ev$, $\Ev{p}$
+\end{itemize}
+
+\section*{Custom commands}
+
+We provide two commands you may find useful.
+
+The command \texttt{\textbackslash blankpage} adds a blank page. Differently from \texttt{\textbackslash newpage}, the added page is completely blank and the text resume from the page after.
+
+The command \texttt{\textbackslash todo} let you add the \todo symbol in the text. You can use it whenever you have text to be revisioned after.
+
+\section*{Environments}
+
+The thesis package provide three useful packages you may need for the theoretical part.
+
+\subsection*{Definition}
+
+Definitions are used for introducing a concept and its theoretical meaning for the first time. Do not use it just for clarifying the notation. Definitions are numbered within the chapter, such that the first definition of chapter 2 is 2.1. The syntax is the following:
+\begin{verbatim}
+\begin{definition}[NAME (optional)]
+\label{def:LABEL}
+DEFINITION
+\end{definition}
+\end{verbatim}
+
+\noindent Example:
+
+\begin{definition}[$(\alpha, \beta)$-approximation]
+\label{def:alphabetaapprox}
+An $(\alpha, \beta)$\textit{-approximation} algorithm outputs with success probability $\beta$ a solution which is at least $\alpha$ fraction of the optimal solution, for some $\alpha, \beta \leq 1$.
+\end{definition}
+
+\subsection*{Theorem}
+
+Theorems are numbered incrementally within the thesis, regardless of the chapter they are declared in. The syntax is the following:
+\begin{verbatim}
+\begin{theorem}
+\label{thm:LABEL}
+THEOREM
+\end{theorem}
+\end{verbatim}
+
+\noindent Example:
+
+\begin{theorem}
+\label{thm:approximation}
+For a non-negative, monotone, submodular function $f(\cdot)$, let $S_k$ be a set obtained by selecting $k$ elements one at a time, each time choosing an element that provides the largest marginal increase in the function value. Let $S_k^*$ be a set that maximizes the value of $f(\cdot)$ over all $k$-sized sets. Then,
+$$f(S_k) \geq \left( 1-\frac{1}{e} \right) \cdot f(S_k^*).$$
+\end{theorem}
+
+\subsection*{Lemma}
+Lemma are like theorems. The syntax is the following:
+\begin{verbatim}
+\begin{lemma}
+\label{thm:LABEL}
+LEMMA
+\end{lemma}
+\end{verbatim}
+
+\noindent Example:
+
+\begin{lemma}
+\label{thm:lemma}
+This is a lemma.
+\end{lemma}
+
+\subsection*{Proposition}
+Propositions are like lemmas but they are numbered within the chapter. The syntax is the following:
+\begin{verbatim}
+\begin{proposition}
+\label{thm:LABEL}
+PROPOSITION
+\end{proposition}
+\end{verbatim}
+
+\noindent Example:
+
+\begin{proposition}
+\label{thm:chernoff}
+If the diffusion process starting with $S$ is simulated independently at least $r=\Omega\left(\frac{n^2}{\varepsilon^2}\ln\left(\frac{1}{\delta}\right)\right)$ times, then the average number of activated nodes over these simulations is a $(1 \pm \varepsilon)$-approximation to $\sigma(S)$, with probability at least $1 - \delta$.
+\end{proposition}
+
+\subsection*{Algorithm}
+The algorithm environment is used to show pseudocodes. The syntax, which follows the same paradigm of table/tabular combo, is the following:
+\begin{verbatim}
+\begin{algorithm}[FLOATING OPTIONS]
+\caption{CAPTION}
+\label{alg:LABEL}
+\begin{algorithmic}[1 if you want the lines to be numbered]
+ALGORITHM
+\end{algorithmic}
+\end{algorithm}
+\end{verbatim}
+
+\noindent Example:
+
+\begin{algorithm}[H]
+\caption{Combinatorial Thompson Sampling}
+\label{alg:cts}
+\begin{algorithmic}[1]
+\Require Directed graph $G(V,E)$, budget constraint $k$, time horizon $T$
+\For {$i = 1$ \textbf{to} $|E|$}
+\State $\alpha_i = 1, \beta_i = 1$ \Comment{Assign a Beta distribution Beta(1,1) to each edge}
+\EndFor
+
+\For {$t = 1$ \textbf{to} $T$}
+\State For each arm $i$, draw a sample $\theta_i(t) \sim$ Beta$(\alpha_i, \beta_i)$
+\State Let $\boldsymbol{\theta}(t) = \left(\theta_1(t), \ldots, \theta_m(t) \right)$
+\State $S_t \gets$ \texttt{oracle}$(G(V,E,\boldsymbol{\theta}(t)), k)$
+\State Run cascade with $S_t$ as the seed set and collect the feedback $F_t$
+\State Update the Beta distributions of the edges involved using $F_t$
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\section*{Referencing}
+
+All the declared environments above can be referenced using the \texttt{{\textbackslash autoref}} command. \autoref{def:alphabetaapprox}, \autoref{thm:approximation}, \autoref{thm:chernoff}, \autoref{alg:cts}.
