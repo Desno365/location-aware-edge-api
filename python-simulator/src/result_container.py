@@ -24,10 +24,6 @@ class ResultContainer:
         self.distance_first_link_list = []
         self.distance_second_link_list = []
 
-        # Read latencies variables.
-        self.total_read_distance = 0.0
-        self.total_read_latency = 0.0
-
     def report_first_link_latency_traffic_and_distance(self, latency: float, traffic: float, distance: float) -> None:
         self.latency_first_link_list.append(latency)
         traffic_per_distance = (traffic * distance)
@@ -69,8 +65,8 @@ class ResultContainer:
             f"Average second link latency: {self.get_average_second_link_latency()}\n"
             f"Average second processing latency: {self.get_average_second_processing_latency()}\n"
             f"\n"
-            f"Average first link traffic per distance: {self.get_average_first_link_traffic_per_distance()}\n"
-            f"Average second link traffic per distance: {self.get_average_second_link_traffic_per_distance()}\n"
+            f"Total first link traffic per distance: {self.get_total_first_link_traffic_per_distance()}\n"
+            f"Total second link traffic per distance: {self.get_total_second_link_traffic_per_distance()}\n"
         )
 
     def get_average_first_link_latency(self) -> float:
@@ -93,20 +89,16 @@ class ResultContainer:
             return 0.0
         return statistics.mean(self.latency_second_processing_list)
 
-    def get_average_first_link_traffic_per_distance(self) -> float:
-        if len(self.traffic_per_distance_first_link_list) == 0:
-            return 0.0
-        return statistics.mean(self.traffic_per_distance_first_link_list)
-
-    def get_average_second_link_traffic_per_distance(self) -> float:
-        if len(self.traffic_per_distance_second_link_list) == 0:
-            return 0.0
-        return statistics.mean(self.traffic_per_distance_second_link_list)
-
     def get_average_total_latency(self) -> float:
         if len(self.latency_total_finished_list) == 0:
             return 0.0
         return statistics.mean(self.latency_total_finished_list)
+
+    def get_total_first_link_traffic_per_distance(self) -> float:
+        return sum(self.traffic_per_distance_first_link_list)
+
+    def get_total_second_link_traffic_per_distance(self) -> float:
+        return sum(self.traffic_per_distance_second_link_list)
 
     def get_average_first_link_distance(self) -> float:
         if len(self.distance_first_link_list) == 0:

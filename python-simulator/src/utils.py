@@ -3,7 +3,7 @@ import random
 
 class Utils:
     PRINT_TIME_MESSAGES = False
-    PRINT_CORE_BUSY_MESSAGES = False
+    PRINT_CORE_BUSY_MESSAGES = True
 
     @staticmethod
     def get_random_positive_gaussian_value(mean: float, std: float) -> float:

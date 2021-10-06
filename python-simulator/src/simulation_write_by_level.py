@@ -55,8 +55,8 @@ Then it can become:
 - Only computation performed locally (ex: publishing videos on social network to avoid modded client)
 '''
 
-SIMULATION_DURATION = 2*60*1000  # In milliseconds.
 TOTAL_NUMBER_OF_PRODUCER_CLIENTS = 10000
+TOTAL_PACKAGES_PRODUCED_BY_EACH_CLIENT = 3  # Note: each client has a waiting time before producing a new package.
 
 CONFIGURATIONS = [
     {
@@ -208,7 +208,13 @@ def run_configuration(config: Dict) -> ResultContainer:
         for i in range(TOTAL_NUMBER_OF_PRODUCER_CLIENTS):
             connected_edge_receiver = random.choice(edge_receivers)
             transmission = connected_edge_receiver.get_incoming_transmission()
-            data_producer = DataProducer(simpy_env=env, result_container=result_container, name=f'DataProducer{i}', transmission_to_data_collector=transmission)
+            data_producer = DataProducer(
+                simpy_env=env,
+                result_container=result_container,
+                name=f'DataProducer{i}',
+                transmission_to_data_collector=transmission,
+                number_of_packages_to_produce=TOTAL_PACKAGES_PRODUCED_BY_EACH_CLIENT,
+            )
             data_producer.start_producing_data()
     elif config["type"] == "cloud":  # If cloud, setup the cloud and data_producers
         cloud = EdgeLocationCentral(
@@ -224,13 +230,19 @@ def run_configuration(config: Dict) -> ResultContainer:
 
         for i in range(TOTAL_NUMBER_OF_PRODUCER_CLIENTS):
             transmission = cloud.get_incoming_transmission()
-            data_producer = DataProducer(simpy_env=env, result_container=result_container, name=f'DataProducer{i}', transmission_to_data_collector=transmission)
+            data_producer = DataProducer(
+                simpy_env=env,
+                result_container=result_container,
+                name=f'DataProducer{i}',
+                transmission_to_data_collector=transmission,
+                number_of_packages_to_produce=TOTAL_PACKAGES_PRODUCED_BY_EACH_CLIENT,
+            )
             data_producer.start_producing_data()
     else:
         raise Exception('Type not recognized')
 
     # Run simulation.
-    env.run(until=SIMULATION_DURATION)
+    env.run()
 
     result_container.print_result()
     return result_container
@@ -245,8 +257,8 @@ first_link_latencies = [result.get_average_first_link_latency() for result in re
 first_processing_latencies = [result.get_average_first_processing_latency() for result in results]
 second_link_latencies = [result.get_average_second_link_latency() for result in results]
 second_processing_latencies = [result.get_average_second_processing_latency() for result in results]
-first_traffic_per_distance = [result.get_average_first_link_traffic_per_distance() for result in results]
-second_traffic_per_distance = [result.get_average_second_link_traffic_per_distance() for result in results]
+first_traffic_per_distance = [result.get_total_first_link_traffic_per_distance() for result in results]
+second_traffic_per_distance = [result.get_total_second_link_traffic_per_distance() for result in results]
 names = [result.simulation_name.replace(" ", "\n") for result in results]
 colors = ['green' if result.simulation_type == 'edge' else 'red' for result in results]
 x_positions = (range(len(results)))
@@ -286,7 +298,7 @@ bars2 = second_traffic_per_distance
 plt.bar(x_positions, bars1, color='#7f6d5f')
 plt.bar(x_positions, bars2, bottom=bars1, color='#557f2d')
 plt.xticks(x_positions, names)
-plt.ylabel("Average Traffic in MB * distance in Km")
+plt.ylabel("Total (traffic in MB) * (distance in Km)")
 plt.legend(["First link", "Second Link"])
 plt.show()
 
@@ -300,6 +312,6 @@ plt.bar(x_positions, bars1, color='#7f6d5f')
 plt.bar(x_positions, bars2, bottom=bars1, color='#557f2d')
 plt.axes().set_ylim([None, cut_limit])
 plt.xticks(x_positions, names)
-plt.ylabel("Average Traffic in MB * distance in Km")
+plt.ylabel("Total (traffic in MB) * (distance in Km)")
 plt.legend(["First link", "Second Link"])
 plt.show()

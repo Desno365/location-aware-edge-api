@@ -82,12 +82,13 @@ class EdgeLocation(ProcessingUnit):
         if self.on_processing_ended_specification == OnProcessingEndedEnum.SEND_TO_AGGREGATOR:
             # Send processed message to aggregator.
             processed_data_size = Utils.get_random_positive_gaussian_value(mean=MEAN_SIZE_FOR_PROCESSED_DATA, std=STD_SIZE_FOR_PROCESSED_DATA)
-            message = DataMessage(
-                megabytes_of_data=processed_data_size,
-                original_data_creation_time=incoming_message.original_data_creation_time,
-                data_sent_time=self.simpy_env.now
-            )
             for transmission in self.transmissions_to_aggregators:
+                # WARNING: it's important to create a different message each time. By sending the same message some infos (like distance and latency) will be overwritten.
+                message = DataMessage(
+                    megabytes_of_data=processed_data_size,
+                    original_data_creation_time=incoming_message.original_data_creation_time,
+                    data_sent_time=self.simpy_env.now
+                )
                 transmission.put_in_cable(message)
         elif self.on_processing_ended_specification == OnProcessingEndedEnum.SAVE_TOTAL_LATENCY:
             # Add start-to-finish time to results.
