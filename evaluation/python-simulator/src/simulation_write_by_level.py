@@ -55,7 +55,7 @@ Then it can become:
 - Only computation performed locally (ex: publishing videos on social network to avoid modded client)
 '''
 
-TOTAL_NUMBER_OF_PRODUCER_CLIENTS = 10000
+TOTAL_NUMBER_OF_PRODUCER_CLIENTS = 2000
 TOTAL_PACKAGES_PRODUCED_BY_EACH_CLIENT = 3  # Note: each client has a waiting time before producing a new package.
 
 CONFIGURATIONS = [

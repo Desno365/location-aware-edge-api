@@ -16,7 +16,7 @@ from src.processing_units.edge_location_district import EdgeLocationDistrict
 from src.processing_units.edge_location_territory import EdgeLocationTerritory
 from src.processing_units.on_processing_ended_enum import OnProcessingEndedEnum
 
-TOTAL_NUMBER_OF_PRODUCER_CLIENTS = 10000
+TOTAL_NUMBER_OF_PRODUCER_CLIENTS = 2000
 TOTAL_PACKAGES_PRODUCED_BY_EACH_CLIENT = 3  # Note: each client has a waiting time before producing a new package.
 
 CONFIGURATIONS = [
@@ -109,12 +109,13 @@ def run_configuration(config: Dict) -> ResultContainer:
 
         edge_receivers = []
         for i in range(architecture_parameters.NUMBER_OF_DISTRICTS):
-            connected_edge_aggregators = []
-            connected_edge_aggregators.append(edge_central)
-            connected_edge_aggregators.append(random.choice(edge_continents))
-            connected_edge_aggregators.append(random.choice(edge_countries))
-            connected_edge_aggregators.append(random.choice(edge_territories))
-            connected_edge_aggregators.append(random.choice(edge_cities))
+            connected_edge_aggregators = [
+                edge_central,
+                random.choice(edge_continents),
+                random.choice(edge_countries),
+                random.choice(edge_territories),
+                random.choice(edge_cities)
+            ]
             transmissions = [connected_edge_aggregator.get_incoming_transmission() for connected_edge_aggregator in connected_edge_aggregators]
             assert len(transmissions) == 5
             edge_receiver = EdgeLocationDistrict(
