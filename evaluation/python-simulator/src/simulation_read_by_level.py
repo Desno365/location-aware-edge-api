@@ -16,8 +16,8 @@ from src.processing_units.edge_location_district import EdgeLocationDistrict
 from src.processing_units.edge_location_territory import EdgeLocationTerritory
 from src.processing_units.on_processing_ended_enum import OnProcessingEndedEnum
 
-SIMULATION_DURATION = 30*1000  # In milliseconds.
-TOTAL_NUMBER_OF_READER_CLIENTS = 10000
+SIMULATION_DURATION = 2*60*1000  # In milliseconds.
+TOTAL_NUMBER_OF_READER_CLIENTS = 2000
 
 COMPARED_CONFIGURATION = {
     "aggregation_level": "central",
