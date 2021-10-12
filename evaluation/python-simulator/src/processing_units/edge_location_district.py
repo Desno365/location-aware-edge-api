@@ -21,6 +21,8 @@ class EdgeLocationDistrict(EdgeLocation):
 
             on_processing_ended_specification: OnProcessingEndedEnum,
             transmissions_to_aggregators: List[Transmission] = None,
+
+            override_bandwidth: float = None,
     ):
         super().__init__(
             simpy_env=simpy_env,
@@ -28,7 +30,7 @@ class EdgeLocationDistrict(EdgeLocation):
             name=name,
 
             number_of_cores=architecture_parameters.NUMBER_OF_CORES_DISTRICT,
-            bandwidth_capability=architecture_parameters.BANDWIDTH_CAPABILITY_DISTRICT,
+            bandwidth_capability=architecture_parameters.BANDWIDTH_CAPABILITY_DISTRICT if override_bandwidth is None else override_bandwidth,
             mean_processing_start_delay=architecture_parameters.MEAN_PROCESSING_START_DELAY_DISTRICT,
             std_processing_start_delay=architecture_parameters.STD_PROCESSING_START_DELAY_DISTRICT,
 

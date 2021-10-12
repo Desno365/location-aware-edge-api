@@ -53,7 +53,7 @@ class ProcessingUnit(metaclass=abc.ABCMeta):
         with self.cores_resource.request() as req:
             yield req
             ready_time = self.simpy_env.now
-            if Utils.PRINT_CORE_BUSY_MESSAGES and (ready_time - arrive_time) > 0.0:
+            if Utils.PRINT_CORE_BUSY_MESSAGES and (ready_time - arrive_time) > 10.0:
                 print(f'Cores in {self.name} where not free, waiting time: {ready_time - arrive_time}')
 
             time_to_process = self.get_processing_time(incoming_message=incoming_message)
