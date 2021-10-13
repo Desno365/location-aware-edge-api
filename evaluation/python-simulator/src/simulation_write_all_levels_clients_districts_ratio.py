@@ -2,6 +2,7 @@ import multiprocessing
 import random
 from typing import Dict
 
+import numpy as np
 import simpy
 from matplotlib import pyplot as plt
 
@@ -175,8 +176,11 @@ pool = multiprocessing.Pool()
 results_cloud = pool.map(run_configuration, CONFIGURATIONS_CLOUD)
 
 # Prepare plot variables
-total_latencies_edge = [result.get_average_total_latency() for result in results_edge]
-total_latencies_cloud = [result.get_average_total_latency() for result in results_cloud]
+total_latencies_edge = np.array([result.get_average_total_latency() for result in results_edge])
+total_latencies_confidence_edge = np.array([result.get_average_total_latency_confidence() for result in results_edge])
+print(total_latencies_confidence_edge)
+total_latencies_cloud = np.array([result.get_average_total_latency() for result in results_cloud])
+total_latencies_confidence_cloud = np.array([result.get_average_total_latency_confidence() for result in results_cloud])
 total_traffic_per_distance_edge = [result.get_total_first_link_traffic_per_distance() + result.get_total_second_link_traffic_per_distance() for result in results_edge]
 total_traffic_per_distance_cloud = [result.get_total_first_link_traffic_per_distance() + result.get_total_second_link_traffic_per_distance() for result in results_cloud]
 x_positions = [i for i in CLIENTS_DISTRICTS_RATIO_RANGE]
@@ -189,6 +193,18 @@ plt.plot(x_positions, total_latencies_cloud, color="red")
 plt.axes().set_ylim([0, None])
 plt.ylabel("Average Write Latency")
 plt.show()
+
+'''
+fig, ax = plt.subplots(figsize=(8, 6))
+ax.set_title('Write Latencies')
+ax.set_ylabel('Average Write Latency')
+ax.plot(x_positions, total_latencies_edge, color="green")
+ax.fill_between(x_positions, (total_latencies_edge - total_latencies_confidence_edge), (total_latencies_edge + total_latencies_confidence_edge), color="green", alpha=0.33)
+ax.plot(x_positions, total_latencies_cloud, color="red")
+ax.fill_between(x_positions, (total_latencies_cloud - total_latencies_confidence_cloud), (total_latencies_cloud + total_latencies_confidence_cloud), color="red", alpha=0.33)
+ax.set_ylim([0, None])
+fig.tight_layout()
+'''
 
 # Plot sum of traffic uncut.
 plt.figure(figsize=(8, 6))

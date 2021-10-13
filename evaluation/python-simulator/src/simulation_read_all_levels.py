@@ -2,6 +2,7 @@ import multiprocessing
 import random
 from typing import Dict
 
+import numpy as np
 import simpy
 from matplotlib import pyplot as plt
 
@@ -164,7 +165,9 @@ pool = multiprocessing.Pool()
 results = pool.map(run_configuration, CONFIGURATIONS)
 
 # Prepare plot variables
-latencies = [result.get_average_total_latency() for result in results]
+total_latencies = np.array([result.get_average_total_latency() for result in results])
+total_latencies_confidence = np.array([result.get_average_total_latency_confidence() for result in results])
+print(total_latencies_confidence)
 distances = [result.get_average_first_link_distance() + result.get_average_second_link_distance() for result in results]
 x_positions_true = range(len(results))
 x_positions_scaled = [x / (len(results)-1) for x in range(len(results))]
@@ -173,7 +176,7 @@ x_positions_scaled = [x / (len(results)-1) for x in range(len(results))]
 # Plot total latency.
 plt.figure(figsize=(8, 6))
 plt.title('Read Latencies')
-plt.bar(x_positions_true, latencies, color="green")
+plt.bar(x_positions_true, total_latencies, color="green")
 plt.axes().yaxis.grid()  # horizontal lines
 plt.ylabel("Average Read Latency")
 plt.show()
@@ -189,7 +192,7 @@ plt.show()
 # Plot total latency.
 plt.figure(figsize=(8, 6))
 plt.title('Read Latencies')
-plt.fill_between(x_positions_scaled, latencies)
+plt.fill_between(x_positions_scaled, total_latencies)
 plt.axes().yaxis.grid()  # horizontal lines
 plt.ylabel("Average Read Latency")
 plt.show()
@@ -201,3 +204,13 @@ plt.fill_between(x_positions_scaled, distances)
 plt.axes().yaxis.grid()  # horizontal lines
 plt.ylabel("Average Read Distance")
 plt.show()
+
+'''
+fig, ax = plt.subplots(figsize=(8, 6))
+ax.set_title('Read Latencies')
+ax.set_ylabel('Average Read Latency')
+ax.plot(x_positions_scaled, total_latencies, color="green")
+ax.fill_between(x_positions_scaled, (total_latencies - total_latencies_confidence), (total_latencies + total_latencies_confidence), color="green", alpha=0.1)
+fig.tight_layout()
+fig.show()
+'''

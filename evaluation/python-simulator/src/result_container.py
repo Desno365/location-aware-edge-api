@@ -1,3 +1,4 @@
+import math
 import statistics
 
 
@@ -93,6 +94,14 @@ class ResultContainer:
         if len(self.latency_total_finished_list) == 0:
             return 0.0
         return statistics.mean(self.latency_total_finished_list)
+
+    def get_average_total_latency_confidence(self) -> float:
+        if len(self.latency_total_finished_list) == 0:
+            return 0.0
+        z_value = 3.291  # Correspond to 99.9% confidence (probability that true mean is inside this interval).
+        std = statistics.stdev(self.latency_total_finished_list)
+        num_observations = len(self.latency_total_finished_list)
+        return z_value * std / math.sqrt(num_observations)
 
     def get_total_first_link_traffic_per_distance(self) -> float:
         return sum(self.traffic_per_distance_first_link_list)

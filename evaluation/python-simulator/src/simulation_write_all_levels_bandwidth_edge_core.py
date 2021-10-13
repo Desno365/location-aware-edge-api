@@ -173,8 +173,9 @@ pool = multiprocessing.Pool()
 results = pool.map(run_configuration, CONFIGURATIONS)
 
 # Prepare plot variables
-total_latencies = [result.get_average_total_latency() for result in results]
-total_traffic_per_distance = [result.get_total_first_link_traffic_per_distance() + result.get_total_second_link_traffic_per_distance() for result in results]
+total_latencies = np.array([result.get_average_total_latency() for result in results])
+total_latencies_confidence = np.array([result.get_average_total_latency_confidence() for result in results])
+print(total_latencies_confidence)
 x_positions = [i for i in BANDWIDTH_RATIO_RANGE]
 
 # Plot total latency.
@@ -184,3 +185,13 @@ plt.plot(x_positions, total_latencies, color="green")
 plt.axes().set_ylim([0, None])
 plt.ylabel("Average Write Latency")
 plt.show()
+
+'''
+fig, ax = plt.subplots(figsize=(8, 6))
+ax.set_title('Write Latencies')
+ax.set_ylabel('Average Write Latency')
+ax.plot(x_positions, total_latencies, color="green")
+ax.fill_between(x_positions, (total_latencies - total_latencies_confidence), (total_latencies + total_latencies_confidence), color="green", alpha=0.1)
+ax.set_ylim([0, None])
+fig.tight_layout()
+'''
