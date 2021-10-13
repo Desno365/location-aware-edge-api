@@ -2,7 +2,7 @@ from typing import List
 
 import simpy
 
-from src import architecture_parameters
+from src import default_architecture_parameters
 from src.communication.transmission import Transmission
 from src.processing_units.edge_location import EdgeLocation
 from src.processing_units.on_processing_ended_enum import OnProcessingEndedEnum
@@ -34,10 +34,10 @@ class EdgeLocationCountry(EdgeLocation):
             result_container=result_container,
             name=name,
 
-            number_of_cores=architecture_parameters.NUMBER_OF_CORES_COUNTRY,
-            bandwidth_capability=architecture_parameters.BANDWIDTH_CAPABILITY_COUNTRY,
-            mean_processing_start_delay=architecture_parameters.MEAN_PROCESSING_START_DELAY_COUNTRY,
-            std_processing_start_delay=architecture_parameters.STD_PROCESSING_START_DELAY_COUNTRY,
+            number_of_cores=default_architecture_parameters.NUMBER_OF_CORES_COUNTRY,
+            bandwidth_capability=default_architecture_parameters.BANDWIDTH_CAPABILITY_COUNTRY,
+            mean_processing_start_delay=default_architecture_parameters.MEAN_PROCESSING_START_DELAY_COUNTRY,
+            std_processing_start_delay=default_architecture_parameters.STD_PROCESSING_START_DELAY_COUNTRY,
 
             is_data_coming_from_first_link=is_data_coming_from_first_link,
             mean_distance_km=mean_distance_km,

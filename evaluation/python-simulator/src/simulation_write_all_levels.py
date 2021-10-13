@@ -6,7 +6,7 @@ import simpy
 from matplotlib import pyplot as plt
 
 from result_container import ResultContainer
-from src import architecture_parameters
+from src import default_architecture_parameters
 from src.clients.data_producer import DataProducer
 from src.processing_units.edge_location_central import EdgeLocationCentral
 from src.processing_units.edge_location_city import EdgeLocationCity
@@ -45,70 +45,70 @@ def run_configuration(config: Dict) -> ResultContainer:
             result_container=result_container,
             name=f'Central',
             is_data_coming_from_first_link=False,
-            mean_distance_km=architecture_parameters.MEAN_DISTANCE_DISTRICT_CENTRAL,
-            std_distance_km=architecture_parameters.STD_DISTANCE_DISTRICT_CENTRAL,
+            mean_distance_km=default_architecture_parameters.MEAN_DISTANCE_DISTRICT_CENTRAL,
+            std_distance_km=default_architecture_parameters.STD_DISTANCE_DISTRICT_CENTRAL,
             on_processing_ended_specification=OnProcessingEndedEnum.SAVE_TOTAL_LATENCY,  # Save only here.
         )
         edge_central.start_listening_for_incoming_data()
 
         edge_continents = []
-        for i in range(architecture_parameters.NUMBER_OF_CONTINENTS):
+        for i in range(default_architecture_parameters.NUMBER_OF_CONTINENTS):
             edge_continent = EdgeLocationContinent(
                 simpy_env=env,
                 result_container=result_container,
                 name=f'Continent{i}',
                 is_data_coming_from_first_link=False,
-                mean_distance_km=architecture_parameters.MEAN_DISTANCE_DISTRICT_CONTINENT,
-                std_distance_km=architecture_parameters.STD_DISTANCE_DISTRICT_CONTINENT,
+                mean_distance_km=default_architecture_parameters.MEAN_DISTANCE_DISTRICT_CONTINENT,
+                std_distance_km=default_architecture_parameters.STD_DISTANCE_DISTRICT_CONTINENT,
                 on_processing_ended_specification=OnProcessingEndedEnum.DO_NOTHING,  # Otherwise latency is considered for multiple packages since in parallel.
             )
             edge_continent.start_listening_for_incoming_data()
             edge_continents.append(edge_continent)
 
         edge_countries = []
-        for i in range(architecture_parameters.NUMBER_OF_COUNTRIES):
+        for i in range(default_architecture_parameters.NUMBER_OF_COUNTRIES):
             edge_country = EdgeLocationCountry(
                 simpy_env=env,
                 result_container=result_container,
                 name=f'Country{i}',
                 is_data_coming_from_first_link=False,
-                mean_distance_km=architecture_parameters.MEAN_DISTANCE_DISTRICT_COUNTRY,
-                std_distance_km=architecture_parameters.STD_DISTANCE_DISTRICT_COUNTRY,
+                mean_distance_km=default_architecture_parameters.MEAN_DISTANCE_DISTRICT_COUNTRY,
+                std_distance_km=default_architecture_parameters.STD_DISTANCE_DISTRICT_COUNTRY,
                 on_processing_ended_specification=OnProcessingEndedEnum.DO_NOTHING,  # Otherwise latency is considered for multiple packages since in parallel.
             )
             edge_country.start_listening_for_incoming_data()
             edge_countries.append(edge_country)
 
         edge_territories = []
-        for i in range(architecture_parameters.NUMBER_OF_TERRITORIES):
+        for i in range(default_architecture_parameters.NUMBER_OF_TERRITORIES):
             edge_territory = EdgeLocationTerritory(
                 simpy_env=env,
                 result_container=result_container,
                 name=f'Territory{i}',
                 is_data_coming_from_first_link=False,
-                mean_distance_km=architecture_parameters.MEAN_DISTANCE_DISTRICT_TERRITORY,
-                std_distance_km=architecture_parameters.STD_DISTANCE_DISTRICT_TERRITORY,
+                mean_distance_km=default_architecture_parameters.MEAN_DISTANCE_DISTRICT_TERRITORY,
+                std_distance_km=default_architecture_parameters.STD_DISTANCE_DISTRICT_TERRITORY,
                 on_processing_ended_specification=OnProcessingEndedEnum.DO_NOTHING,  # Otherwise latency is considered for multiple packages since in parallel.
             )
             edge_territory.start_listening_for_incoming_data()
             edge_territories.append(edge_territory)
 
         edge_cities = []
-        for i in range(architecture_parameters.NUMBER_OF_CITIES):
+        for i in range(default_architecture_parameters.NUMBER_OF_CITIES):
             edge_city = EdgeLocationCity(
                 simpy_env=env,
                 result_container=result_container,
                 name=f'City{i}',
                 is_data_coming_from_first_link=False,
-                mean_distance_km=architecture_parameters.MEAN_DISTANCE_DISTRICT_CITY,
-                std_distance_km=architecture_parameters.STD_DISTANCE_DISTRICT_CITY,
+                mean_distance_km=default_architecture_parameters.MEAN_DISTANCE_DISTRICT_CITY,
+                std_distance_km=default_architecture_parameters.STD_DISTANCE_DISTRICT_CITY,
                 on_processing_ended_specification=OnProcessingEndedEnum.DO_NOTHING,  # Otherwise latency is considered for multiple packages since in parallel.
             )
             edge_city.start_listening_for_incoming_data()
             edge_cities.append(edge_city)
 
         edge_receivers = []
-        for i in range(architecture_parameters.NUMBER_OF_DISTRICTS):
+        for i in range(default_architecture_parameters.NUMBER_OF_DISTRICTS):
             connected_edge_aggregators = [
                 edge_central,
                 random.choice(edge_continents),
@@ -122,8 +122,8 @@ def run_configuration(config: Dict) -> ResultContainer:
                 simpy_env=env,
                 result_container=result_container,
                 name=f'District{i}',
-                mean_distance_km=architecture_parameters.MEAN_DISTANCE_CLIENT_DISTRICT,
-                std_distance_km=architecture_parameters.STD_DISTANCE_CLIENT_DISTRICT,
+                mean_distance_km=default_architecture_parameters.MEAN_DISTANCE_CLIENT_DISTRICT,
+                std_distance_km=default_architecture_parameters.STD_DISTANCE_CLIENT_DISTRICT,
                 on_processing_ended_specification=OnProcessingEndedEnum.SEND_TO_AGGREGATOR,
                 transmissions_to_aggregators=transmissions,
             )
@@ -147,8 +147,8 @@ def run_configuration(config: Dict) -> ResultContainer:
             result_container=result_container,
             name="Cloud",
             is_data_coming_from_first_link=True,
-            mean_distance_km=architecture_parameters.MEAN_DISTANCE_CLIENT_CENTRAL,
-            std_distance_km=architecture_parameters.STD_DISTANCE_CLIENT_CENTRAL,
+            mean_distance_km=default_architecture_parameters.MEAN_DISTANCE_CLIENT_CENTRAL,
+            std_distance_km=default_architecture_parameters.STD_DISTANCE_CLIENT_CENTRAL,
             on_processing_ended_specification=OnProcessingEndedEnum.SAVE_TOTAL_LATENCY,
         )
         cloud.start_listening_for_incoming_data()
