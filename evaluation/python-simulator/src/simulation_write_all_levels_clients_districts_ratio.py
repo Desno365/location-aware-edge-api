@@ -18,6 +18,7 @@ from src.processing_units.on_processing_ended_enum import OnProcessingEndedEnum
 
 TOTAL_PACKAGES_PRODUCED_BY_EACH_CLIENT = 2  # Note: each client has a waiting time before producing a new package.
 CLIENTS_DISTRICTS_RATIO_RANGE = range(1, 402, 26)  # start, end, step
+print(CLIENTS_DISTRICTS_RATIO_RANGE)
 
 CONFIGURATIONS_EDGE = [{"ratio": i, "type": "edge"} for i in CLIENTS_DISTRICTS_RATIO_RANGE]
 CONFIGURATIONS_CLOUD = [{"ratio": i, "type": "cloud"} for i in CLIENTS_DISTRICTS_RATIO_RANGE]

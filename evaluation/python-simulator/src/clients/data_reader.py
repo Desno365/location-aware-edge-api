@@ -31,6 +31,7 @@ class DataReader(object):
             transmission_to_country: Transmission = None,
             transmission_to_continent: Transmission = None,
             transmission_to_central: Transmission = None,
+            number_of_packages_to_read: int or None = None,
     ):
         assert (use_single_transmission and transmission is not None) or (not use_single_transmission and probabilities is not None and len(probabilities) == 6)
         self.simpy_env = simpy_env
@@ -45,13 +46,15 @@ class DataReader(object):
         self.transmission_to_country = transmission_to_country
         self.transmission_to_continent = transmission_to_continent
         self.transmission_to_central = transmission_to_central
+        self.number_of_packages_to_read = number_of_packages_to_read
 
     def start_reading_data(self):
         self.simpy_env.process(self.data_producer_process())
 
     def data_producer_process(self):
         """A process which randomly generates messages."""
-        while True:
+        number_of_packages_read = 0
+        while self.number_of_packages_to_read is None or number_of_packages_read < self.number_of_packages_to_read:
             # Wait a random time for the next data read.
             time_to_wait_for_next_data = Utils.get_random_positive_gaussian_value(mean=MEAN_TIME_FOR_NEW_DATA_READ, std=STD_TIME_FOR_NEW_DATA_READ)
             yield self.simpy_env.timeout(time_to_wait_for_next_data)
@@ -83,3 +86,5 @@ class DataReader(object):
                 print(f'{self.name} has waited {time_to_wait_for_next_data} and now is sending {created_data_size} MB of read request data.')
             transmission.put_in_cable(message)
             self.result_container.data_packages_produced += 1
+
+            number_of_packages_read += 1
