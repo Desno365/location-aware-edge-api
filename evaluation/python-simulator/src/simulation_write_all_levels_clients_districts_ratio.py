@@ -192,6 +192,7 @@ plt.plot(x_positions, total_latencies_edge, color="green")
 plt.plot(x_positions, total_latencies_cloud, color="red")
 plt.axes().set_ylim([0, None])
 plt.ylabel("Average Write Latency")
+plt.tight_layout()
 plt.show()
 
 '''
@@ -204,6 +205,7 @@ ax.plot(x_positions, total_latencies_cloud, color="red")
 ax.fill_between(x_positions, (total_latencies_cloud - total_latencies_confidence_cloud), (total_latencies_cloud + total_latencies_confidence_cloud), color="red", alpha=0.33)
 ax.set_ylim([0, None])
 fig.tight_layout()
+fig.show()
 '''
 
 # Plot sum of traffic uncut.
@@ -213,4 +215,5 @@ plt.plot(x_positions, total_traffic_per_distance_edge, color="green")
 plt.plot(x_positions, total_traffic_per_distance_cloud, color="red")
 plt.axes().set_ylim([0, None])
 plt.ylabel("Total (traffic in MB) * (distance in Km)")
+plt.tight_layout()
 plt.show()

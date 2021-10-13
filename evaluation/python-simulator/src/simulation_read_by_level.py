@@ -172,6 +172,7 @@ for result in results:
     plt.axes().yaxis.grid()  # horizontal lines
     plt.xticks(x_positions, names)
     plt.ylabel("Average Read Latency")
+    plt.tight_layout()
     plt.show()
 
 for result in results:
@@ -188,4 +189,5 @@ for result in results:
     plt.axes().yaxis.grid()  # horizontal lines
     plt.xticks(x_positions, names)
     plt.ylabel("Average Read Distance")
+    plt.tight_layout()
     plt.show()

@@ -179,6 +179,7 @@ plt.title('Read Latencies')
 plt.bar(x_positions_true, total_latencies, color="green")
 plt.axes().yaxis.grid()  # horizontal lines
 plt.ylabel("Average Read Latency")
+plt.tight_layout()
 plt.show()
 
 # Plot total distance.
@@ -187,6 +188,7 @@ plt.title('Read Distances')
 plt.bar(x_positions_true, distances, color="green")
 plt.axes().yaxis.grid()  # horizontal lines
 plt.ylabel("Average Read Distance")
+plt.tight_layout()
 plt.show()
 
 # Plot total latency.
@@ -195,6 +197,7 @@ plt.title('Read Latencies')
 plt.fill_between(x_positions_scaled, total_latencies)
 plt.axes().yaxis.grid()  # horizontal lines
 plt.ylabel("Average Read Latency")
+plt.tight_layout()
 plt.show()
 
 # Plot total distance.
@@ -203,6 +206,7 @@ plt.title('Read Distances')
 plt.fill_between(x_positions_scaled, distances)
 plt.axes().yaxis.grid()  # horizontal lines
 plt.ylabel("Average Read Distance")
+plt.tight_layout()
 plt.show()
 
 '''

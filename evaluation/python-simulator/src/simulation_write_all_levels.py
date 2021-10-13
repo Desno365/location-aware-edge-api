@@ -191,6 +191,7 @@ plt.bar(x_positions, total_latencies, color=colors)
 plt.axes().yaxis.grid()  # horizontal lines
 plt.xticks(x_positions, names)
 plt.ylabel("Average Write Latency")
+plt.tight_layout()
 plt.show()
 
 # Plot sum of traffic uncut.
@@ -206,6 +207,7 @@ plt.bar(x_positions, bars2, bottom=bars1, color='#557f2d')
 plt.xticks(x_positions, names)
 plt.ylabel("Total (traffic in MB) * (distance in Km)")
 plt.legend(["First link", "Second Link"])
+plt.tight_layout()
 plt.show()
 
 # Plot sum of traffic cut.
@@ -220,4 +222,5 @@ plt.axes().set_ylim([None, cut_limit])
 plt.xticks(x_positions, names)
 plt.ylabel("Total (traffic in MB) * (distance in Km)")
 plt.legend(["First link", "Second Link"])
+plt.tight_layout()
 plt.show()

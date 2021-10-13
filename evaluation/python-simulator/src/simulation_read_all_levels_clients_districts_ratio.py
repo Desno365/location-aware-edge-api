@@ -97,6 +97,7 @@ plt.plot(x_positions, total_latencies_edge, color="green")
 plt.plot(x_positions, total_latencies_cloud, color="red")
 plt.axes().set_ylim([0, None])
 plt.ylabel("Average Read Latency")
+plt.tight_layout()
 plt.show()
 
 # Plot sum of traffic uncut.
@@ -106,4 +107,5 @@ plt.plot(x_positions, total_distance_edge, color="green")
 plt.plot(x_positions, total_distance_cloud, color="red")
 plt.axes().set_ylim([0, None])
 plt.ylabel("Average Read Distance")
+plt.tight_layout()
 plt.show()

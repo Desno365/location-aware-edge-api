@@ -184,6 +184,7 @@ plt.title('Write Latencies')
 plt.plot(x_positions, total_latencies, color="green")
 plt.axes().set_ylim([0, None])
 plt.ylabel("Average Write Latency")
+plt.tight_layout()
 plt.show()
 
 '''
@@ -194,4 +195,5 @@ ax.plot(x_positions, total_latencies, color="green")
 ax.fill_between(x_positions, (total_latencies - total_latencies_confidence), (total_latencies + total_latencies_confidence), color="green", alpha=0.1)
 ax.set_ylim([0, None])
 fig.tight_layout()
+fig.show()
 '''
