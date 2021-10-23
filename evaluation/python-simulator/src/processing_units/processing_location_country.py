@@ -4,7 +4,7 @@ import simpy
 
 from src import default_architecture_parameters
 from src.communication.transmission import Transmission
-from src.processing_units.edge_location import EdgeLocation
+from src.processing_units.processing_location import ProcessingLocation
 from src.processing_units.on_processing_ended_enum import OnProcessingEndedEnum
 from src.result_container import ResultContainer
 
@@ -15,7 +15,7 @@ MEAN_PROCESSING_START_DELAY = 4.0
 STD_PROCESSING_START_DELAY = 1.0
 
 
-class EdgeLocationCountry(EdgeLocation):
+class ProcessingLocationCountry(ProcessingLocation):
     def __init__(
             self,
             simpy_env: simpy.Environment,

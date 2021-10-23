@@ -6,15 +6,15 @@ import numpy as np
 import simpy
 from matplotlib import pyplot as plt
 
-from src.clients.data_producer import DataProducer
+from src.clients.data_producer_client import DataProducerClient
 from result_container import ResultContainer
 from src import default_architecture_parameters
-from src.processing_units.edge_location_central import EdgeLocationCentral
-from src.processing_units.edge_location_city import EdgeLocationCity
-from src.processing_units.edge_location_continent import EdgeLocationContinent
-from src.processing_units.edge_location_country import EdgeLocationCountry
-from src.processing_units.edge_location_district import EdgeLocationDistrict
-from src.processing_units.edge_location_territory import EdgeLocationTerritory
+from src.processing_units.processing_location_central import ProcessingLocationCentral
+from src.processing_units.processing_location_city import ProcessingLocationCity
+from src.processing_units.processing_location_continent import ProcessingLocationContinent
+from src.processing_units.processing_location_country import ProcessingLocationCountry
+from src.processing_units.processing_location_district import ProcessingLocationDistrict
+from src.processing_units.processing_location_territory import ProcessingLocationTerritory
 from src.processing_units.on_processing_ended_enum import OnProcessingEndedEnum
 
 '''
@@ -135,7 +135,7 @@ def run_configuration(config: Dict) -> ResultContainer:
         edge_aggregators = []
         for i in range(config["#edge_aggregators"]):
             if config["aggregation_level"] == "city":
-                edge_aggregator = EdgeLocationCity(
+                edge_aggregator = ProcessingLocationCity(
                     simpy_env=env,
                     result_container=result_container,
                     name=f'EdgeAggregator{i}',
@@ -145,7 +145,7 @@ def run_configuration(config: Dict) -> ResultContainer:
                     on_processing_ended_specification=OnProcessingEndedEnum.SAVE_TOTAL_LATENCY,
                 )
             elif config["aggregation_level"] == "territory":
-                edge_aggregator = EdgeLocationTerritory(
+                edge_aggregator = ProcessingLocationTerritory(
                     simpy_env=env,
                     result_container=result_container,
                     name=f'EdgeAggregator{i}',
@@ -155,7 +155,7 @@ def run_configuration(config: Dict) -> ResultContainer:
                     on_processing_ended_specification=OnProcessingEndedEnum.SAVE_TOTAL_LATENCY,
                 )
             elif config["aggregation_level"] == "country":
-                edge_aggregator = EdgeLocationCountry(
+                edge_aggregator = ProcessingLocationCountry(
                     simpy_env=env,
                     result_container=result_container,
                     name=f'EdgeAggregator{i}',
@@ -165,7 +165,7 @@ def run_configuration(config: Dict) -> ResultContainer:
                     on_processing_ended_specification=OnProcessingEndedEnum.SAVE_TOTAL_LATENCY,
                 )
             elif config["aggregation_level"] == "continent":
-                edge_aggregator = EdgeLocationContinent(
+                edge_aggregator = ProcessingLocationContinent(
                     simpy_env=env,
                     result_container=result_container,
                     name=f'EdgeAggregator{i}',
@@ -175,7 +175,7 @@ def run_configuration(config: Dict) -> ResultContainer:
                     on_processing_ended_specification=OnProcessingEndedEnum.SAVE_TOTAL_LATENCY,
                 )
             elif config["aggregation_level"] == "central":
-                edge_aggregator = EdgeLocationCentral(
+                edge_aggregator = ProcessingLocationCentral(
                     simpy_env=env,
                     result_container=result_container,
                     name=f'EdgeAggregator{i}',
@@ -193,7 +193,7 @@ def run_configuration(config: Dict) -> ResultContainer:
         for i in range(config["#edge_receivers"]):
             connected_edge_aggregator = random.choice(edge_aggregators)
             transmission = connected_edge_aggregator.get_incoming_transmission()
-            edge_receiver = EdgeLocationDistrict(
+            edge_receiver = ProcessingLocationDistrict(
                 simpy_env=env,
                 result_container=result_container,
                 name=f'EdgeReceiver{i}',
@@ -208,16 +208,16 @@ def run_configuration(config: Dict) -> ResultContainer:
         for i in range(TOTAL_NUMBER_OF_PRODUCER_CLIENTS):
             connected_edge_receiver = random.choice(edge_receivers)
             transmission = connected_edge_receiver.get_incoming_transmission()
-            data_producer = DataProducer(
+            data_producer = DataProducerClient(
                 simpy_env=env,
                 result_container=result_container,
-                name=f'DataProducer{i}',
+                name=f'DataProducerClient{i}',
                 transmission_to_data_collector=transmission,
                 number_of_packages_to_produce=TOTAL_PACKAGES_PRODUCED_BY_EACH_CLIENT,
             )
             data_producer.start_producing_data()
     elif config["type"] == "cloud":  # If cloud, setup the cloud and data_producers
-        cloud = EdgeLocationCentral(
+        cloud = ProcessingLocationCentral(
             simpy_env=env,
             result_container=result_container,
             name="Cloud",
@@ -230,10 +230,10 @@ def run_configuration(config: Dict) -> ResultContainer:
 
         for i in range(TOTAL_NUMBER_OF_PRODUCER_CLIENTS):
             transmission = cloud.get_incoming_transmission()
-            data_producer = DataProducer(
+            data_producer = DataProducerClient(
                 simpy_env=env,
                 result_container=result_container,
-                name=f'DataProducer{i}',
+                name=f'DataProducerClient{i}',
                 transmission_to_data_collector=transmission,
                 number_of_packages_to_produce=TOTAL_PACKAGES_PRODUCED_BY_EACH_CLIENT,
             )

@@ -15,7 +15,7 @@ MEAN_SIZE_FOR_NEW_DATA_READ_REQUEST = 0.010  # In MB.
 STD_SIZE_FOR_NEW_DATA_READ_REQUEST = 0.001  # In MB.
 
 
-class DataReader(object):
+class DataReaderClient(object):
 
     def __init__(
             self,

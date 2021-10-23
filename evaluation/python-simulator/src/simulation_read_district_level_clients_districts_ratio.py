@@ -7,9 +7,9 @@ from matplotlib import pyplot as plt
 
 from result_container import ResultContainer
 from src import default_architecture_parameters
-from src.clients.data_reader import DataReader
-from src.processing_units.edge_location_central import EdgeLocationCentral
-from src.processing_units.edge_location_district import EdgeLocationDistrict
+from src.clients.data_reader_client import DataReaderClient
+from src.processing_units.processing_location_central import ProcessingLocationCentral
+from src.processing_units.processing_location_district import ProcessingLocationDistrict
 from src.processing_units.on_processing_ended_enum import OnProcessingEndedEnum
 
 TOTAL_PACKAGES_READ_BY_EACH_CLIENT = 2  # Note: each client has a waiting time before reading a new data.
@@ -32,7 +32,7 @@ def run_configuration(config: Dict) -> ResultContainer:
     edge_locations = []
     if config["type"] == "edge":
         for i in range(default_architecture_parameters.NUMBER_OF_DISTRICTS):
-            edge_district = EdgeLocationDistrict(
+            edge_district = ProcessingLocationDistrict(
                 simpy_env=env,
                 result_container=result_container,
                 name=f'Location{i}',
@@ -43,7 +43,7 @@ def run_configuration(config: Dict) -> ResultContainer:
             edge_district.start_listening_for_incoming_data()
             edge_locations.append(edge_district)
     elif config["type"] == "cloud":  # If cloud, setup the cloud and data_producers
-        cloud = EdgeLocationCentral(
+        cloud = ProcessingLocationCentral(
             simpy_env=env,
             result_container=result_container,
             name="Cloud",
@@ -58,10 +58,10 @@ def run_configuration(config: Dict) -> ResultContainer:
         raise Exception('Type not recognized')
 
     for i in range(number_of_clients):
-        data_reader = DataReader(
+        data_reader = DataReaderClient(
             simpy_env=env,
             result_container=result_container,
-            name=f'DataProducer{i}',
+            name=f'DataProducerClient{i}',
             use_single_transmission=True,
             transmission=random.choice(edge_locations).get_incoming_transmission(),
             number_of_packages_to_read=TOTAL_PACKAGES_READ_BY_EACH_CLIENT,

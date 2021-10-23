@@ -7,13 +7,13 @@ from matplotlib import pyplot as plt
 
 from result_container import ResultContainer
 from src import default_architecture_parameters
-from src.clients.data_producer import DataProducer
-from src.processing_units.edge_location_central import EdgeLocationCentral
-from src.processing_units.edge_location_city import EdgeLocationCity
-from src.processing_units.edge_location_continent import EdgeLocationContinent
-from src.processing_units.edge_location_country import EdgeLocationCountry
-from src.processing_units.edge_location_district import EdgeLocationDistrict
-from src.processing_units.edge_location_territory import EdgeLocationTerritory
+from src.clients.data_producer_client import DataProducerClient
+from src.processing_units.processing_location_central import ProcessingLocationCentral
+from src.processing_units.processing_location_city import ProcessingLocationCity
+from src.processing_units.processing_location_continent import ProcessingLocationContinent
+from src.processing_units.processing_location_country import ProcessingLocationCountry
+from src.processing_units.processing_location_district import ProcessingLocationDistrict
+from src.processing_units.processing_location_territory import ProcessingLocationTerritory
 from src.processing_units.on_processing_ended_enum import OnProcessingEndedEnum
 
 TOTAL_NUMBER_OF_PRODUCER_CLIENTS = 2000
@@ -40,7 +40,7 @@ def run_configuration(config: Dict) -> ResultContainer:
 
     # Setup processes in the simulation.
     if config["type"] == "edge":
-        edge_central = EdgeLocationCentral(
+        edge_central = ProcessingLocationCentral(
             simpy_env=env,
             result_container=result_container,
             name=f'Central',
@@ -53,7 +53,7 @@ def run_configuration(config: Dict) -> ResultContainer:
 
         edge_continents = []
         for i in range(default_architecture_parameters.NUMBER_OF_CONTINENTS):
-            edge_continent = EdgeLocationContinent(
+            edge_continent = ProcessingLocationContinent(
                 simpy_env=env,
                 result_container=result_container,
                 name=f'Continent{i}',
@@ -67,7 +67,7 @@ def run_configuration(config: Dict) -> ResultContainer:
 
         edge_countries = []
         for i in range(default_architecture_parameters.NUMBER_OF_COUNTRIES):
-            edge_country = EdgeLocationCountry(
+            edge_country = ProcessingLocationCountry(
                 simpy_env=env,
                 result_container=result_container,
                 name=f'Country{i}',
@@ -81,7 +81,7 @@ def run_configuration(config: Dict) -> ResultContainer:
 
         edge_territories = []
         for i in range(default_architecture_parameters.NUMBER_OF_TERRITORIES):
-            edge_territory = EdgeLocationTerritory(
+            edge_territory = ProcessingLocationTerritory(
                 simpy_env=env,
                 result_container=result_container,
                 name=f'Territory{i}',
@@ -95,7 +95,7 @@ def run_configuration(config: Dict) -> ResultContainer:
 
         edge_cities = []
         for i in range(default_architecture_parameters.NUMBER_OF_CITIES):
-            edge_city = EdgeLocationCity(
+            edge_city = ProcessingLocationCity(
                 simpy_env=env,
                 result_container=result_container,
                 name=f'City{i}',
@@ -118,7 +118,7 @@ def run_configuration(config: Dict) -> ResultContainer:
             ]
             transmissions = [connected_edge_aggregator.get_incoming_transmission() for connected_edge_aggregator in connected_edge_aggregators]
             assert len(transmissions) == 5
-            edge_receiver = EdgeLocationDistrict(
+            edge_receiver = ProcessingLocationDistrict(
                 simpy_env=env,
                 result_container=result_container,
                 name=f'District{i}',
@@ -133,16 +133,16 @@ def run_configuration(config: Dict) -> ResultContainer:
         for i in range(TOTAL_NUMBER_OF_PRODUCER_CLIENTS):
             connected_edge_receiver = random.choice(edge_receivers)
             transmission = connected_edge_receiver.get_incoming_transmission()
-            data_producer = DataProducer(
+            data_producer = DataProducerClient(
                 simpy_env=env,
                 result_container=result_container,
-                name=f'DataProducer{i}',
+                name=f'DataProducerClient{i}',
                 transmission_to_data_collector=transmission,
                 number_of_packages_to_produce=TOTAL_PACKAGES_PRODUCED_BY_EACH_CLIENT
             )
             data_producer.start_producing_data()
     elif config["type"] == "cloud":  # If cloud, setup the cloud and data_producers
-        cloud = EdgeLocationCentral(
+        cloud = ProcessingLocationCentral(
             simpy_env=env,
             result_container=result_container,
             name="Cloud",
@@ -155,10 +155,10 @@ def run_configuration(config: Dict) -> ResultContainer:
 
         for i in range(TOTAL_NUMBER_OF_PRODUCER_CLIENTS):
             transmission = cloud.get_incoming_transmission()
-            data_producer = DataProducer(
+            data_producer = DataProducerClient(
                 simpy_env=env,
                 result_container=result_container,
-                name=f'DataProducer{i}',
+                name=f'DataProducerClient{i}',
                 transmission_to_data_collector=transmission,
                 number_of_packages_to_produce=TOTAL_PACKAGES_PRODUCED_BY_EACH_CLIENT
             )

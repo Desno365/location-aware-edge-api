@@ -4,12 +4,12 @@ import simpy
 
 from src import default_architecture_parameters
 from src.communication.transmission import Transmission
-from src.processing_units.edge_location import EdgeLocation
+from src.processing_units.processing_location import ProcessingLocation
 from src.processing_units.on_processing_ended_enum import OnProcessingEndedEnum
 from src.result_container import ResultContainer
 
 
-class EdgeLocationCentral(EdgeLocation):
+class ProcessingLocationTerritory(ProcessingLocation):
     def __init__(
             self,
             simpy_env: simpy.Environment,
@@ -28,10 +28,10 @@ class EdgeLocationCentral(EdgeLocation):
             result_container=result_container,
             name=name,
 
-            number_of_cores=default_architecture_parameters.NUMBER_OF_CORES_CENTRAL,
-            bandwidth_capability=default_architecture_parameters.BANDWIDTH_CAPABILITY_CENTRAL,
-            mean_processing_start_delay=default_architecture_parameters.MEAN_PROCESSING_START_DELAY_CENTRAL,
-            std_processing_start_delay=default_architecture_parameters.STD_PROCESSING_START_DELAY_CENTRAL,
+            number_of_cores=default_architecture_parameters.NUMBER_OF_CORES_TERRITORY,
+            bandwidth_capability=default_architecture_parameters.BANDWIDTH_CAPABILITY_TERRITORY,
+            mean_processing_start_delay=default_architecture_parameters.MEAN_PROCESSING_START_DELAY_TERRITORY,
+            std_processing_start_delay=default_architecture_parameters.STD_PROCESSING_START_DELAY_TERRITORY,
 
             is_data_coming_from_first_link=is_data_coming_from_first_link,
             mean_distance_km=mean_distance_km,

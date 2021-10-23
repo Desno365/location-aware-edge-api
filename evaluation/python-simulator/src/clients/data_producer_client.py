@@ -12,7 +12,7 @@ MEAN_SIZE_FOR_NEW_DATA_PRODUCED = 0.423  # In MB. Average Full HD JPG 100% quali
 STD_SIZE_FOR_NEW_DATA_PRODUCED = 0.150  # In MB.
 
 
-class DataProducer(object):
+class DataProducerClient(object):
 
     def __init__(self, simpy_env: simpy.Environment, result_container: ResultContainer, name: str, transmission_to_data_collector: Transmission, number_of_packages_to_produce: int or None):
         self.simpy_env = simpy_env

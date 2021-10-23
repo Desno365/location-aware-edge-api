@@ -13,7 +13,7 @@ MEAN_SIZE_FOR_PROCESSED_DATA = 0.010  # In MB.
 STD_SIZE_FOR_PROCESSED_DATA = 0.001  # In MB.
 
 
-class EdgeLocation(ProcessingUnit):
+class ProcessingLocation(ProcessingUnit):
     def __init__(
             self,
             simpy_env: simpy.Environment,
