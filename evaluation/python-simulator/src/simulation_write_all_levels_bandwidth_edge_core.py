@@ -19,9 +19,10 @@ from src.processing_units.on_processing_ended_enum import OnProcessingEndedEnum
 
 TOTAL_NUMBER_OF_PRODUCER_CLIENTS = 2000
 TOTAL_PACKAGES_PRODUCED_BY_EACH_CLIENT = 2  # Note: each client has a waiting time before producing a new package.
-BANDWIDTH_RATIO_RANGE = np.linspace(0.1, 1, 32)  # start, end, num_of_points
+BANDWIDTH_RATIO_RANGE = np.linspace(0.1, 1, 64)  # start, end, num_of_points
 
-CONFIGURATIONS = [{"ratio": i, "type": "edge"} for i in BANDWIDTH_RATIO_RANGE]
+EDGE_CONFIGURATIONS = [{"ratio": i, "type": "edge"} for i in BANDWIDTH_RATIO_RANGE]
+CLOUD_CONFIGURATION = {"ratio": 1, "type": "cloud"}
 
 
 def run_configuration(config: Dict) -> ResultContainer:
@@ -170,7 +171,9 @@ def run_configuration(config: Dict) -> ResultContainer:
 
 
 pool = multiprocessing.Pool()
-results = pool.map(run_configuration, CONFIGURATIONS)
+results = pool.map(run_configuration, EDGE_CONFIGURATIONS)
+
+cloud_result = run_configuration(CLOUD_CONFIGURATION)
 
 # Prepare plot variables
 total_latencies = np.array([result.get_average_total_latency() for result in results])
@@ -182,8 +185,12 @@ x_positions = [i for i in BANDWIDTH_RATIO_RANGE]
 plt.figure(figsize=(8, 6))
 plt.title('Write Latencies')
 plt.plot(x_positions, total_latencies, color="green")
+plt.axhline(y=cloud_result.get_average_total_latency(), color='r', linestyle='dotted')
+plt.axes().set_xlim([0, 1.0])
 plt.axes().set_ylim([0, None])
+plt.ylabel("% of CPU power for lower level in respect to highest level")
 plt.ylabel("Average Write Latency")
+plt.legend(["Edge solution", "Cloud solution"])
 plt.tight_layout()
 plt.show()
 

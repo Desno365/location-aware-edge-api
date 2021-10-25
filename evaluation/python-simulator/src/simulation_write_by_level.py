@@ -282,8 +282,8 @@ bars3 = second_link_latencies
 bars4 = second_processing_latencies
 bars_1_plus_2 = np.add(bars1, bars2).tolist()
 bars_1_plus_2_plus_3 = np.add(bars_1_plus_2, bars3).tolist()
-plt.bar(x_positions, bars1, color='#7f6d5f')
-plt.bar(x_positions, bars2, bottom=bars1, color='#557f2d')
+plt.bar(x_positions, bars1, color='#333333')
+plt.bar(x_positions, bars2, bottom=bars1, color='#7f6d5f')
 plt.bar(x_positions, bars3, bottom=bars_1_plus_2, color='#2d7f5e')
 plt.bar(x_positions, bars4, bottom=bars_1_plus_2_plus_3, color='#34e363')
 plt.xticks(x_positions, names)
@@ -297,8 +297,8 @@ plt.figure(figsize=(8, 6))
 plt.title('Traffic * Distance')
 bars1 = first_traffic_per_distance
 bars2 = second_traffic_per_distance
-plt.bar(x_positions, bars1, color='#7f6d5f')
-plt.bar(x_positions, bars2, bottom=bars1, color='#557f2d')
+plt.bar(x_positions, bars1, color='#333333')
+plt.bar(x_positions, bars2, bottom=bars1, color='#2d7f5e')
 plt.xticks(x_positions, names)
 plt.ylabel("Total (traffic in MB) * (distance in Km)")
 plt.legend(["First link", "Second Link"])
@@ -311,8 +311,8 @@ cut_limit = int(1.5 * (first_traffic_per_distance[-2] + second_traffic_per_dista
 plt.title(f'Traffic * Distance (cut at {cut_limit})')
 bars1 = first_traffic_per_distance
 bars2 = second_traffic_per_distance
-plt.bar(x_positions, bars1, color='#7f6d5f')
-plt.bar(x_positions, bars2, bottom=bars1, color='#557f2d')
+plt.bar(x_positions, bars1, color='#333333')
+plt.bar(x_positions, bars2, bottom=bars1, color='#2d7f5e')
 plt.axes().set_ylim([None, cut_limit])
 plt.xticks(x_positions, names)
 plt.ylabel("Total (traffic in MB) * (distance in Km)")

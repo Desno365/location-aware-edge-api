@@ -185,7 +185,7 @@ colors = ['green' if result.simulation_type == 'edge' else 'red' for result in r
 x_positions = (range(len(results)))
 
 # Plot total latency.
-plt.figure(figsize=(8, 6))
+plt.figure(figsize=(5, 5))
 plt.title('Write Latencies')
 plt.bar(x_positions, total_latencies, color=colors)
 plt.axes().yaxis.grid()  # horizontal lines
@@ -195,15 +195,15 @@ plt.tight_layout()
 plt.show()
 
 # Plot sum of traffic uncut.
-plt.figure(figsize=(8, 6))
+plt.figure(figsize=(5, 5))
 plt.title('Traffic * Distance')
 bars1 = first_traffic_per_distance
 bars2 = second_traffic_per_distance
 print(results[0].traffic_per_distance_second_link_list[:100])
 print(bars1)
 print(bars2)
-plt.bar(x_positions, bars1, color='#7f6d5f')
-plt.bar(x_positions, bars2, bottom=bars1, color='#557f2d')
+plt.bar(x_positions, bars1, color='#333333')
+plt.bar(x_positions, bars2, bottom=bars1, color='#2d7f5e')
 plt.xticks(x_positions, names)
 plt.ylabel("Total (traffic in MB) * (distance in Km)")
 plt.legend(["First link", "Second Link"])
@@ -211,13 +211,13 @@ plt.tight_layout()
 plt.show()
 
 # Plot sum of traffic cut.
-plt.figure(figsize=(8, 6))
+plt.figure(figsize=(5, 5))
 cut_limit = int(1.5 * (first_traffic_per_distance[-2] + second_traffic_per_distance[-2]))
 plt.title(f'Total traffic * distance (cut at {cut_limit})')
 bars1 = first_traffic_per_distance
 bars2 = second_traffic_per_distance
-plt.bar(x_positions, bars1, color='#7f6d5f')
-plt.bar(x_positions, bars2, bottom=bars1, color='#557f2d')
+plt.bar(x_positions, bars1, color='#333333')
+plt.bar(x_positions, bars2, bottom=bars1, color='#2d7f5e')
 plt.axes().set_ylim([None, cut_limit])
 plt.xticks(x_positions, names)
 plt.ylabel("Total (traffic in MB) * (distance in Km)")
