@@ -1,6 +1,342 @@
 \chapter{Experimental evaluation}
 \label{ch:experiments}
 
+In this chapter, we present experimental results on the system proposed. Two types of evaluations are present: a first assessment done on the working prototype running on multiple \glspl{VM} and an evaluation of the performance of the approach, measured using a simulation run on a discrete-event simulator.
+In the first case, since it's not possible to emulate a network similar to a real edge network due to the amount of resources needed, we focus on the effectiveness, efficiency and usability of the framework.
+While with the discrete-event simulation at hand we can focus on the performance obtained and the resources consumed.
+In both scenarios we compare the proposed approach to a typical core-centric approach.
+
+
+
+\section{Emulation}
+TODO
+
+
+
+\section{Simulation}
+Using a popular discrete-event simulator written in Python, called SimPy \cite{simpy}, we developed a simulation of our approach. Then we compared our approach with the simulation of a core-centric approach.
+
+
+\subsection{Components}
+To simulate the framework we developed the following abstract components in SimPy:
+\begin{itemize}
+    \item \inlinecode{Client}: a simplified abstraction of a machine that simply sends or requests data;
+    \item \inlinecode{Transmission}: a simplified abstraction of a virtual link between two machines;
+    \item \inlinecode{ProcessingUnit}: a simplified abstraction of a machine that performs a processing job;
+\end{itemize}
+
+In the following section we see in the details the behaviour of these abstract components, and their respective realization.
+
+
+\subsubsection{Client}
+There are two realizations of the \inlinecode{Client} abstract component:
+\begin{itemize}
+    \item \inlinecode{DataProducerClient}: produces a message with a significant amount of data and always sends the message in a deterministic way to a single \inlinecode{ProcessingUnit} (when simulating our edge approach it sends the message to the lowest level of the hierarchy);
+    \item \inlinecode{DataReaderClient}: that produces a message with a small amount of data, this message is used to simulate the retrieval of aggregated data. In the edge scenario the level contacted to make the read request can be any level of the hierarchy.
+\end{itemize}
+
+
+\subsubsection{Transmission}
+The \inlinecode{Transmission} component allows to simulate the communication between a \inlinecode{Client} and a \inlinecode{ProcessingUnit} or between two \inlinecode{ProcessingUnit} components.
+The \inlinecode{Transmission} is initialized with two inputs: the information about the distance between the two machines and a boolean value (\inlinecode{is\_weak\_network}) specifying if the communication passes through only the faster backbone network. The job of the \inlinecode{Transmission} component is converting the two inputs into a single value of latency and simulating this latency.
+
+To compute the latency the \inlinecode{Transmission} component does as follows:
+
+\[ latency = network\_delay +  distance\_delay \]
+
+\[
+    network\_delay= 
+\begin{cases}
+    weak\_network\_delay,    & \text{if } is\_weak\_network\\
+    robust\_network\_delay,  & \text{otherwise}
+\end{cases}
+\]
+
+\[ distance\_delay = \frac{distance}{SPEED\_OF\_SIGNAL} \]
+
+The \inlinecode{network\_delay} is a value representing a constant latency toll that needs to be paid when making the communication, this value simply depends on the \inlinecode{is\_weak\_network} boolean. The network which is used by the client (i.e., Wi-Fi, LTE, copper cables) is considered to be weak.
+
+The \inlinecode{distance\_delay} is a value that is proportional to the distance that the signal needs to travel.
+
+The constant \inlinecode{SPEED\_OF\_SIGNAL} is computed in the following way:
+
+\[ SPEED\_OF\_SIGNAL = c \cdot 0.67 \cdot 0.50 \cdot \frac{1}{\sqrt{2}} \]
+
+Where \inlinecode{c} is the speed of light in a vacuum; 0.67 denotes how fast a signal travels through the optical fiber media \cite{optical-fiber-latency}; 0.50 is used to take into consideration the round trip time; \(\frac{1}{\sqrt{2}}\) ($\approx$0.707) is used to take into consideration the fact that cables cannot make a direct path between two points, this offset allows us to put as input the straight line distance between two points.
+
+
+\subsubsection{ProcessingUnit}
+A \inlinecode{ProcessingUnit} component waits for data coming from a \inlinecode{Transmission} component. When new data arrives it is put in an unbounded queue that is used by the cores for starting the processes, so by having \textit{N} cores it means that the \inlinecode{ProcessingUnit} can execute \textit{N} processes in parallel.
+When a core is free it takes as input the data from the queue and starts simulating the data processing. The simulation time needed for the data processing is computed as the sum of \inlinecode{start\_delay} and \inlinecode{time\_to\_process}. The value of \inlinecode{start\_delay} is used to simulate a constant delay needed to start the processing and initializing the required resources, while \inlinecode{time\_to\_process} is a value that is computed as:
+
+\[ time\_to\_process = \frac{megabytes\_of\_data}{bandwidth\_capability} \]
+
+Where \inlinecode{megabytes\_of\_data} represents the quantity of data sent in the message and \inlinecode{bandwidth\_capability} represents the Megabytes per unit of time that the core can process. As we will see, a core of an edge device is assumed to be less performing than a core in a big cloud data-center.
+
+The realizations of \inlinecode{ProcessingUnit} are shown below in Figure \ref{fig:processing-unit-realizations}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.66\linewidth]{Figures/Evaluation/processing-unit-realizations.png}
+    \caption{Concrete realizations of the ProcessingUnit component.}
+    \label{fig:processing-unit-realizations}
+\end{figure}
+
+
+\subsection{Matching the abstractions to a real use case}
+To better narrow down the abstractions we can see in one of our use cases how these abstractions match a real scenario: in the traffic use case (TODO ref to use case chapter) the \inlinecode{DataProducerClient} represents the camera producing frames of the road. In our edge scenario the camera sends the frame to the lowest level in the hierarchy, which in our example architecture correspond to the "district" level (\inlinecode{ProcessingLocationDistrict}). While in the core-centric scenario the camera sends the frame to the central cloud (\inlinecode{ProcessingLocationCentral}).
+
+The action of sending the frame is simulated using the \inlinecode{Transmission} component. The frame is then processed by applying an image recognition algorithm, an algorithm which is simulated as a data processing by the receiving \inlinecode{ProcessingUnit}.
+
+In the core-centric scenario the output data is ready when finished processing. While in our edge scenario the ouput data is sent to the specified aggregating \inlinecode{ProcessingUnit} which needs to save the data. The communication is again simulated using the \inlinecode{Transmission} component, while the saving of data is simulated as a small processing of data in the aggregating \inlinecode{ProcessingUnit}.
+
+A client can then need to know the traffic in a specific area. This is simulated using the \inlinecode{DataReaderClient} component which can send a read request message, sent using the \inlinecode{Transmission} component and processed by the receiving \inlinecode{ProcessingUnit}.
+
+
+\subsection{Simulation Setting}
+\label{section:simulation_setting}
+Since the setting is similar in the various experiments, we present in the tables below the default values of the variables used in the experiments. The actual value will be extracted case by case from a normal distribution truncated to the left at zero. If the standard deviation is zero the value is actually a constant. Unless specified otherwise the values specified here are the ones used in the experiments.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|l|}
+\hline
+\textbf{Variable}                                               & \textbf{Mean}              & \textbf{Standard deviation} \\ \hline
+\begin{tabular}[c]{@{}c@{}}Number of clients\end{tabular}       & 2000                       & 0                           \\ \hline
+\begin{tabular}[c]{@{}c@{}}Time between requests\end{tabular}   & 10s                        & 3s                          \\ \hline
+\begin{tabular}[c]{@{}c@{}}Message size\end{tabular}            & 423KB                      & 150KB                       \\ \hline
+\end{tabular}
+\caption{Default values for variables of DataProducerClient}
+\label{tab:default_setting_data_producer}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|l|}
+\hline
+\textbf{Variable}                                               & \textbf{Mean}              & \textbf{Standard deviation} \\ \hline
+\begin{tabular}[c]{@{}c@{}}Number of clients\end{tabular}       & 2000                       & 0                           \\ \hline
+\begin{tabular}[c]{@{}c@{}}Time between requests\end{tabular}   & 5s                         & 2s                          \\ \hline
+\begin{tabular}[c]{@{}c@{}}Message size\end{tabular}            & 10KB                       & 1KB                         \\ \hline
+\end{tabular}
+\caption{Default values for variables of DataReaderClient}
+\label{tab:default_setting_data_reader}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|l|}
+\hline
+\textbf{Variable}                                              & \textbf{Mean}              & \textbf{Standard deviation} \\ \hline
+\begin{tabular}[c]{@{}c@{}}Weak network delay\end{tabular}     & 12ms                       & 8ms                         \\ \hline
+\begin{tabular}[c]{@{}c@{}}Robust network delay\end{tabular}   & 3ms                        & 1ms                         \\ \hline
+\end{tabular}
+\caption{Default values for variables of Transmission}
+\label{tab:default_setting_transmission}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|l|}
+\hline
+\textbf{Variable}                                                       & \textbf{Mean}              & \textbf{Standard deviation} \\ \hline
+\begin{tabular}[c]{@{}c@{}}Number of districts\end{tabular}             & 1000                       & 0                           \\ \hline
+\begin{tabular}[c]{@{}c@{}}Distance client-district\end{tabular}        & 20km                       & 8km                         \\ \hline
+\begin{tabular}[c]{@{}c@{}}Number of cores per district\end{tabular}    & 2                          & 0                           \\ \hline
+\begin{tabular}[c]{@{}c@{}}Processing bandwidth per core\end{tabular}   & 10MB/s                     & 0                           \\ \hline
+\begin{tabular}[c]{@{}c@{}}Processing start delay\end{tabular}          & 5ms                        & 2ms                         \\ \hline
+\end{tabular}
+\caption{Default values for variables of ProcessingLocationDistrict}
+\label{tab:default_setting_district}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|l|}
+\hline
+\textbf{Variable}                                                       & \textbf{Mean}              & \textbf{Standard deviation} \\ \hline
+\begin{tabular}[c]{@{}c@{}}Number of cities\end{tabular}                & 400                        & 0                           \\ \hline
+\begin{tabular}[c]{@{}c@{}}Distance client-city\end{tabular}            & 60km                       & 15km                        \\ \hline
+\begin{tabular}[c]{@{}c@{}}Distance district-city\end{tabular}          & 50km                       & 15km                        \\ \hline
+\begin{tabular}[c]{@{}c@{}}Number of cores per city\end{tabular}        & 2                          & 0                           \\ \hline
+\begin{tabular}[c]{@{}c@{}}Processing bandwidth per core\end{tabular}   & 10MB/s                     & 0                           \\ \hline
+\begin{tabular}[c]{@{}c@{}}Processing start delay\end{tabular}          & 5ms                        & 2ms                         \\ \hline
+\end{tabular}
+\caption{Default values for variables of ProcessingLocationCity}
+\label{tab:default_setting_city}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|l|}
+\hline
+\textbf{Variable}                                                            & \textbf{Mean}              & \textbf{Standard deviation} \\ \hline
+\begin{tabular}[c]{@{}c@{}}Number of territories\end{tabular}                & 200                        & 0                           \\ \hline
+\begin{tabular}[c]{@{}c@{}}Distance client-territory\end{tabular}            & 300km                      & 100km                       \\ \hline
+\begin{tabular}[c]{@{}c@{}}Distance district-territory\end{tabular}          & 290km                      & 100km                       \\ \hline
+\begin{tabular}[c]{@{}c@{}}Number of cores per district\end{tabular}         & 4                          & 0                           \\ \hline
+\begin{tabular}[c]{@{}c@{}}Processing bandwidth per core\end{tabular}        & 15MB/s                     & 0                           \\ \hline
+\begin{tabular}[c]{@{}c@{}}Processing start delay\end{tabular}               & 4ms                        & 1ms                         \\ \hline
+\end{tabular}
+\caption{Default values for variables of ProcessingLocationTerritory}
+\label{tab:default_setting_territory}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|l|}
+\hline
+\textbf{Variable}                                                          & \textbf{Mean}              & \textbf{Standard deviation} \\ \hline
+\begin{tabular}[c]{@{}c@{}}Number of countries\end{tabular}                & 80                         & 0                           \\ \hline
+\begin{tabular}[c]{@{}c@{}}Distance client-country\end{tabular}            & 700km                      & 300km                       \\ \hline
+\begin{tabular}[c]{@{}c@{}}Distance district-country\end{tabular}          & 690km                      & 300km                       \\ \hline
+\begin{tabular}[c]{@{}c@{}}Number of cores per country\end{tabular}        & 4                          & 0                           \\ \hline
+\begin{tabular}[c]{@{}c@{}}Processing bandwidth per core\end{tabular}      & 15MB/s                     & 0                           \\ \hline
+\begin{tabular}[c]{@{}c@{}}Processing start delay\end{tabular}             & 4ms                        & 1ms                         \\ \hline
+\end{tabular}
+\caption{Default values for variables of ProcessingLocationCountry}
+\label{tab:default_setting_country}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|l|}
+\hline
+\textbf{Variable}                                                            & \textbf{Mean}              & \textbf{Standard deviation} \\ \hline
+\begin{tabular}[c]{@{}c@{}}Number of continents\end{tabular}                 & 7                          & 0                           \\ \hline
+\begin{tabular}[c]{@{}c@{}}Distance client-continent\end{tabular}            & 1500km                     & 500km                       \\ \hline
+\begin{tabular}[c]{@{}c@{}}Distance district-continent\end{tabular}          & 1490km                     & 500km                       \\ \hline
+\begin{tabular}[c]{@{}c@{}}Number of cores per continent\end{tabular}        & 1000                       & 0                           \\ \hline
+\begin{tabular}[c]{@{}c@{}}Processing bandwidth per core\end{tabular}        & 20MB/s                     & 0                           \\ \hline
+\begin{tabular}[c]{@{}c@{}}Processing start delay\end{tabular}               & 4ms                        & 1ms                         \\ \hline
+\end{tabular}
+\caption{Default values for variables of ProcessingLocationContinent}
+\label{tab:default_setting_continent}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|l|}
+\hline
+\textbf{Variable}                                                   & \textbf{Mean}              & \textbf{Standard deviation} \\ \hline
+\begin{tabular}[c]{@{}c@{}}Distance client-central\end{tabular}     & 5000km                     & 2000km                      \\ \hline
+\begin{tabular}[c]{@{}c@{}}Distance district-central\end{tabular}   & 4990km                     & 2000km                      \\ \hline
+\begin{tabular}[c]{@{}c@{}}Number of cores\end{tabular}             & 1000                       & 0                           \\ \hline
+\begin{tabular}[c]{@{}c@{}}Processing bandwidth\end{tabular}        & 20MB/s                     & 0                           \\ \hline
+\begin{tabular}[c]{@{}c@{}}Processing start delay\end{tabular}      & 4ms                        & 1ms                         \\ \hline
+\end{tabular}
+\caption{Default values for variables of ProcessingLocationCentral}
+\label{tab:default_setting_central}
+\end{table}
+
+
+\subsection{Results}
+In each experiment we ran our SimPy simulation and let thousands of clients connect to the thousands of cloudlets and data centers, we collected data about latencies, distances and traffic and now we show in this section the results.
+By having many variables extracted from the truncated normal distributions, we are effectively running random experiments where it makes sense to show a confidence interval calculated on the list of samples obtained. But collecting numerous samples is easy in a simulation, in fact we obtained in all the experiments a really tight 95\% confidence interval that cannot even be seen on the plot.
+
+
+\subsubsection{Write by level}
+In this experiment we suppose that the developer wants a single geographical aggregation, this means that we are simulating as if we were using our framework with the \inlinecode{saveAlsoInIntermediateLevels} set to \inlinecode{false}.
+The clients send their data to the bottom level of the hierarchy (\inlinecode{ProcessingLocationDistrict} in case of the edge approach, \inlinecode{ProcessingLocationCentral} in case of the cloud approach). The data is then processed and, in the case of the edge approach, forwarded to the \inlinecode{referringArea} that aggregates the data.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{Figures/Evaluation/write-by-latency2.png}
+    \caption{Details on the average write latency compared between various aggregation in the edge setup and compared to the cloud setup.}
+    \label{fig:write-by-latency2}
+\end{figure}
+
+In Figure \ref{fig:write-by-latency2} we can see the average write latency for each setup. For the edge approach we show the result of five different setups with five different levels of aggregation (city, territory, country, continent, central).
+This average write latency comes from four different operations:
+\begin{itemize}
+    \item First link latency: latency of the communication between the client and the receiving machine.
+    \item Processing latency: latency that considers the wait time for a core to be free and the processing time for the data sent by the client. We can see in the plot that the processing time of the cloud solution is close to half of the processing time in the edge setups, this is due the fact that the core bandwidth of a core in \inlinecode{ProcessingLocationCentral} is supposed to be double the core bandwidth of a core in \inlinecode{ProcessingLocationDistrict}.
+    \item Second link latency: latency of the communication between the receiving  \inlinecode{ProcessingUnit} and the aggregating \inlinecode{ProcessingUnit}. This latency is only present in the setups using the edge approach.
+    \item Aggregation latency: time required by the aggregating \inlinecode{ProcessingUnit} to save the data received from the \inlinecode{ProcessingLocationDistrict}. This time is the sum of the wait time for a core to be free and the time to save the processed data.
+\end{itemize}
+
+This result shows that with the edge approach using any aggregation level we have a smaller average latency than the cloud solution thanks to a much smaller travel distance needed to reach the aggregating \inlinecode{ProcessingUnit}. The only exception is the central aggregation of the edge approach, which is expected since it has the same travel distance of the cloud solution, but by doing the processing on the lower level of the hierarchy we have a smaller processing power.
+
+Using this same experiment we now analyze the huge improvements our edge approach gives to the traffic in the network.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{Figures/Evaluation/write-by-traffic1.png}
+    \caption{Traffic per distance generated in the network.}
+    \label{fig:write-by-traffic1}
+\end{figure}
+
+In Figure \ref{fig:write-by-traffic1} we show the total traffic in megabytes multiplied by the distance travelled. This visualization is used to show that the cloud solution clogs the entire network, instead by processing the data near the client we obtain a huge saving in terms of bandwidth used in the network.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{Figures/Evaluation/write-by-traffic2.png}
+    \caption{Traffic per distance generated in the network (cut at a lower traffic*distance value).}
+    \label{fig:write-by-traffic2}
+\end{figure}
+
+In Figure \ref{fig:write-by-traffic2} we zoom on the values of the setups of the edge approach by cutting the plot at a lower traffic*distance value. We can see how the traffic*distance values in the first link for the edge approach are very much similar since in all five setups we have the same communication between the \inlinecode{DataProducerClient} and the \inlinecode{ProcessingLocationDistrict}. While for the second link we find an increase in the traffic*distance due to the fact that the distance increases between the \inlinecode{ProcessingLocationDistrict} and the aggregating \inlinecode{ProcessingUnit}.
+
+
+\subsubsection{Write all levels}
+In this experiment, for the edge approach, we suppose that the developer uses the boolean \inlinecode{saveAlsoInIntermediateLevels} set to \inlinecode{true} and sets the \inlinecode{referringAreaType} in our framework to the highest level of the hierarchy (central). Meaning that all writes made at the receiving  \inlinecode{ProcessingLocationDistrict} are forwarded to the upper levels. This setup is compared to the cloud setup in which data are sent to a central data center that can aggregate them by location.
+
+Writes to upper levels happen in parallel, so we expect to have an average latency similar to the latency of the edge setup with central aggregation of the previous experiment. This is in fact what we obtain as can be seen in Figure \ref{fig:write-all-latency}. In terms of latency we are clearly in a case of disadvantage here since as it has been seen in the previous experiment that by doing a central aggregation, like the cloud approach does, we are not exploiting our edge approach to the max.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{Figures/Evaluation/write-all-latency.png}
+    \caption{Average write latency of the single edge setup compared to the cloud setup.}
+    \label{fig:write-all-latency}
+\end{figure}
+
+Many more messages are sent in parallel to the various aggregating \inlinecode{ProcessingUnit} so we expect the traffic*distance in the network to increase compared to the previous experiment. This is in fact true as can be seen in Figure \ref{fig:write-all-traffic1}, but still the cloud setup clogs the network 2000\% more than the edge setup.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{Figures/Evaluation/write-all-traffic1.png}
+    \caption{Traffic per distance generated in the network.}
+    \label{fig:write-all-traffic1}
+\end{figure}
+
+We saw in this experiment that even in a disadvantage situation where our approach is used to aggregate the data in a central manner, which is not the intended use case, the increase in write latency is less than 27\%, but the improvement in terms of traffic sent in the network is tremendous.
+
+
+\subsubsection{Write all levels, with CPU core performance as parameter}
+As in the previous experiment we are working in a scenario where the developer imposes writes on all levels in the edge approach.
+
+In our simulation we represented the performance of the cores as a processing bandwidth, so we specified how much data a core can process in a second. In the previous experiments we used the default values reported in Section \ref{section:simulation_setting}, so we arbitrarily assumed that the \inlinecode{ProcessingLocationDistrict} and \inlinecode{ProcessingLocationCity} have 50\% of the performance of \inlinecode{ProcessingLocationCentral}. We now analyze the behaviour of the latency while slowly changing this percentage to show that the increase in write latency is not substantial.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{Figures/Evaluation/write-all-cpu-latency.png}
+    \caption{Average write latency of the edge solution while changing the CPU core performance of lower levels}
+    \label{fig:/write-all-cpu-latency}
+\end{figure}
+
+In Figure \ref{fig:/write-all-cpu-latency} it is shown the changing write latency of the edge solution due to the changing performance of the \inlinecode{ProcessingUnits} cores, compared to the constant latency of the cloud solution. From 1.0 to 0.40 we have an almost linear increase, which is not substantial. Then down from 0.40 the cores can't keep up with the requests and start to put them in queue, creating an exponential increase in the latency.
+
+So this experiment shows the following:
+\begin{itemize}
+    \item By having a lower performance in the \inlinecode{ProcessingUnits} at the edge the processing latency increase linearly, making the write latency also increase linearly;
+    \item By having a lower performance in the \inlinecode{ProcessingUnits} at the edge it becomes easier to reach a limit where the cores can't keep up with the requests, creating an exponential increase in the write latency.
+\end{itemize}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\iffalse
 This chapter shows the results of the experiments carried out to assess your contribution, usually compared to state of the art solutions. In the proposed structure, we separate experiments setup from experiment results, in which we list the experiments. This is especially convenient in case the setting is the same or very similar for all the experiments. Should this not be the case, you may consider instead to structure each experiment is a section/subsection and embed both setting and result inside it.
 
 \begin{example}
@@ -56,3 +392,4 @@ In this experiment, we test the algorithms on Email over a time horizon of $T=10
 
 As shown in the plot, our algorithm performs better with both the exploration strategies. However, the gain on TIM is more evident with the PE strategy, specially in the first rounds.
 \end{example}
+\fi

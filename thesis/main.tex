@@ -17,6 +17,11 @@
 \usepackage{svg}
 \usepackage[utf8]{inputenc}
 
+% Better inline code
+\usepackage{xcolor}
+\definecolor{light-gray}{gray}{0.95}
+\newcommand{\inlinecode}[1]{\colorbox{light-gray}{\texttt{#1}}}
+
 %*****************************************************************
 %                      THESIS CUSTOMIZATIONS                      
 %*****************************************************************
@@ -63,7 +68,7 @@
 \department{Dipartimento di Elettronica, Informazione e
  Bioingegneria}
 \course{Computer Science and Engineering}
-\title{Stateful Serverless Microservices on the Edge with Location-Aware APIs}
+\title{Location-Aware Stateful Serverless Computing on the Edge}
 \supervisor{Prof. Alessandro Margara}
 % You can specify more than one co-supervisor, separating them
 % with commas.
@@ -101,20 +106,20 @@
 
 \mainmatter
 \input{Chapters/Introduction}
-\input{Chapters/Preliminaries_and_Sota}
-\input{Chapters/LaTeX_tips}
-\input{Chapters/ProblemFormulation}
-\input{Chapters/Solution}
+%\input{Chapters/Preliminaries_and_Sota}
+%\input{Chapters/LaTeX_tips}
+%\input{Chapters/ProblemFormulation}
+%\input{Chapters/Solution}
 \input{Chapters/Evaluation}
-\input{Chapters/Conclusions}
+%\input{Chapters/Conclusions}
 
 %*****************************************************************
 %                            APPENDIX                            
 %*****************************************************************
 
 \appendix
-\input{Chapters/Appendix}
-\input{Chapters/Thanks}
+%\input{Chapters/Appendix}
+%\input{Chapters/Thanks}
 
 %*****************************************************************
 %                         REFERENCE LIST                         
