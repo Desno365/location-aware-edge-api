@@ -166,14 +166,15 @@ for result in results:
     x_positions = (range(len(total_latencies)))
 
     # Plot total latency.
-    plt.figure(figsize=(6, 6))
+    plt.figure(figsize=(5, 4))
     plt.title(f'Read Latencies for {result.simulation_name}')
     plt.bar(x_positions, total_latencies, width=0.666, color=colors)
     plt.axes().yaxis.grid()  # horizontal lines
     plt.xticks(x_positions, names)
     plt.ylabel("Average Read Latency")
     plt.tight_layout()
-    plt.show()
+    plt.savefig(f'read-by-latency-{result.simulation_name.replace(" ", "-")}.png')
+    #plt.show()
 
 for result in results:
     # Prepare plot variables
@@ -183,11 +184,12 @@ for result in results:
     x_positions = (range(len(total_distances)))
 
     # Plot total distance.
-    plt.figure(figsize=(6, 6))
+    plt.figure(figsize=(5, 4))
     plt.title(f'Read Distances for {result.simulation_name}')
     plt.bar(x_positions, total_distances, width=0.666, color=colors)
     plt.axes().yaxis.grid()  # horizontal lines
     plt.xticks(x_positions, names)
     plt.ylabel("Average Read Distance")
     plt.tight_layout()
-    plt.show()
+    plt.savefig(f'read-by-distance-{result.simulation_name.replace(" ", "-")}.png')
+    #plt.show()

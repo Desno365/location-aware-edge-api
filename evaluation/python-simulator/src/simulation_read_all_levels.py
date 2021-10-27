@@ -232,8 +232,11 @@ x_positions_scaled = [x / (len(results)-1) for x in range(len(results))]
 plt.figure(figsize=(8, 6))
 plt.title('Read Latencies')
 plt.bar(x_positions_true, total_latencies, color="green")
+plt.axhline(y=results[-1].get_average_total_latency(), color='r', linestyle='dotted')
 plt.axes().yaxis.grid()  # horizontal lines
+plt.xlabel("Probability of making a request to an higher level of the hierarchy")
 plt.ylabel("Average Read Latency")
+plt.legend(["Edge solution", "Cloud solution"])
 plt.tight_layout()
 plt.show()
 
@@ -241,8 +244,11 @@ plt.show()
 plt.figure(figsize=(8, 6))
 plt.title('Read Distances')
 plt.bar(x_positions_true, distances, color="green")
+plt.axhline(y=results[-1].get_average_first_link_distance() + results[-1].get_average_second_link_distance(), color='r', linestyle='dotted')
 plt.axes().yaxis.grid()  # horizontal lines
+plt.xlabel("Probability of making a request to an higher level of the hierarchy")
 plt.ylabel("Average Read Distance")
+plt.legend(["Edge solution", "Cloud solution"])
 plt.tight_layout()
 plt.show()
 
@@ -250,8 +256,11 @@ plt.show()
 plt.figure(figsize=(8, 6))
 plt.title('Read Latencies')
 plt.fill_between(x_positions_scaled, total_latencies)
+plt.axhline(y=results[-1].get_average_total_latency(), color='r', linestyle='dotted')
 plt.axes().yaxis.grid()  # horizontal lines
+plt.xlabel("Probability of making a request to an higher level of the hierarchy")
 plt.ylabel("Average Read Latency")
+plt.legend(["Cloud solution", "Edge solution"], loc='center left', bbox_to_anchor=(0.0, 0.5), ncol=1, fancybox=True, shadow=True)
 plt.tight_layout()
 plt.show()
 
@@ -259,8 +268,11 @@ plt.show()
 plt.figure(figsize=(8, 6))
 plt.title('Read Distances')
 plt.fill_between(x_positions_scaled, distances)
+plt.axhline(y=results[-1].get_average_first_link_distance() + results[-1].get_average_second_link_distance(), color='r', linestyle='dotted')
 plt.axes().yaxis.grid()  # horizontal lines
+plt.xlabel("Probability of making a request to an higher level of the hierarchy")
 plt.ylabel("Average Read Distance")
+plt.legend(["Cloud solution", "Edge solution"], loc='center left', bbox_to_anchor=(0.0, 0.5), ncol=1, fancybox=True, shadow=True)
 plt.tight_layout()
 plt.show()
 

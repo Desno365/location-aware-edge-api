@@ -18,7 +18,8 @@ from src.processing_units.processing_location_territory import ProcessingLocatio
 from src.processing_units.on_processing_ended_enum import OnProcessingEndedEnum
 
 TOTAL_PACKAGES_PRODUCED_BY_EACH_CLIENT = 2  # Note: each client has a waiting time before producing a new package.
-CLIENTS_DISTRICTS_RATIO_RANGE = range(1, 402, 26)  # start, end, step
+CLIENTS_DISTRICTS_RATIO_RANGE = list(range(0, 351, 25))
+CLIENTS_DISTRICTS_RATIO_RANGE[0] = 1
 print(CLIENTS_DISTRICTS_RATIO_RANGE)
 
 CONFIGURATIONS_EDGE = [{"ratio": i, "type": "edge"} for i in CLIENTS_DISTRICTS_RATIO_RANGE]
@@ -183,7 +184,7 @@ total_latencies_cloud = np.array([result.get_average_total_latency() for result 
 total_latencies_confidence_cloud = np.array([result.get_average_total_latency_confidence() for result in results_cloud])
 total_traffic_per_distance_edge = [result.get_total_first_link_traffic_per_distance() + result.get_total_second_link_traffic_per_distance() for result in results_edge]
 total_traffic_per_distance_cloud = [result.get_total_first_link_traffic_per_distance() + result.get_total_second_link_traffic_per_distance() for result in results_cloud]
-x_positions = [i for i in CLIENTS_DISTRICTS_RATIO_RANGE]
+x_positions = [default_architecture_parameters.NUMBER_OF_DISTRICTS * i for i in CLIENTS_DISTRICTS_RATIO_RANGE]
 
 # Plot total latency.
 plt.figure(figsize=(8, 6))
@@ -191,7 +192,9 @@ plt.title('Write Latencies')
 plt.plot(x_positions, total_latencies_edge, color="green")
 plt.plot(x_positions, total_latencies_cloud, color="red")
 plt.axes().set_ylim([0, None])
+plt.xlabel("Number of clients")
 plt.ylabel("Average Write Latency")
+plt.legend(["Edge solution", "Cloud solution"])
 plt.tight_layout()
 plt.show()
 
@@ -214,6 +217,8 @@ plt.title('Traffic * Distance')
 plt.plot(x_positions, total_traffic_per_distance_edge, color="green")
 plt.plot(x_positions, total_traffic_per_distance_cloud, color="red")
 plt.axes().set_ylim([0, None])
+plt.xlabel("Number of clients")
 plt.ylabel("Total (traffic in MB) * (distance in Km)")
+plt.legend(["Edge solution", "Cloud solution"])
 plt.tight_layout()
 plt.show()
