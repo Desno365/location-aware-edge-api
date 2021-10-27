@@ -22,6 +22,61 @@ TOTAL_NUMBER_OF_READER_CLIENTS = 2000
 
 CONFIGURATIONS = [
     {"probabilities": [1.0, 0.0, 0.0, 0.0, 0.0, 0.0]},
+    {"probabilities": [0.9, 0.1, 0.0, 0.0, 0.0, 0.0]},
+    {"probabilities": [0.9, 0.0, 0.1, 0.0, 0.0, 0.0]},
+    {"probabilities": [0.9, 0.0, 0.0, 0.1, 0.0, 0.0]},
+    {"probabilities": [0.9, 0.0, 0.0, 0.0, 0.1, 0.0]},
+    {"probabilities": [0.9, 0.0, 0.0, 0.0, 0.0, 0.1]},
+    {"probabilities": [0.8, 0.1, 0.0, 0.0, 0.0, 0.1]},
+    {"probabilities": [0.8, 0.0, 0.1, 0.0, 0.0, 0.1]},
+    {"probabilities": [0.8, 0.0, 0.0, 0.1, 0.0, 0.1]},
+    {"probabilities": [0.8, 0.0, 0.0, 0.0, 0.1, 0.1]},
+    {"probabilities": [0.7, 0.1, 0.0, 0.0, 0.1, 0.1]},
+    {"probabilities": [0.7, 0.0, 0.1, 0.0, 0.1, 0.1]},
+    {"probabilities": [0.7, 0.0, 0.0, 0.1, 0.1, 0.1]},
+    {"probabilities": [0.6, 0.1, 0.0, 0.1, 0.1, 0.1]},
+    {"probabilities": [0.6, 0.0, 0.1, 0.1, 0.1, 0.1]},
+    {"probabilities": [0.5, 0.1, 0.1, 0.1, 0.1, 0.1]},
+    {"probabilities": [0.4, 0.2, 0.1, 0.1, 0.1, 0.1]},
+    {"probabilities": [0.4, 0.1, 0.2, 0.1, 0.1, 0.1]},
+    {"probabilities": [0.4, 0.1, 0.1, 0.2, 0.1, 0.1]},
+    {"probabilities": [0.4, 0.1, 0.1, 0.1, 0.2, 0.1]},
+    {"probabilities": [0.4, 0.1, 0.1, 0.1, 0.1, 0.2]},
+    {"probabilities": [0.3, 0.2, 0.1, 0.1, 0.1, 0.2]},
+    {"probabilities": [0.3, 0.1, 0.2, 0.1, 0.1, 0.2]},
+    {"probabilities": [0.3, 0.1, 0.1, 0.2, 0.1, 0.2]},
+    {"probabilities": [0.3, 0.1, 0.1, 0.1, 0.2, 0.2]},
+    {"probabilities": [0.2, 0.2, 0.1, 0.1, 0.2, 0.2]},
+    {"probabilities": [0.2, 0.1, 0.2, 0.1, 0.2, 0.2]},
+    {"probabilities": [0.2, 0.1, 0.1, 0.2, 0.2, 0.2]},
+    {"probabilities": [0.1, 0.2, 0.1, 0.2, 0.2, 0.2]},
+    {"probabilities": [0.1, 0.1, 0.2, 0.2, 0.2, 0.2]},
+    {"probabilities": [0.0, 0.2, 0.2, 0.2, 0.2, 0.2]},
+    {"probabilities": [0.0, 0.1, 0.3, 0.2, 0.2, 0.2]},
+    {"probabilities": [0.0, 0.1, 0.2, 0.3, 0.2, 0.2]},
+    {"probabilities": [0.0, 0.1, 0.2, 0.2, 0.3, 0.2]},
+    {"probabilities": [0.0, 0.1, 0.2, 0.2, 0.2, 0.3]},
+    {"probabilities": [0.0, 0.0, 0.3, 0.2, 0.2, 0.3]},
+    {"probabilities": [0.0, 0.0, 0.2, 0.3, 0.2, 0.3]},
+    {"probabilities": [0.0, 0.0, 0.2, 0.2, 0.3, 0.3]},
+    {"probabilities": [0.0, 0.0, 0.2, 0.2, 0.2, 0.4]},
+    {"probabilities": [0.0, 0.0, 0.1, 0.3, 0.2, 0.4]},
+    {"probabilities": [0.0, 0.0, 0.1, 0.2, 0.3, 0.4]},
+    {"probabilities": [0.0, 0.0, 0.1, 0.2, 0.2, 0.5]},
+    {"probabilities": [0.0, 0.0, 0.0, 0.3, 0.2, 0.5]},
+    {"probabilities": [0.0, 0.0, 0.0, 0.2, 0.3, 0.5]},
+    {"probabilities": [0.0, 0.0, 0.0, 0.2, 0.2, 0.6]},
+    {"probabilities": [0.0, 0.0, 0.0, 0.1, 0.3, 0.6]},
+    {"probabilities": [0.0, 0.0, 0.0, 0.1, 0.2, 0.7]},
+    {"probabilities": [0.0, 0.0, 0.0, 0.1, 0.1, 0.8]},
+    {"probabilities": [0.0, 0.0, 0.0, 0.0, 0.2, 0.8]},
+    {"probabilities": [0.0, 0.0, 0.0, 0.0, 0.1, 0.9]},
+    {"probabilities": [0.0, 0.0, 0.0, 0.0, 0.0, 1.0]},
+]
+
+'''
+CONFIGURATIONS = [
+    {"probabilities": [1.0, 0.0, 0.0, 0.0, 0.0, 0.0]},
     {"probabilities": [0.8, 0.2, 0.0, 0.0, 0.0, 0.0]},
     {"probabilities": [0.8, 0.0, 0.2, 0.0, 0.0, 0.0]},
     {"probabilities": [0.8, 0.0, 0.0, 0.2, 0.0, 0.0]},
@@ -48,7 +103,7 @@ CONFIGURATIONS = [
     {"probabilities": [0.0, 0.0, 0.0, 0.0, 0.2, 0.8]},
     {"probabilities": [0.0, 0.0, 0.0, 0.0, 0.0, 1.0]},
 ]
-
+'''
 
 def run_configuration(config: Dict) -> ResultContainer:
     probabilities = config['probabilities']
