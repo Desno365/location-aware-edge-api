@@ -12,9 +12,10 @@ from src.processing_units.processing_location_central import ProcessingLocationC
 from src.processing_units.processing_location_district import ProcessingLocationDistrict
 from src.processing_units.on_processing_ended_enum import OnProcessingEndedEnum
 
-TOTAL_PACKAGES_READ_BY_EACH_CLIENT = 2  # Note: each client has a waiting time before reading a new data.
-CLIENTS_DISTRICTS_RATIO_RANGE = range(2, 2002, 132)  # start, end, step
-print(CLIENTS_DISTRICTS_RATIO_RANGE)
+#default_architecture_parameters.NUMBER_OF_DISTRICTS = 200  # Overwrite number of districts (with 1000 goes out of RAM :( ).
+TOTAL_PACKAGES_READ_BY_EACH_CLIENT = 1  # Note: each client has a waiting time before reading a new data.
+CLIENTS_DISTRICTS_RATIO_RANGE = range(2, 4000, 501)  # start, end, step
+print(list(CLIENTS_DISTRICTS_RATIO_RANGE))
 
 CONFIGURATIONS_EDGE = [{"ratio": i, "type": "edge"} for i in CLIENTS_DISTRICTS_RATIO_RANGE]
 CONFIGURATIONS_CLOUD = [{"ratio": i, "type": "cloud"} for i in CLIENTS_DISTRICTS_RATIO_RANGE]
@@ -75,11 +76,9 @@ def run_configuration(config: Dict) -> ResultContainer:
     return result_container
 
 
-default_architecture_parameters.NUMBER_OF_DISTRICTS = 50  # Overwrite number of districts.
 pool = multiprocessing.Pool()
 results_edge = pool.map(run_configuration, CONFIGURATIONS_EDGE)
 
-default_architecture_parameters.NUMBER_OF_DISTRICTS = 200  # Overwrite number of districts (with 1000 goes out of RAM :( ).
 pool = multiprocessing.Pool()
 results_cloud = pool.map(run_configuration, CONFIGURATIONS_CLOUD)
 
@@ -88,15 +87,19 @@ total_latencies_edge = [result.get_average_total_latency() for result in results
 total_latencies_cloud = [result.get_average_total_latency() for result in results_cloud]
 total_distance_edge = [result.get_average_first_link_distance() + result.get_average_second_link_distance() for result in results_edge]
 total_distance_cloud = [result.get_average_first_link_distance() + result.get_average_second_link_distance() for result in results_cloud]
-x_positions = [i for i in CLIENTS_DISTRICTS_RATIO_RANGE]
+x_positions = [default_architecture_parameters.NUMBER_OF_DISTRICTS * i for i in CLIENTS_DISTRICTS_RATIO_RANGE]
 
 # Plot total latency.
 plt.figure(figsize=(8, 6))
 plt.title('Read Latencies')
 plt.plot(x_positions, total_latencies_edge, color="green")
 plt.plot(x_positions, total_latencies_cloud, color="red")
+plt.axes().yaxis.grid()  # horizontal lines
+plt.axes().set_xlim([0, None])
 plt.axes().set_ylim([0, None])
+plt.xlabel("Number of clients")
 plt.ylabel("Average Read Latency")
+plt.legend(["Edge solution", "Cloud solution"])
 plt.tight_layout()
 plt.show()
 
@@ -105,7 +108,11 @@ plt.figure(figsize=(8, 6))
 plt.title('Read Distances')
 plt.plot(x_positions, total_distance_edge, color="green")
 plt.plot(x_positions, total_distance_cloud, color="red")
+plt.axes().yaxis.grid()  # horizontal lines
+plt.axes().set_xlim([0, None])
 plt.axes().set_ylim([0, None])
+plt.xlabel("Number of clients")
 plt.ylabel("Average Read Distance")
+plt.legend(["Edge solution", "Cloud solution"])
 plt.tight_layout()
 plt.show()

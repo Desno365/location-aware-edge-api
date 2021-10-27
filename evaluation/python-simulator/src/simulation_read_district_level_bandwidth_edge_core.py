@@ -18,7 +18,8 @@ TOTAL_PACKAGES_READ_BY_EACH_CLIENT = 2  # Note: each client has a waiting time b
 BANDWIDTH_RATIO_RANGE = np.linspace(0.01, 1, 64)  # start, end, num_of_points
 print(BANDWIDTH_RATIO_RANGE)
 
-CONFIGURATIONS = [{"ratio": i, "type": "edge"} for i in BANDWIDTH_RATIO_RANGE]
+EDGE_CONFIGURATIONS = [{"ratio": i, "type": "edge"} for i in BANDWIDTH_RATIO_RANGE]
+CLOUD_CONFIGURATION = {"ratio": 1.0, "type": "cloud"}
 
 
 def run_configuration(config: Dict) -> ResultContainer:
@@ -77,24 +78,30 @@ def run_configuration(config: Dict) -> ResultContainer:
 
 
 pool = multiprocessing.Pool()
-results = pool.map(run_configuration, CONFIGURATIONS)
+edge_results = pool.map(run_configuration, EDGE_CONFIGURATIONS)
+
+cloud_result = run_configuration(CLOUD_CONFIGURATION)
 
 # Prepare plot variables
-total_latencies = np.array([result.get_average_total_latency() for result in results])
-total_latencies_confidence = np.array([result.get_average_total_latency_confidence() for result in results])
+total_latencies = np.array([result.get_average_total_latency() for result in edge_results])
+total_latencies_confidence = np.array([result.get_average_total_latency_confidence() for result in edge_results])
 x_positions = [i for i in BANDWIDTH_RATIO_RANGE]
 
 # Plot total latency.
 plt.figure(figsize=(8, 6))
 plt.title('Read Latencies')
 plt.plot(x_positions, total_latencies, color="green")
-plt.axes().set_xlim([0, None])
+plt.axhline(y=cloud_result.get_average_total_latency(), color='r', linestyle='dotted')
+plt.axes().yaxis.grid()  # horizontal lines
+plt.axes().set_xlim([0, 1.0])
 plt.axes().set_ylim([0, None])
+plt.xlabel("% of CPU power for lower level compared to highest level")
 plt.ylabel("Average Read Latency")
+plt.legend(["Edge solution", "Cloud solution"])
 plt.tight_layout()
 plt.show()
 
-#'''
+'''
 fig, ax = plt.subplots(figsize=(8, 6))
 ax.set_title('Read Latencies')
 ax.set_ylabel('Average Read Latency')
@@ -104,4 +111,4 @@ ax.set_xlim([0, None])
 ax.set_ylim([0, None])
 fig.tight_layout()
 fig.show()
-#'''
+'''
