@@ -1,134 +1,252 @@
-\chapter*{\LaTeX~ suggestions}
+\chapter{Chapter one}
+\label{ch:chapter_one}%
+% The \label{...}% enables to remove the small indentation that is generated, always leave the % symbol.
 
-\begin{center}
-\bfseries 
-\color{red}{REMOVE THIS CHAPTER BEFORE SUBMISSION}
-\end{center}
+In this chapter additional useful information are reported.
 
-\noindent In this file there are listed some tips you may find useful. Some of the shortcuts shown are custom, so I suggest you to have a look at what's next even if you are expert in LaTeX.
-
-\section*{Math}
-
-All the fonts supported by the template provide a math variant for the formulas. You can use the standard math commands of LaTeX plus the following additions:
-\begin{itemize}
-\item Argmin/max: $\argmin_i$, $\argmax_i$, and their rendering in centered equations
-$$\argmin_i \quad \argmax_i$$
-\item Variance: $\var$, $\Var{p}$
-\item Expected value: $\ev$, $\Ev{p}$
-\end{itemize}
-
-\section*{Custom commands}
-
-We provide two commands you may find useful.
-
-The command \texttt{\textbackslash blankpage} adds a blank page. Differently from \texttt{\textbackslash newpage}, the added page is completely blank and the text resume from the page after.
-
-The command \texttt{\textbackslash todo} let you add the \todo symbol in the text. You can use it whenever you have text to be revisioned after.
-
-\section*{Environments}
-
-The thesis package provide three useful packages you may need for the theoretical part.
-
-\subsection*{Definition}
-
-Definitions are used for introducing a concept and its theoretical meaning for the first time. Do not use it just for clarifying the notation. Definitions are numbered within the chapter, such that the first definition of chapter 2 is 2.1. The syntax is the following:
+\section{Sections and subsections}
+\label{sec:section_name}
+Chapters are typically subdivided into sections and subsections, and, optionally,
+subsubsections, paragraphs and subparagraphs.
+All can have a title, but only sections and subsections are numbered.
+A new section is created by the command
 \begin{verbatim}
-\begin{definition}[NAME (optional)]
-\label{def:LABEL}
-DEFINITION
-\end{definition}
+\section{Title of the section}
+\end{verbatim}
+The numbering can be turned off by using \verb|\section*{}|.
+\\
+A new subsection is created by the command
+\begin{verbatim}
+\subsection{Title of the subsection}
+\end{verbatim}
+and, similarly, the numbering can be turned off by adding an asterisk as follows 
+\begin{verbatim}
+\subsection*{}
 \end{verbatim}
 
-\noindent Example:
+\section{Equations}
+\label{sec:eqs}
+This section gives some examples of writing mathematical equations in your thesis.
 
-\begin{definition}[$(\alpha, \beta)$-approximation]
-\label{def:alphabetaapprox}
-An $(\alpha, \beta)$\textit{-approximation} algorithm outputs with success probability $\beta$ a solution which is at least $\alpha$ fraction of the optimal solution, for some $\alpha, \beta \leq 1$.
-\end{definition}
+Maxwell's equations read:
+\begin{subequations}
+    \label{eq:maxwell}
+    \begin{align}[left=\empheqlbrace]
+    \nabla\cdot \bm{D} & = \rho, \label{eq:maxwell1} \\
+    \nabla \times \bm{E} +  \frac{\partial \bm{B}}{\partial t} & = \bm{0}, \label{eq:maxwell2} \\
+    \nabla\cdot \bm{B} & = 0, \label{eq:maxwell3} \\
+    \nabla \times \bm{H} - \frac{\partial \bm{D}}{\partial t} &= \bm{J}. \label{eq:maxwell4}
+    \end{align}
+\end{subequations}
 
-\subsection*{Theorem}
+Equation~\eqref{eq:maxwell} is automatically labeled by \texttt{cleveref},
+as well as Equation~\eqref{eq:maxwell1} and Equation~\eqref{eq:maxwell3}.
+Thanks to the \verb|cleveref| package, there is no need to use \verb|\eqref|.
+Remember that Equations have to be numbered only if they are referenced in the text.
 
-Theorems are numbered incrementally within the thesis, regardless of the chapter they are declared in. The syntax is the following:
+Equations~\eqref{eq:maxwell_multilabels1}, \eqref{eq:maxwell_multilabels2}, \eqref{eq:maxwell_multilabels3}, and \eqref{eq:maxwell_multilabels4} show again Maxwell's equations without brace:
+\begin{align}
+    \nabla\cdot \bm{D} & = \rho, \label{eq:maxwell_multilabels1} \\
+    \nabla \times \bm{E} +  \frac{\partial \bm{B}}{\partial t} &= \bm{0}, \label{eq:maxwell_multilabels2} \\
+    \nabla\cdot \bm{B} & = 0, \label{eq:maxwell_multilabels3} \\
+    \nabla \times \bm{H} - \frac{\partial \bm{D}}{\partial t} &= \bm{J} \label{eq:maxwell_multilabels4}.
+\end{align}
+
+Equation~\eqref{eq:maxwell_singlelabel} is the same as before,
+but with just one label:
+\begin{equation}
+    \label{eq:maxwell_singlelabel}
+    \left\{
+    \begin{aligned}
+    \nabla\cdot \bm{D} & = \rho, \\
+    \nabla \times \bm{E} +  \frac{\partial \bm{B}}{\partial t} &= \bm{0},\\
+    \nabla\cdot \bm{B} & = 0, \\
+    \nabla \times \bm{H} - \frac{\partial \bm{D}}{\partial t} &= \bm{J}.
+    \end{aligned}
+    \right.
+\end{equation}
+
+\section{Figures, Tables and Algorithms}
+Figures, Tables and Algorithms have to contain a Caption that describe their content, and have to be properly reffered in the text.
+
+\subsection{Figures}
+\label{subsec:figures}
+
+For including pictures in your text you can use \texttt{TikZ} for high-quality hand-made figures,
+or just include them as usual with the command
 \begin{verbatim}
-\begin{theorem}
-\label{thm:LABEL}
-THEOREM
-\end{theorem}
+\includegraphics[options]{filename.xxx}
 \end{verbatim}
+Here xxx is the correct format, e.g. \verb|.png|, \verb|.jpg|, \verb|.eps|, \dots.
 
-\noindent Example:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{logo_polimi_scritta.eps}
+    \caption{Caption of the Figure to appear in the List of Figures.}
+    \label{fig:quadtree}
+\end{figure}
 
-\begin{theorem}
-\label{thm:approximation}
-For a non-negative, monotone, submodular function $f(\cdot)$, let $S_k$ be a set obtained by selecting $k$ elements one at a time, each time choosing an element that provides the largest marginal increase in the function value. Let $S_k^*$ be a set that maximizes the value of $f(\cdot)$ over all $k$-sized sets. Then,
-$$f(S_k) \geq \left( 1-\frac{1}{e} \right) \cdot f(S_k^*).$$
-\end{theorem}
+Thanks to the \texttt{\textbackslash subfloat} command, a single figure, such as Figure~\ref{fig:quadtree},
+can contain multiple sub-figures with their own caption and label, e.g. \color{black} Figure~\ref{fig:polimi_logo1} and Figure~\ref{fig:polimi_logo2}. 
 
-\subsection*{Lemma}
-Lemma are like theorems. The syntax is the following:
-\begin{verbatim}
-\begin{lemma}
-\label{thm:LABEL}
-LEMMA
-\end{lemma}
-\end{verbatim}
+\begin{figure}[H]
+    \centering
+    \subfloat[One PoliMi logo.\label{fig:polimi_logo1}]{
+        \includegraphics[scale=0.5]{Images/logo_polimi_scritta.eps}
+    }
+    \quad
+    \subfloat[Another one PoliMi logo.\label{fig:polimi_logo2}]{
+        \includegraphics[scale=0.5]{Images/logo_polimi_scritta2.eps}
+    }
+    \caption[Shorter caption]{This is a very long caption you don't want to appear in the List of Figures.}
+    \label{fig:quadtree2}
+\end{figure}
 
-\noindent Example:
 
-\begin{lemma}
-\label{thm:lemma}
-This is a lemma.
-\end{lemma}
+\subsection{Tables}
+\label{subsec:tables}
 
-\subsection*{Proposition}
-Propositions are like lemmas but they are numbered within the chapter. The syntax is the following:
-\begin{verbatim}
-\begin{proposition}
-\label{thm:LABEL}
-PROPOSITION
-\end{proposition}
-\end{verbatim}
+Within the environments \texttt{table} and  \texttt{tabular} you can create very fancy tables as the one shown in Table~\ref{table:example}.
+\begin{table}[H]
+    \caption*{\textbf{Title of Table (optional)}}
+    \centering 
+    \begin{tabular}{|p{3em} c c c |}
+    \hline
+    \rowcolor{bluepoli!40} % comment this line to remove the color
+     & \textbf{column 1} & \textbf{column 2} & \textbf{column 3} \T\B \\
+    \hline \hline
+    \textbf{row 1} & 1 & 2 & 3 \T\B \\
+    \textbf{row 2} & $\alpha$ & $\beta$ & $\gamma$ \T\B\\
+    \textbf{row 3} & alpha & beta & gamma \B\\
+    \hline
+    \end{tabular}
+    \\[10pt]
+    \caption{Caption of the Table to appear in the List of Tables.}
+    \label{table:example}
+\end{table}
 
-\noindent Example:
+You can also consider to highlight selected columns or rows in order to make tables more readable.
+Moreover, with the use of \texttt{table*} and the option \texttt{bp} it is possible to align them at the bottom of the page. One example is presented in Table~\ref{table:exampleC}. 
 
-\begin{proposition}
-\label{thm:chernoff}
-If the diffusion process starting with $S$ is simulated independently at least $r=\Omega\left(\frac{n^2}{\varepsilon^2}\ln\left(\frac{1}{\delta}\right)\right)$ times, then the average number of activated nodes over these simulations is a $(1 \pm \varepsilon)$-approximation to $\sigma(S)$, with probability at least $1 - \delta$.
-\end{proposition}
+\begin{table}[H]
+\centering 
+    \begin{tabular}{|p{3em} | c | c | c | c | c | c|}
+    \hline
+%    \rowcolor{bluepoli!40}
+     & \textbf{column1} & \textbf{column2} & \textbf{column3} & \textbf{column4} & \textbf{column5} & \textbf{column6} \T\B \\
+    \hline \hline
+    \textbf{row1} & 1 & 2 & 3 & 4 & 5 & 6 \T\B\\
+    \textbf{row2} & a & b & c & d & e & f \T\B\\
+    \textbf{row3} & $\alpha$ & $\beta$ & $\gamma$ & $\delta$ & $\phi$ & $\omega$ \T\B\\
+    \textbf{row4} & alpha & beta & gamma & delta & phi & omega \B\\
+    \hline
+    \end{tabular}
+    \\[10pt]
+    \caption{Highlighting the columns}
+    \label{table:exampleC}
+\end{table}
 
-\subsection*{Algorithm}
-The algorithm environment is used to show pseudocodes. The syntax, which follows the same paradigm of table/tabular combo, is the following:
-\begin{verbatim}
-\begin{algorithm}[FLOATING OPTIONS]
-\caption{CAPTION}
-\label{alg:LABEL}
-\begin{algorithmic}[1 if you want the lines to be numbered]
-ALGORITHM
-\end{algorithmic}
-\end{algorithm}
-\end{verbatim}
+\begin{table}[H]
+\centering 
+    \begin{tabular}{|p{3em} c c c c c c|}
+    \hline
+%    \rowcolor{bluepoli!40}
+     & \textbf{column1} & \textbf{column2} & \textbf{column3} & \textbf{column4} & \textbf{column5} & \textbf{column6} \T\B \\
+    \hline \hline
+    \textbf{row1} & 1 & 2 & 3 & 4 & 5 & 6 \T\B\\
+    \hline
+    \textbf{row2} & a & b & c & d & e & f \T\B\\
+    \hline
+    \textbf{row3} & $\alpha$ & $\beta$ & $\gamma$ & $\delta$ & $\phi$ & $\omega$ \T\B\\
+    \hline
+    \textbf{row4} & alpha & beta & gamma & delta & phi & omega \B\\
+    \hline
+    \end{tabular}
+    \\[10pt]
+    \caption{Highlighting the rows}
+    \label{table:exampleR}
+\end{table}
 
-\noindent Example:
+\subsection{Algorithms}
+\label{subsec:algorithms}
 
+Pseudo-algorithms can be written in \LaTeX{} with the \texttt{algorithm} and \texttt{algorithmic} packages.
+An example is shown in Algorithm~\ref{alg:var}.
 \begin{algorithm}[H]
-\caption{Combinatorial Thompson Sampling}
-\label{alg:cts}
-\begin{algorithmic}[1]
-\Require Directed graph $G(V,E)$, budget constraint $k$, time horizon $T$
-\For {$i = 1$ \textbf{to} $|E|$}
-\State $\alpha_i = 1, \beta_i = 1$ \Comment{Assign a Beta distribution Beta(1,1) to each edge}
-\EndFor
+    \label{alg:example}
+    \caption{Name of the Algorithm}
+    \label{alg:var}
+    \label{protocol1}
+    \begin{algorithmic}[1]
+    \STATE Initial instructions
+    \FOR{$for-condition$}
+    \STATE{Some instructions}
+    \IF{$if-condition$}
+    \STATE{Some other instructions}
+    \ENDIF
+    \ENDFOR
+    \WHILE{$while-condition$}
+    \STATE{Some further instructions}
+    \ENDWHILE
+    \STATE Final instructions
+    \end{algorithmic}
+\end{algorithm} 
 
-\For {$t = 1$ \textbf{to} $T$}
-\State For each arm $i$, draw a sample $\theta_i(t) \sim$ Beta$(\alpha_i, \beta_i)$
-\State Let $\boldsymbol{\theta}(t) = \left(\theta_1(t), \ldots, \theta_m(t) \right)$
-\State $S_t \gets$ \texttt{oracle}$(G(V,E,\boldsymbol{\theta}(t)), k)$
-\State Run cascade with $S_t$ as the seed set and collect the feedback $F_t$
-\State Update the Beta distributions of the edges involved using $F_t$
-\EndFor
-\end{algorithmic}
-\end{algorithm}
+\vspace{5mm}
 
-\section*{Referencing}
+\section{Theorems, propositions and lists}
 
-All the declared environments above can be referenced using the \texttt{{\textbackslash autoref}} command. \autoref{def:alphabetaapprox}, \autoref{thm:approximation}, \autoref{thm:chernoff}, \autoref{alg:cts}.
+\subsection{Theorems}
+Theorems have to be formatted as:
+\begin{theorem}
+\label{a_theorem}
+Write here your theorem. 
+\end{theorem}
+\textit{Proof.} If useful you can report here the proof.
+
+\subsection{Propositions}
+Propositions have to be formatted as:
+\begin{proposition}
+Write here your proposition.
+\end{proposition}
+
+\subsection{Lists}
+How to  insert itemized lists:
+\begin{itemize}
+    \item first item;
+    \item second item.
+\end{itemize}
+How to insert numbered lists:
+\begin{enumerate}
+    \item first item;
+    \item second item.
+\end{enumerate}
+
+\section{Use of copyrighted material}
+
+Each student is responsible for obtaining copyright permissions, if necessary, to include published material in the thesis.
+This applies typically to third-party material published by someone else.
+
+\section{Plagiarism}
+
+You have to be sure to respect the rules on Copyright and avoid an involuntary plagiarism.
+It is allowed to take other persons' ideas only if the author and his original work are clearly mentioned.
+As stated in the Code of Ethics and Conduct, Politecnico di Milano \textit{promotes the integrity of research,
+condemns manipulation and the infringement of intellectual property}, and gives opportunity to all those
+who carry out research activities to have an adequate training on ethical conduct and integrity while doing research.
+To be sure to respect the copyright rules, read the guides on Copyright legislation and citation styles available
+at:
+\begin{verbatim}
+https://www.biblio.polimi.it/en/tools/courses-and-tutorials
+\end{verbatim}
+You can also attend the courses which are periodically organized on "Bibliographic citations and bibliography management".
+
+\section{Bibliography and citations}
+Your thesis must contain a suitable Bibliography which lists all the sources consulted on developing the work.
+The list of references is placed at the end of the manuscript after the chapter containing the conclusions.
+We suggest to use the BibTeX package and save the bibliographic references  in the file \verb|Thesis_bibliography.bib|.
+This is indeed a database containing all the information about the references. To cite in your manuscript, use the \verb|\cite{}| command as follows:
+\\
+\textit{Here is how you cite bibliography entries: \cite{knuth74}, or multiple ones at once: \cite{knuth92,lamport94}}.
+\\
+The bibliography and list of references are generated automatically by running BibTeX \cite{bibtex}.
