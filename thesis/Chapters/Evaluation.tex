@@ -20,7 +20,7 @@ Using a popular discrete-event simulator written in Python, called SimPy \cite{s
 \subsection{Components}
 To simulate the framework we developed the following abstract components in SimPy:
 \begin{itemize}
-    \item \inlinecode{Client}: a simplified abstraction of a machine that simply sends or requests data;
+    \item \inlinecode{Client}: a simplified abstraction of a machine that sends or requests data;
     \item \inlinecode{Transmission}: a simplified abstraction of a virtual link between two machines;
     \item \inlinecode{ProcessingUnit}: a simplified abstraction of a machine that performs a processing job;
 \end{itemize}
@@ -54,7 +54,7 @@ To compute the latency the \inlinecode{Transmission} component does as follows:
 
 \[ distance\_delay = \frac{distance}{SPEED\_OF\_SIGNAL} \]
 
-The \inlinecode{network\_delay} is a value representing a constant latency toll that needs to be paid when making the communication, this value simply depends on the \inlinecode{is\_weak\_network} boolean. The network which is used by the client (i.e., Wi-Fi, LTE, copper cables) is considered to be weak.
+The \inlinecode{network\_delay} is a value representing a constant latency toll that needs to be paid when making the communication, this value depends only on the \inlinecode{is\_weak\_network} boolean. The network which is used by the client (i.e., Wi-Fi, LTE, copper cables) is considered to be weak.
 
 The \inlinecode{distance\_delay} is a value that is proportional to the distance that the signal needs to travel.
 
@@ -302,25 +302,181 @@ Many more messages are sent in parallel to the various aggregating \inlinecode{P
 We saw in this experiment that even in a disadvantage situation where our approach is used to aggregate the data in a central manner, which is not the intended use case, the increase in write latency is less than 27\%, but the improvement in terms of traffic sent in the network is tremendous.
 
 
-\subsubsection{Write all levels, with CPU core performance as parameter}
+\subsubsection{Write all levels, with cores performance as parameter}
 As in the previous experiment we are working in a scenario where the developer imposes writes on all levels in the edge approach.
 
-In our simulation we represented the performance of the cores as a processing bandwidth, so we specified how much data a core can process in a second. In the previous experiments we used the default values reported in Section \ref{section:simulation_setting}, so we arbitrarily assumed that the \inlinecode{ProcessingLocationDistrict} and \inlinecode{ProcessingLocationCity} have 50\% of the performance of \inlinecode{ProcessingLocationCentral}. We now analyze the behaviour of the latency while slowly changing this percentage to show that the increase in write latency is not substantial.
+In our simulation we represented the performance of the cores as a processing bandwidth, so we specified how much megabytes a core can process in a second. In the previous experiments we used the default values reported in Section \ref{section:simulation_setting}, so we arbitrarily assumed that the \inlinecode{ProcessingLocationDistrict} and \inlinecode{ProcessingLocationCity} have 50\% of the performance of \inlinecode{ProcessingLocationCentral}. We now analyze the behaviour of the latency while slowly changing this percentage to show that the increase in write latency is not substantial.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.95\linewidth]{Figures/Evaluation/write-all-cpu-latency.png}
-    \caption{Average write latency of the edge solution while changing the CPU core performance of lower levels}
+    \caption{Average write latency of the edge solution as a function of the cores performance of lower levels}
     \label{fig:/write-all-cpu-latency}
 \end{figure}
 
-In Figure \ref{fig:/write-all-cpu-latency} it is shown the changing write latency of the edge solution due to the changing performance of the \inlinecode{ProcessingUnits} cores, compared to the constant latency of the cloud solution. From 1.0 to 0.40 we have an almost linear increase, which is not substantial. Then down from 0.40 the cores can't keep up with the requests and start to put them in queue, creating an exponential increase in the latency.
+In Figure \ref{fig:/write-all-cpu-latency} it is shown the changing write latency of the edge solution due to the changing performance of the \inlinecode{ProcessingUnits} cores, compared to the constant latency of the cloud solution.
+
+Note that the value 0.1 on the x-axis means that the performance of the core at the edge is 0.1 times (10\%) the performance of the core of cloud solution.
+
+From 1.0 to 0.40 we have an almost linear increase, which is not substantial. Then down from 0.40 the cores can't keep up with the requests and start to put them in queue, creating an exponential increase in the latency.
 
 So this experiment shows the following:
 \begin{itemize}
     \item By having a lower performance in the \inlinecode{ProcessingUnits} at the edge the processing latency increase linearly, making the write latency also increase linearly;
     \item By having a lower performance in the \inlinecode{ProcessingUnits} at the edge it becomes easier to reach a limit where the cores can't keep up with the requests, creating an exponential increase in the write latency.
 \end{itemize}
+
+
+\subsubsection{Write all levels, with number of clients as parameter}
+In this experiment we are again working in the scenario where the developer imposes writes on all levels while using the edge approach. But now we want to simulate, in this extreme setup, how our framework behaves when the number of clients rises without modifying other parameters.
+We start from 1000 clients, rising up to 350'000 clients.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{Figures/Evaluation/write-all-clients-latency.png}
+    \caption{Average write latency as a function of the number of clients}
+    \label{fig:/write-all-clients-latency}
+\end{figure}
+
+As expected we see in Figure \ref{fig:/write-all-clients-latency} that, when the number of clients becomes too much to handle, both the cores at the edge and the cores in the cloud are overwhelmed and can't keep up with the requests causing the queues to grow indefinitely and consequently making the average latency grow.
+
+We can also notice how the number of cores affects the latency: in the edge approach by having a low number of cores it's easier to be unlucky and having a momentary spike where the \inlinecode{ProcessingLocationDistrict} can't keep up with the requests, causing new requests to be queued for a short time. Basically by increasing the number of clients it become more probable to have a random spike in the requests, that a single \inlinecode{ProcessingLocationDistrict} cannot handle immediately since equipped with only 2 cores. This phenomenon causes a continuous increase in the average latency for the edge solution.
+Instead in the cloud solution, to start to queue requests we have to first fill the 1000 cores, and for that to happen it needs many more clients.
+
+It's important also to consider that in our simulation we are not modelling the access to the database: in a cloud scenario in which writes happen to a single instance of the database it can easily become a bottleneck if not replicated and handed correctly.
+
+But again the improvements relative to the traffic generated in the network are immense. In Figure \ref{fig:/write-all-clients-traffic} we show the total traffic*distance as a function of the number of clients. Both the edge solution and cloud solution have a linear increase, but the coefficient of the increase in the cloud solution is evidently bigger than the one of the edge solution.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{Figures/Evaluation/write-all-clients-traffic.png}
+    \caption{Total traffic*distance as a function of the number of clients}
+    \label{fig:/write-all-clients-traffic}
+\end{figure}
+
+In this experiment we showed that our framework can keep up effectively with heavy load, with only minor random congestions at the lower levels of the hierarchy. But still provide immensely benefits in term of traffic through the network.
+
+
+\subsubsection{Read by level}
+We now start with a new type of experiment, focusing on the reads and not on the writes. We will immediately see the benefit on the latency since by having a geographical aggregation we can avoid to travel huge distances.
+In practice in this experiment we have different setups in which every \inlinecode{DataReaderClients} in the setup communicates to a certain level of the hierarchy of the edge solution. While in the cloud solution they can only communicate to the central cloud.
+In the figures reported below we can see, for each level of aggregation, the average latency and the average distance traveled, compared to the cloud solution.
+
+\begin{figure}[H]
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=1\linewidth]{Figures/Evaluation/read-by-latency-District-Aggregation.png}
+\end{minipage}
+\hfill
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=1\linewidth]{Figures/Evaluation/read-by-distance-District-Aggregation.png}
+\end{minipage}
+\label{fig:read-by-district}
+\caption{Average latency and average distance traveled for the district aggregation compared to a central aggregation}
+\end{figure}
+
+\begin{figure}[H]
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=1\linewidth]{Figures/Evaluation/read-by-latency-City-Aggregation.png}
+\end{minipage}
+\hfill
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=1\linewidth]{Figures/Evaluation/read-by-distance-City-Aggregation.png}
+\end{minipage}
+\label{fig:read-by-city}
+\caption{Average latency and average distance traveled for the city aggregation compared to a central aggregation}
+\end{figure}
+
+\begin{figure}[H]
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=1\linewidth]{Figures/Evaluation/read-by-latency-Territory-Aggregation.png}
+\end{minipage}
+\hfill
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=1\linewidth]{Figures/Evaluation/read-by-distance-Territory-Aggregation.png}
+\end{minipage}
+\label{fig:read-by-city}
+\caption{Average latency and average distance traveled for the territory aggregation compared to a central aggregation}
+\end{figure}
+
+\begin{figure}[H]
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=1\linewidth]{Figures/Evaluation/read-by-latency-Country-Aggregation.png}
+\end{minipage}
+\hfill
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=1\linewidth]{Figures/Evaluation/read-by-distance-Country-Aggregation.png}
+\end{minipage}
+\label{fig:read-by-city}
+\caption{Average latency and average distance traveled for the country aggregation compared to a central aggregation}
+\end{figure}
+
+\begin{figure}[H]
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=1\linewidth]{Figures/Evaluation/read-by-latency-Continent-Aggregation.png}
+\end{minipage}
+\hfill
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=1\linewidth]{Figures/Evaluation/read-by-distance-Continent-Aggregation.png}
+\end{minipage}
+\label{fig:read-by-city}
+\caption{Average latency and average distance traveled for the continent aggregation compared to a central aggregation}
+\end{figure}
+
+If we go up in the hierarchy to perform the aggregation we become more distant to the reading client, creating a bigger latency on average.
+
+We can see also how the average latency is proportional to the average distance: when the distance increases, so does the latency due to the bigger travel distance.
+
+If we compare the best scenario, in which the aggregation is performed at the lowest level, to the cloud solution we see that the cloud solution creates a latency 350\% bigger than the district (19.5 ms compared to 88.5 ms). 
+
+
+\subsubsection{Read all levels}
+This time we allow clients to perform the reads on every level, this means that to have the data available the writes must have happen with the \inlinecode{saveAlsoInIntermediateLevels} boolean set to \inlinecode{true}.
+In the 51 setups that we ran we increased the probability of making a read on an upper level of the hierarchy. The first setup performs all the read requests at the district level, in the intermediate setup the clients perform the read requests with almost an equal probability to all levels, while the last setup performs all the read requests to the single central level.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{Figures/Evaluation/read-all-latency.png}
+    \caption{Average read latency as a function of the probability of making the read request to an higher level}
+    \label{fig:/read-all-latency}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{Figures/Evaluation/read-all-distance.png}
+     \caption{Average distance traveled for the request as a function of the probability of making the read request to an higher level}
+    \label{fig:/read-all-distance}
+\end{figure}
+
+As expected we see a monotonic increase in the latency and a strict correlation between the average distance traveled and the average latency.
+
+\subsubsection{Read district level, with cores performance as parameter}
+In this experiment clients make read requests to the lowest level of the hierarchy, the district level, and we study the latency as a function of the cores performance of this level.
+We arbitrarily assumed that the \inlinecode{ProcessingLocationDistrict} has 50\% of the performance of \inlinecode{ProcessingLocationCentral}, but now we slowly change this percentage to analyze the behaviour of the latency.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{Figures/Evaluation/read-district-cpu-latency.png}
+    \caption{Average read latency of the edge solution as a function of the cores performance of lower levels}
+    \label{fig:/read-district-cpu-latency}
+\end{figure}
+
+As can be seen in Figure \ref{fig:/read-district-cpu-latency}, the effects of slower cores start to affect the latency only when reaching very low percentages i.e., 10\%, and still even at 1\% of the performance the latency is smaller than the one of the cloud solution. This is because a read request is a fast operation and is not a processing intensive task, so the cores can manage the load comfortably.
+
+
+
+
+
+
 
 
 
