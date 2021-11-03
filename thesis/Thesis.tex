@@ -1,6 +1,8 @@
 % A LaTeX template for MSc Thesis submissions to 
 % Politecnico di Milano (PoliMi) - School of Industrial and Information Engineering
 %
+% https://www.ingindinf.polimi.it/it/didattica/lezioni-e-esami/esami-di-laurea-e-laurea-magistrale
+%
 % S. Bonetti, A. Gruttadauria, G. Mescolini, A. Zingaro
 % e-mail: template-tesi-ingind@polimi.it
 %
@@ -103,6 +105,9 @@
 \usepackage{svg}
 \usepackage[utf8]{inputenc}
 \usepackage{xcolor}
+\usepackage{graphicx,wrapfig} % For figures inside the text
+\usepackage{listings} % Show code in text
+\usepackage{mdframed} % Example box \begin{example} ... \end{example}
 
 %----------------------------------------------------------------------------
 %	ADD YOUR DEFINITIONS AND COMMANDS (be careful of existing commands)
@@ -111,6 +116,53 @@
 % Better inline code
 \definecolor{light-gray}{gray}{0.95}
 \newcommand{\inlinecode}[1]{\colorbox{light-gray}{\texttt{#1}}}
+
+% Show code in text
+\colorlet{punct}{red!60!black}
+\definecolor{CodeBackground}{HTML}{EEEEEE}
+\definecolor{delim}{RGB}{20,105,176}
+\colorlet{numb}{magenta!60!black}
+\lstdefinelanguage{json}{
+    basicstyle=\normalfont\ttfamily,
+    numbers=left,
+    numberstyle=\scriptsize,
+    stepnumber=1,
+    numbersep=8pt,
+    showstringspaces=false,
+    breaklines=true,
+    frame=lines,
+    backgroundcolor=\color{CodeBackground},
+    literate=
+     *{:}{{{\color{punct}{:}}}}{1}
+      {,}{{{\color{punct}{,}}}}{1}
+      {\{}{{{\color{delim}{\{}}}}{1}
+      {\}}{{{\color{delim}{\}}}}}{1}
+      {[}{{{\color{delim}{[}}}}{1}
+      {]}{{{\color{delim}{]}}}}{1},
+}
+
+% Example box. \begin{example} ... \end{example}
+\definecolor{ExampleBoxBackground}{HTML}{999999}
+\newmdenv[ % Define mdframe settings and store as leftrule
+  linecolor=ExampleBoxBackground,
+  linewidth = 2pt,
+  topline=false,
+  bottomline=false,
+  rightline=false,
+  skipabove=\topsep,
+  skipbelow=\topsep
+]{leftrule}
+\newenvironment{example}{
+	\medskip
+	\begin{leftrule}
+	\textbf{Example}
+	\medskip
+	\color{black!60}
+   	\newline%
+}{
+	\medskip
+    \end{leftrule}
+}
 
 %----------------------------------------------------------------------------
 %	BEGIN OF YOUR DOCUMENT
@@ -132,11 +184,11 @@
 \frontmatter % Use roman page numbering style (i, ii, iii, iv...) for the preamble pages
 
 \puttitle{
-	title=Location-Aware Stateful Serverless Computing on the Edge, % Title of the thesis
+	title=Location-Aware and Stateful Serverless Computing on the Edge, % Title of the thesis
 	name=Dennis Motta, % Author Name and Surname
 	course=Computer Science and Engineering, % Study Programme (in Italian)
 	ID  = 940064,  % Student ID number (numero di matricola)
-	advisor= Prof. Alessandro Margara, % Supervisor name
+	advisor= Alessandro Margara, % Supervisor name
 	coadvisor={Gianpaolo Cugola}, % Co-Supervisor name, remove this line if there is none
 	academicyear={2020-21},  % Academic Year
 } % These info will be put into your Title page 
@@ -188,12 +240,13 @@
 % NUMBERED CHAPTERS % Regular chapters following
 % --------------------------------------------------------------------------
 \input{Chapters/Introduction}
-%\input{Chapters/Preliminaries_and_Sota}
+\input{Chapters/PreliminariesAndSota}
 %\input{Chapters/LaTeX_tips}
-%\input{Chapters/ProblemFormulation}
-%\input{Chapters/Solution}
+\input{Chapters/ProblemFormulation}
+\input{Chapters/Solution}
+\input{Chapters/Prototype}
 \input{Chapters/Evaluation}
-%\input{Chapters/Conclusions}
+\input{Chapters/Conclusions}
 
 %-------------------------------------------------------------------------
 %	BIBLIOGRAPHY
@@ -210,7 +263,7 @@
 \addtocontents{toc}{\vspace{2em}} % Add a gap in the Contents, for aesthetics
 \appendix
 \input{Chapters/AppendixA}
-%\input{Chapters/AppendixB}
+\input{Chapters/AppendixB}
 
 % LIST OF FIGURES
 \listoffigures
@@ -219,10 +272,10 @@
 \listoftables
 
 % LIST OF SYMBOLS
-\input{Chapters/Symbols}
+\input{Chapters/Acronyms}
 
-% ACKNOWLEDGEMENTS
-\input{Chapters/Thanks}
+% INFORMAL ACKNOWLEDGEMENTS
+%\input{Chapters/Thanks}
 
 \cleardoublepage
 

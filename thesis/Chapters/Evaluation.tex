@@ -100,11 +100,12 @@ Since the setting is similar in the various experiments, we present in the table
 \begin{table}[H]
 \centering
 \begin{tabular}{|c|c|l|}
+\rowcolor{bluepoli!40} % comment this line to remove the color
 \hline
-\textbf{Variable}                                               & \textbf{Mean}              & \textbf{Standard deviation} \\ \hline
-\begin{tabular}[c]{@{}c@{}}Number of clients\end{tabular}       & 2000                       & 0                           \\ \hline
-\begin{tabular}[c]{@{}c@{}}Time between requests\end{tabular}   & 10s                        & 3s                          \\ \hline
-\begin{tabular}[c]{@{}c@{}}Message size\end{tabular}            & 423KB                      & 150KB                       \\ \hline
+\textbf{Variable}       & \textbf{Mean}   & \textbf{Standard deviation}    \\ \hline \hline
+Number of clients       & 2000            & 0                              \\ \hline
+Time between requests   & 10s             & 3s                             \\ \hline
+Message size            & 423KB           & 150KB                          \\ \hline
 \end{tabular}
 \caption{Default values for variables of DataProducerClient}
 \label{tab:default_setting_data_producer}
@@ -113,11 +114,12 @@ Since the setting is similar in the various experiments, we present in the table
 \begin{table}[H]
 \centering
 \begin{tabular}{|c|c|l|}
+\rowcolor{bluepoli!40} % comment this line to remove the color
 \hline
-\textbf{Variable}                                               & \textbf{Mean}              & \textbf{Standard deviation} \\ \hline
-\begin{tabular}[c]{@{}c@{}}Number of clients\end{tabular}       & 2000                       & 0                           \\ \hline
-\begin{tabular}[c]{@{}c@{}}Time between requests\end{tabular}   & 5s                         & 2s                          \\ \hline
-\begin{tabular}[c]{@{}c@{}}Message size\end{tabular}            & 10KB                       & 1KB                         \\ \hline
+\textbf{Variable}       & \textbf{Mean}   & \textbf{Standard deviation}   \\ \hline \hline
+Number of clients       & 2000            & 0                             \\ \hline
+Time between requests   & 5s              & 2s                            \\ \hline
+Message size            & 10KB            & 1KB                           \\ \hline
 \end{tabular}
 \caption{Default values for variables of DataReaderClient}
 \label{tab:default_setting_data_reader}
@@ -126,10 +128,11 @@ Since the setting is similar in the various experiments, we present in the table
 \begin{table}[H]
 \centering
 \begin{tabular}{|c|c|l|}
+\rowcolor{bluepoli!40} % comment this line to remove the color
 \hline
-\textbf{Variable}                                              & \textbf{Mean}              & \textbf{Standard deviation} \\ \hline
-\begin{tabular}[c]{@{}c@{}}Weak network delay\end{tabular}     & 12ms                       & 8ms                         \\ \hline
-\begin{tabular}[c]{@{}c@{}}Robust network delay\end{tabular}   & 3ms                        & 1ms                         \\ \hline
+\textbf{Variable}      & \textbf{Mean}   & \textbf{Standard deviation}   \\ \hline \hline
+Weak network delay     & 12ms            & 8ms                           \\ \hline
+Robust network delay   & 3ms             & 1ms                           \\ \hline
 \end{tabular}
 \caption{Default values for variables of Transmission}
 \label{tab:default_setting_transmission}
@@ -138,13 +141,14 @@ Since the setting is similar in the various experiments, we present in the table
 \begin{table}[H]
 \centering
 \begin{tabular}{|c|c|l|}
+\rowcolor{bluepoli!40} % comment this line to remove the color
 \hline
-\textbf{Variable}                                                       & \textbf{Mean}              & \textbf{Standard deviation} \\ \hline
-\begin{tabular}[c]{@{}c@{}}Number of districts\end{tabular}             & 1000                       & 0                           \\ \hline
-\begin{tabular}[c]{@{}c@{}}Distance client-district\end{tabular}        & 20km                       & 8km                         \\ \hline
-\begin{tabular}[c]{@{}c@{}}Number of cores per district\end{tabular}    & 2                          & 0                           \\ \hline
-\begin{tabular}[c]{@{}c@{}}Processing bandwidth per core\end{tabular}   & 10MB/s                     & 0                           \\ \hline
-\begin{tabular}[c]{@{}c@{}}Processing start delay\end{tabular}          & 5ms                        & 2ms                         \\ \hline
+\textbf{Variable}               & \textbf{Mean}   & \textbf{Standard deviation}   \\ \hline \hline
+Number of districts             & 1000            & 0                             \\ \hline
+Distance client-district        & 20km            & 8km                           \\ \hline
+Number of cores per district    & 2               & 0                             \\ \hline
+Processing bandwidth per core   & 10MB/s          & 0                             \\ \hline
+Processing start delay          & 5ms             & 2ms                           \\ \hline
 \end{tabular}
 \caption{Default values for variables of ProcessingLocationDistrict}
 \label{tab:default_setting_district}
@@ -153,14 +157,15 @@ Since the setting is similar in the various experiments, we present in the table
 \begin{table}[H]
 \centering
 \begin{tabular}{|c|c|l|}
+\rowcolor{bluepoli!40} % comment this line to remove the color
 \hline
-\textbf{Variable}                                                       & \textbf{Mean}              & \textbf{Standard deviation} \\ \hline
-\begin{tabular}[c]{@{}c@{}}Number of cities\end{tabular}                & 400                        & 0                           \\ \hline
-\begin{tabular}[c]{@{}c@{}}Distance client-city\end{tabular}            & 60km                       & 15km                        \\ \hline
-\begin{tabular}[c]{@{}c@{}}Distance district-city\end{tabular}          & 50km                       & 15km                        \\ \hline
-\begin{tabular}[c]{@{}c@{}}Number of cores per city\end{tabular}        & 2                          & 0                           \\ \hline
-\begin{tabular}[c]{@{}c@{}}Processing bandwidth per core\end{tabular}   & 10MB/s                     & 0                           \\ \hline
-\begin{tabular}[c]{@{}c@{}}Processing start delay\end{tabular}          & 5ms                        & 2ms                         \\ \hline
+\textbf{Variable}               & \textbf{Mean}   & \textbf{Standard deviation}   \\ \hline \hline
+Number of cities                & 400             & 0                             \\ \hline
+Distance client-city            & 60km            & 15km                          \\ \hline
+Distance district-city          & 50km            & 15km                          \\ \hline
+Number of cores per city        & 2               & 0                             \\ \hline
+Processing bandwidth per core   & 10MB/s          & 0                             \\ \hline
+Processing start delay          & 5ms             & 2ms                           \\ \hline
 \end{tabular}
 \caption{Default values for variables of ProcessingLocationCity}
 \label{tab:default_setting_city}
@@ -169,14 +174,15 @@ Since the setting is similar in the various experiments, we present in the table
 \begin{table}[H]
 \centering
 \begin{tabular}{|c|c|l|}
+\rowcolor{bluepoli!40} % comment this line to remove the color
 \hline
-\textbf{Variable}                                                            & \textbf{Mean}              & \textbf{Standard deviation} \\ \hline
-\begin{tabular}[c]{@{}c@{}}Number of territories\end{tabular}                & 200                        & 0                           \\ \hline
-\begin{tabular}[c]{@{}c@{}}Distance client-territory\end{tabular}            & 300km                      & 100km                       \\ \hline
-\begin{tabular}[c]{@{}c@{}}Distance district-territory\end{tabular}          & 290km                      & 100km                       \\ \hline
-\begin{tabular}[c]{@{}c@{}}Number of cores per district\end{tabular}         & 4                          & 0                           \\ \hline
-\begin{tabular}[c]{@{}c@{}}Processing bandwidth per core\end{tabular}        & 15MB/s                     & 0                           \\ \hline
-\begin{tabular}[c]{@{}c@{}}Processing start delay\end{tabular}               & 4ms                        & 1ms                         \\ \hline
+\textbf{Variable}               & \textbf{Mean}   & \textbf{Standard deviation}   \\ \hline \hline
+Number of territories           & 200             & 0                             \\ \hline
+Distance client-territory       & 300km           & 100km                         \\ \hline
+Distance district-territory     & 290km           & 100km                         \\ \hline
+Number of cores per district    & 4               & 0                             \\ \hline
+Processing bandwidth per core   & 15MB/s          & 0                             \\ \hline
+Processing start delay          & 4ms             & 1ms                           \\ \hline
 \end{tabular}
 \caption{Default values for variables of ProcessingLocationTerritory}
 \label{tab:default_setting_territory}
@@ -185,14 +191,15 @@ Since the setting is similar in the various experiments, we present in the table
 \begin{table}[H]
 \centering
 \begin{tabular}{|c|c|l|}
+\rowcolor{bluepoli!40} % comment this line to remove the color
 \hline
-\textbf{Variable}                                                          & \textbf{Mean}              & \textbf{Standard deviation} \\ \hline
-\begin{tabular}[c]{@{}c@{}}Number of countries\end{tabular}                & 80                         & 0                           \\ \hline
-\begin{tabular}[c]{@{}c@{}}Distance client-country\end{tabular}            & 700km                      & 300km                       \\ \hline
-\begin{tabular}[c]{@{}c@{}}Distance district-country\end{tabular}          & 690km                      & 300km                       \\ \hline
-\begin{tabular}[c]{@{}c@{}}Number of cores per country\end{tabular}        & 4                          & 0                           \\ \hline
-\begin{tabular}[c]{@{}c@{}}Processing bandwidth per core\end{tabular}      & 15MB/s                     & 0                           \\ \hline
-\begin{tabular}[c]{@{}c@{}}Processing start delay\end{tabular}             & 4ms                        & 1ms                         \\ \hline
+\textbf{Variable}               & \textbf{Mean}   & \textbf{Standard deviation}   \\ \hline \hline
+Number of countries             & 80              & 0                             \\ \hline
+Distance client-country         & 700km           & 300km                         \\ \hline
+Distance district-country       & 690km           & 300km                         \\ \hline
+Number of cores per country     & 4               & 0                             \\ \hline
+Processing bandwidth per core   & 15MB/s          & 0                             \\ \hline
+Processing start delay          & 4ms             & 1ms                           \\ \hline
 \end{tabular}
 \caption{Default values for variables of ProcessingLocationCountry}
 \label{tab:default_setting_country}
@@ -201,14 +208,15 @@ Since the setting is similar in the various experiments, we present in the table
 \begin{table}[H]
 \centering
 \begin{tabular}{|c|c|l|}
+\rowcolor{bluepoli!40} % comment this line to remove the color
 \hline
-\textbf{Variable}                                                            & \textbf{Mean}              & \textbf{Standard deviation} \\ \hline
-\begin{tabular}[c]{@{}c@{}}Number of continents\end{tabular}                 & 7                          & 0                           \\ \hline
-\begin{tabular}[c]{@{}c@{}}Distance client-continent\end{tabular}            & 1500km                     & 500km                       \\ \hline
-\begin{tabular}[c]{@{}c@{}}Distance district-continent\end{tabular}          & 1490km                     & 500km                       \\ \hline
-\begin{tabular}[c]{@{}c@{}}Number of cores per continent\end{tabular}        & 1000                       & 0                           \\ \hline
-\begin{tabular}[c]{@{}c@{}}Processing bandwidth per core\end{tabular}        & 20MB/s                     & 0                           \\ \hline
-\begin{tabular}[c]{@{}c@{}}Processing start delay\end{tabular}               & 4ms                        & 1ms                         \\ \hline
+\textbf{Variable}               & \textbf{Mean}   & \textbf{Standard deviation}   \\ \hline \hline
+Number of continents            & 7               & 0                             \\ \hline
+Distance client-continent       & 1500km          & 500km                         \\ \hline
+Distance district-continent     & 1490km          & 500km                         \\ \hline
+Number of cores per continent   & 1000            & 0                             \\ \hline
+Processing bandwidth per core   & 20MB/s          & 0                             \\ \hline
+Processing start delay          & 4ms             & 1ms                           \\ \hline
 \end{tabular}
 \caption{Default values for variables of ProcessingLocationContinent}
 \label{tab:default_setting_continent}
@@ -217,13 +225,14 @@ Since the setting is similar in the various experiments, we present in the table
 \begin{table}[H]
 \centering
 \begin{tabular}{|c|c|l|}
+\rowcolor{bluepoli!40} % comment this line to remove the color
 \hline
-\textbf{Variable}                                                   & \textbf{Mean}              & \textbf{Standard deviation} \\ \hline
-\begin{tabular}[c]{@{}c@{}}Distance client-central\end{tabular}     & 5000km                     & 2000km                      \\ \hline
-\begin{tabular}[c]{@{}c@{}}Distance district-central\end{tabular}   & 4990km                     & 2000km                      \\ \hline
-\begin{tabular}[c]{@{}c@{}}Number of cores\end{tabular}             & 1000                       & 0                           \\ \hline
-\begin{tabular}[c]{@{}c@{}}Processing bandwidth\end{tabular}        & 20MB/s                     & 0                           \\ \hline
-\begin{tabular}[c]{@{}c@{}}Processing start delay\end{tabular}      & 4ms                        & 1ms                         \\ \hline
+\textbf{Variable}           & \textbf{Mean}   & \textbf{Standard deviation}   \\ \hline \hline
+Distance client-central     & 5000km          & 2000km                        \\ \hline
+Distance district-central   & 4990km          & 2000km                        \\ \hline
+Number of cores             & 1000            & 0                             \\ \hline
+Processing bandwidth        & 20MB/s          & 0                             \\ \hline
+Processing start delay      & 4ms             & 1ms                           \\ \hline
 \end{tabular}
 \caption{Default values for variables of ProcessingLocationCentral}
 \label{tab:default_setting_central}
@@ -241,7 +250,7 @@ The clients send their data to the bottom level of the hierarchy (\inlinecode{Pr
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{Figures/Evaluation/write-by-latency2.png}
+    \includegraphics[width=0.86\linewidth]{Figures/Evaluation/write-by-latency2.png}
     \caption{Details on the average write latency compared between various aggregation in the edge setup and compared to the cloud setup.}
     \label{fig:write-by-latency2}
 \end{figure}
@@ -261,7 +270,7 @@ Using this same experiment we now analyze the huge improvements our edge approac
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{Figures/Evaluation/write-by-traffic1.png}
+    \includegraphics[width=0.86\linewidth]{Figures/Evaluation/write-by-traffic1.png}
     \caption{Traffic per distance generated in the network.}
     \label{fig:write-by-traffic1}
 \end{figure}
@@ -270,7 +279,7 @@ In Figure \ref{fig:write-by-traffic1} we show the total traffic in megabytes mul
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{Figures/Evaluation/write-by-traffic2.png}
+    \includegraphics[width=0.86\linewidth]{Figures/Evaluation/write-by-traffic2.png}
     \caption{Traffic per distance generated in the network (cut at a lower traffic*distance value).}
     \label{fig:write-by-traffic2}
 \end{figure}
@@ -309,7 +318,7 @@ In our simulation we represented the performance of the cores as a processing ba
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{Figures/Evaluation/write-all-cpu-latency.png}
+    \includegraphics[width=0.86\linewidth]{Figures/Evaluation/write-all-cpu-latency.png}
     \caption{Average write latency of the edge solution as a function of the cores performance of lower levels}
     \label{fig:/write-all-cpu-latency}
 \end{figure}
@@ -333,7 +342,7 @@ We start from 1000 clients, rising up to 350'000 clients.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{Figures/Evaluation/write-all-clients-latency.png}
+    \includegraphics[width=0.86\linewidth]{Figures/Evaluation/write-all-clients-latency.png}
     \caption{Average write latency as a function of the number of clients}
     \label{fig:/write-all-clients-latency}
 \end{figure}
@@ -349,7 +358,7 @@ But again the improvements relative to the traffic generated in the network are 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{Figures/Evaluation/write-all-clients-traffic.png}
+    \includegraphics[width=0.86\linewidth]{Figures/Evaluation/write-all-clients-traffic.png}
     \caption{Total traffic*distance as a function of the number of clients}
     \label{fig:/write-all-clients-traffic}
 \end{figure}
@@ -445,14 +454,14 @@ In the 51 setups that we ran we increased the probability of making a read on an
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{Figures/Evaluation/read-all-latency.png}
+    \includegraphics[width=0.86\linewidth]{Figures/Evaluation/read-all-latency.png}
     \caption{Average read latency as a function of the probability of making the read request to an higher level}
     \label{fig:/read-all-latency}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{Figures/Evaluation/read-all-distance.png}
+    \includegraphics[width=0.86\linewidth]{Figures/Evaluation/read-all-distance.png}
      \caption{Average distance traveled for the request as a function of the probability of making the read request to an higher level}
     \label{fig:/read-all-distance}
 \end{figure}
@@ -465,9 +474,30 @@ We arbitrarily assumed that the \inlinecode{ProcessingLocationDistrict} has 50\%
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\linewidth]{Figures/Evaluation/read-district-cpu-latency.png}
+    \includegraphics[width=0.86\linewidth]{Figures/Evaluation/read-district-cpu-latency.png}
     \caption{Average read latency of the edge solution as a function of the cores performance of lower levels}
     \label{fig:/read-district-cpu-latency}
 \end{figure}
 
 As can be seen in Figure \ref{fig:/read-district-cpu-latency}, the effects of slower cores start to affect the latency only when reaching very low percentages i.e., 10\%, and still even at 1\% of the performance the latency is smaller than the one of the cloud solution. This is because a read request is a fast operation and is not a processing intensive task, so the cores can manage the load comfortably.
+
+\subsubsection{Read district level, with number of clients as parameter}
+As a last experiment we see how the framework performs in the simulations with a varying number of clients (and consequently a varying load).
+Similarly here read requests are made to the lowest level of the hierarchy, the district level.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.86\linewidth]{Figures/Evaluation/read-district-clients-latency.png}
+    \caption{Average read latency of the edge solution as a function of the number of clients}
+    \label{fig:/read-district-clients-latency}
+\end{figure}
+
+The read operation is a fast operation that does not require heavy processing, this allows both the cloud solution and the edge solution to fulfill a million of requests in a small amount of time before starting to not keep up with the load.
+
+\subsection{Summing up}
+Thanks to the simulation and by performing the various experiments we showed that by using our framework we get immense benefits in terms of traffic generated in the network while allowing faster reads when the data aggregation needed is not central.
+In a case where a central aggregation is still needed we showed that the write requests suffer an increase in latency, but the increase is not substantial.
+
+We also noticed how our edge solution can be affected by random spikes in the requests due to the small number of cores and resources in the lowest level of the hierarchy, so there is a clear room for improvements on this matter, but still the increase in latency is not drastic.
+
+

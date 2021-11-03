@@ -21,17 +21,41 @@ A non-technology and non-infrastructure dependant framework is needed in order t
 
 Therefore this work aims at answering the following research questions (RQ):
 \begin{itemize}
-    \item[RQ.1]\emph{Which use cases are predominantly affected by bandwidth and latency constraints? What are the common characteristics of these use cases?}
+    \item[\textbf{RQ.1}]\emph{Which use cases are predominantly affected by bandwidth and latency constraints? What are the common characteristics of these use cases?}
     
-    \item[RQ.2]\emph{Which frameworks allowing computation on the edge are currently available in the industry? Can the available frameworks accomplish the use cases seen in RQ.1?}
+    \item[\textbf{RQ.2}]\emph{Which frameworks allowing computation on the edge are currently available in the industry? Can the available frameworks accomplish the use cases seen in RQ.1?}
     
-    \item[RQ.3]\emph{Can a new approach accomplish the use cases seen in RQ.1? What are the drawbacks and benefits of the approach?}
+    \item[\textbf{RQ.3}]\emph{Can a new approach accomplish the use cases seen in RQ.1? How can such approach be implemented?}
+    
+    \item[\textbf{RQ.4}]\emph{Does the new approach simplify the development? Is it easy to use?}
+    
+    \item[\textbf{RQ.5}]\emph{Does the new approach obtain better performance? What are the practical measurable benefits? How much resources does it use? What are its drawbacks?}
 \end{itemize}
 
 We use the answers to these questions to propose an innovative framework that allows the developers to abstract away both the infrastructure and the location of the users.
 
 \section{Research Methodology}
-TODO
+The research approach adopted in this thesis can be summarized at high-level with the following steps:
+\begin{itemize}
+    \item A review and analysis of the state‐of‐the‐art research on edge and fog computing, with a particular emphasis on data processing and identification of objectives;
+    
+    \item A review of the publicly available frameworks provided by the industry in the field of Function-as-a-Service (FaaS), edge computing and stateful logic. 
+    
+    \item Identification of common use cases and formulation of the key requirements needed to better fulfill the use cases;
+    
+    \item Design of a novel problem solution based on the identified requirements;
+    
+    \item Evaluation of the solution through the development of a prototype and through simulations.
+\end{itemize}
+A thorough literature review is the basis of this thesis. For this purpose, we do not limit the analysis scope to the edge data processing problem and instead enlarge our focus generally to edge and fog computing. We started from surveys on edge computing, then moved to papers presented at the "IEEE International Conference on Fog and Edge Computing" and finally performed specific searches to have more emphasis on the data processing part of edge computing.
+We gained understanding of the main issues and collected the motivating use cases (\textbf{RQ1}).
+
+We then moved to a review of publicly available frameworks provided by the industry and analyzed their usability in relation with the motivating use cases collected (\textbf{RQ2}). As we will show we did not find any framework able to sufficiently fulfill the use cases, so we tried to propose a novel solution.
+
+To analyze the effectiveness of our solution we implemented a working prototype (\textbf{RQ3}) and by using our implementation we were able to study its value and benefits (\textbf{RQ4}). Due to to size of an edge network, emulating our prototype to study its performance on a similar setup was infeasible, so we developed a discrete-event simulation to simulate the behavior of our approach in a scenario more similar to the real (\textbf{RQ5}).
+
+The resulting artifacts of our research have been released as open-source software \cite{thesis-github}.
+
 
 \section{Thesis Outline}
 TODO

@@ -1,0 +1,56 @@
+\chapter{The Prototype}
+\label{ch:prototype}
+
+In this chapter we will show the implementation of the prototype running the API that we presented in the previous chapter.
+
+\section{The FaaS platform}
+We saw in Chapter \ref{ch:preliminaries_and_sota} the State of the Art for FaaS platforms, we saw a very valid implementation focused on edge use cases like the one of Cloudflare Workers but unfortunately, being a proprietary solution, it cannot be applied in our framework.
+So we resorted to an open source solution and we chose the solution provided by OpenFaaS since they provide two versions of their system, one version for high-performing machines with more overhead but that can scale greatly, and another more efficient version for edge devices with a smaller overhead but that cannot scale horizontally (there can only be one replica of the container running the function).
+
+We implemented two FaaS triggers in our prototype: an HTTP trigger (a trigger that gets activated by a simple HTTP request) and the cron trigger (a trigger that is automatically called periodically based on the current time).
+
+
+\subsection{Specifying locations}
+We provided a way to specify the hierarchy associated to the infrastructure by using the JavaScript Object Notation format (JSON).
+Below we provide an example of a hierarchy with 4 levels: continent, country, city, district.
+
+\begin{lstlisting}[language=json,firstnumber=1]
+{
+  "areaTypesIdentifiers": ["continent", "country", "city", "district"],
+  "hierarchy": {
+    "europe": {
+      "main-location": { },
+      "italy": {
+        "main-location": { },
+        "milan": {
+          "main-location": { },
+          "milan001": { },
+          "milan002": { }
+        },
+        "turin": {
+          "main-location": { },
+          "turin001": { },
+          "turin002": { }
+        }
+      },
+      "france": {
+        "main-location": { },
+        "paris": {
+          "main-location": { },
+          "paris001": { },
+          "paris002": { }
+        },
+        "nice": {
+          "main-location": { },
+          "nice001": { },
+          "nice002": { }
+        }
+      }
+    }
+  }
+}
+\end{lstlisting}
+
+So we used the hierarchical structure of JSON to represent the infrastructure hierarchy. In this example we have one "continent" location called "europe", containing two "country" locations called "italy" and "france", containing four "city" locations called "milan", "turin", "paris" and "nice", in turn containing eight "district" locations.
+
+The details of the locations and the way to communicate with them are not reported in this example, but these information must be written in the places where two empty braces \inlinecode{\{ \}} are present.
