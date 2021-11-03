@@ -12,9 +12,8 @@ from src.processing_units.processing_location_central import ProcessingLocationC
 from src.processing_units.processing_location_district import ProcessingLocationDistrict
 from src.processing_units.on_processing_ended_enum import OnProcessingEndedEnum
 
-#default_architecture_parameters.NUMBER_OF_DISTRICTS = 200  # Overwrite number of districts (with 1000 goes out of RAM :( ).
-TOTAL_PACKAGES_READ_BY_EACH_CLIENT = 1  # Note: each client has a waiting time before reading a new data.
-CLIENTS_DISTRICTS_RATIO_RANGE = range(2, 4000, 501)  # start, end, step
+TOTAL_PACKAGES_READ_BY_EACH_CLIENT = 2  # Note: each client has a waiting time before reading a new data.
+CLIENTS_DISTRICTS_RATIO_RANGE = [2, 125, 250, 375, 500, 625, 750, 875, 1000, 1125, 1250, 1375, 1500, 1625]
 print(list(CLIENTS_DISTRICTS_RATIO_RANGE))
 
 CONFIGURATIONS_EDGE = [{"ratio": i, "type": "edge"} for i in CLIENTS_DISTRICTS_RATIO_RANGE]
@@ -76,10 +75,10 @@ def run_configuration(config: Dict) -> ResultContainer:
     return result_container
 
 
-pool = multiprocessing.Pool()
+pool = multiprocessing.Pool(processes=4)  # Less processes to avoid to use too much RAM.
 results_edge = pool.map(run_configuration, CONFIGURATIONS_EDGE)
 
-pool = multiprocessing.Pool()
+pool = multiprocessing.Pool(processes=4)  # Less processes to avoid to use too much RAM.
 results_cloud = pool.map(run_configuration, CONFIGURATIONS_CLOUD)
 
 # Prepare plot variables
