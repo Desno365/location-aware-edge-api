@@ -16,7 +16,7 @@
     "shelljs": "0.8.4"
   },
   "bin": {
-    "deployer": "index.js"
+    "edge-deployer": "index.js"
   },
   "devDependencies": {
     "chai": "^4.3.4",
