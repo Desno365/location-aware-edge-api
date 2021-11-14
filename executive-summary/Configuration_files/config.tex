@@ -1,0 +1,105 @@
+% Set the geometric layout of the document
+\usepackage{geometry}
+\geometry{
+  top=3cm,
+  left = 2.0cm,
+  right = 2.0cm,
+  bottom=2cm,
+  headheight= 2cm,
+  headsep= 0cm,
+}
+\raggedbottom 
+
+% Create color bluePoli (-> manuale grafica coordinata:  https://www.polimi.it/fileadmin/user_upload/il_Politecnico/grafica-coordinata/2015_05_11_46xy_manuale_grafica_coordinata.pdf)
+\definecolor{bluePoli}{cmyk}{0.4,0.1,0,0.4}
+
+% Custom theorem environments
+\declaretheoremstyle[
+  headfont=\color{bluePoli}\normalfont\bfseries,
+  bodyfont=\color{black}\normalfont\itshape,
+]{colored}
+
+\captionsetup[figure]{labelfont={color=bluePoli}} % Set colour of the captions
+\captionsetup[table]{labelfont={color=bluePoli}} % Set colour of the captions
+\captionsetup[algorithm]{labelfont={color=bluePoli}} % Set colour of the captions
+
+\theoremstyle{colored}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}{Proposition}[section]
+
+% Enhances the features of the standard "table" and "tabular" environments.
+\newcommand\T{\rule{0pt}{2.6ex}}
+\newcommand\B{\rule[-1.2ex]{0pt}{0pt}}
+
+% Algorithm description
+\newcounter{algsubstate}
+\renewcommand{\thealgsubstate}{\alph{algsubstate}}
+\newenvironment{algsubstates}{
+    \setcounter{algsubstate}{0}%
+    \renewcommand{\STATE}{%
+    \stepcounter{algsubstate}%
+    \Statex {\small\thealgsubstate:}\space}
+    }{}
+    
+% Custom theorem environment
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+
+% Custom itemize environment
+\setlist[itemize,1]{label=$\bullet$}
+\setlist[itemize,2]{label=$\circ$}
+\setlist[itemize,3]{label=$-$}
+\setlist{nosep}
+
+% Set separation of columns 
+\setlength{\columnsep}{30pt}
+
+% Create command for background pic
+\newcommand\BackgroundPic{% Adding background picture
+	\put(230,358){
+		\parbox[b][\paperheight]{\paperwidth}{%
+			\vfill
+			\centering
+			\transparent{0.4}
+			\includegraphics[width=0.5\paperwidth]{raggiera_polimi.eps}%
+			\vfill
+}}}
+
+% Set indentation
+\setlength\parindent{0pt}
+
+% Custom title commands
+\titleformat{\section}
+{\color{bluePoli}\normalfont\Large\bfseries}
+{\color{bluePoli}\thesection.}{1em}{}
+\titlespacing*{\section}
+{0pt}{2ex}{1ex}
+
+\titleformat{\subsection}
+{\color{bluePoli}\normalfont\large\bfseries}
+{\color{bluePoli}\thesubsection.}{1em}{}
+\titlespacing*{\subsection}
+{0pt}{2ex}{1ex}
+
+% Custom headers and footers
+\pagestyle{fancy}
+\fancyhf{}
+      
+\fancyfoot{}
+\fancyfoot[C]{\thepage} % page
+\renewcommand{\headrulewidth}{0mm} % headrule width
+\renewcommand{\footrulewidth}{0mm} % footrule width
+
+\makeatletter
+\patchcmd{\headrule}{\hrule}{\color{black}\hrule}{}{} % headrule
+\patchcmd{\footrule}{\hrule}{\color{black}\hrule}{}{} % footrule
+\makeatother
+
+% -> Create the header
+\chead[C]{
+\centering
+\begin{tcolorbox}[arc=0pt, boxrule=0pt, colback=bluePoli!60, width=\textwidth, colupper=white]
+    \textbf{Executive summary} \hfill \textbf{\author}  
+\end{tcolorbox}
+}
