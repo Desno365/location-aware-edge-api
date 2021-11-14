@@ -1,0 +1,104 @@
+\chapter{Preliminaries and State of the Art}
+\label{ch:preliminaries_and_sota}
+As specified before we started our research from surveys on edge computing, then moved our focus to papers articulating about data processing presented at the "IEEE International Conference on Fog and Edge Computing (ICFEC)", and finally we performed specific searches to have more emphasis on the data processing part of edge computing.
+
+
+\section{Edge Computing Background}
+In the Edge Computing paradigm computing and storage nodes are placed at the Internet’s edge in close proximity to mobile devices or IoT sensors, so "edge" can be considered any computing and network resources along the path between data sources and cloud data centers.
+The origin of Edge Computing dates back to the late 1990s when Content Delivery Networks (CDNs) were introduced to increase web performance \cite{edge-computing-origin}. A CDN uses machines at the edge of the network to cache frequently requested contents, allowing to save bandwidth and improve the latency. Now CDNs are expected to deliver 72\% of Internet traffic by 2022 \cite{cdn-usage}. Edge computing generalizes and extends the CDN concept with the goal of moving core-centric applications to a geo-distributed environment like an edge network.
+
+Edge Computing can address many concerns like response time requirements, mobile devices' limited battery life, as well as bandwidth cost saving \cite{emergence-edge-computing}.
+
+An improved latency can be provided thanks to the proximity between the edge server and the client that allows to avoid the travel-distance needed to make the client communicate to the central cloud platform.
+
+Mobile devices' battery life can be saved by offloading the computation to the nearest edge server, instead of computing it locally. This is particularly useful for battery powered IoT sensors or other devices stringently limited in power.
+
+And ultimately bandwidth costs can be saved thanks to reduced usage of the network and by allowing to run compression techniques directly at the edge near the client.
+
+
+\section{Data Processing}
+Data processing on the edge is clearly a field in development, many different ideas are being presented with innovative concepts.
+In several papers it is applied the concept of stream processing, a branch of data processing which Russo \cite{auto-scaling-streams} defines as a process in which \textit{"data are streamed through a network of so-called operators, which apply specific transformations (e.g., filtering) or computations (e.g., pattern-matching) against input data"}.
+
+
+\subsection{Stream Processing}
+For stream processing long-running operators are placed in the network and data is bound to be flowing through these operators. Renart et al.~\cite{data-driven-stream} propose at the 2017 ICFEC a framework to evaluate data streams at runtime to decide how and in which node to process their data.
+In the same year at the ICFEC Brogi et al.~\cite{how-to-deploy-fog-applications} show their implementation of a simulation that can be used to select the best deployment for a fog infrastructure, the simulation models links from historical behaviour. Two years later Hiessl et al.~\cite{optimal-placement-stream} expand the idea of Brogi et al.~\cite{how-to-deploy-fog-applications} by selecting the best deployment in the specific context of stream processing on the edge, selected by modeling and then solving an Integer Linear Programming problem.
+
+At the 2019 ICFEC, Wiener et al.~\cite{context-aware-stream-processing} propose to consider, in the context of stream processing, the inherent context changes of edge nodes that are less reliable than a cloud data center, thus allowing to relocate certain elements of stream processing pipelines.
+
+
+\subsection{Scarcity of Resources}
+A recurring topic is also the management of less abundant resources, which is for sure a clear distinction in respect to a classic core-centric infrastructure.
+
+At the 2018 ICFEC, Lujic et al.~\cite{efficient-edge-storage} try to optimize data storage on the edge in the context of data analytics scenarios by providing an architecture and an adaptive algorithm to find a balance between high forecast accuracy and the amount of data stored in the space-limited storage.
+
+At the 2019 ICFEC, Zehnder et al.~\cite{virtual-events-edge} instead focus on improving the existing solutions in the field of bandwidth reduction, these existing solutions typically aim to reduce network load either by pre-processing events directly on the edge or by aggregating events into larger batches, so these solutions are using a static approach, they instead introduce methods for publish/subscribe system deployed on the edge to dynamically adapt payloads of events at runtime.
+
+
+\subsection{Serverless}
+A few articles studied by us during our research proposed also to use serverless solutions for data processing and data analytics on the edge.
+
+Nastic et al. with their article "A Serverless Real-Time Data Analytics Platform for Edge Computing" \cite{serverless-analytics-edge} expose how current approaches for data analytics on the edge force developers to resort to ad hoc solutions tailored to the available infrastructure, a process that is largely manual, task-specific, and error-prone. They defined the main prerequisites and the architecture of a platform which can allow data processing and analytics on the edge while abstracting the complexity of the edge infrastructure. The main concepts of their idea are the following:
+\begin{itemize}
+    \item The edge should focus on local views while the cloud supports global views;
+    \item Developers should simply define the function behavior and data processing logic without dealing with the complexity of different management, orchestration, and optimization processes;
+    \item A function wrapper layer should manage user-provided functions, wrapping the functions in executable artifacts such as containers;
+    \item An orchestration layer use the scheduling and placement mechanisms to determine the most suitable node (cloud or edge) for an analytics function to reduce the network latency;
+    \item A runtime layer determines the minimally required elastic resources, provisions them, deploys, and then schedules and executes functions;
+    \item For stateful functions, these wrappers also provide implicit state management: the wrapper should transparently handles state replication and migration, and access to a function’s state is controlled via the exposed API.
+\end{itemize}
+As we will see some of these concepts are the main inspiration behind our work.
+
+With the paper "Serverless Data Analytics with Flint", Kim et al.~\cite{serverless-analytics-cloud} show their framework, this time in the context  of cloud computing, that uses a FaaS architecture to perform analytical processing on big data on the cloud. In this cloud scenario the result are promising and shows a trade-off between a bit of performance and elasticity in a pure pay-as-you-go cost model.
+
+At last, in the context of serverless computing, we studied the paper "Enabling Data Processing at the Network Edge through Lightweight Virtualization Technologies" \cite{lightweight-virtualization} in which the authors empirically demonstrated that employing virtualization technologies on top of a limited edge hardware has an almost negligible impact in terms of performance when compared to native execution.
+
+
+\subsection{Other remarks}
+There are many considerations that can be done in regards to the potentialities that Edge Computing has to offer.
+We report here a few considerations that we found notable for our setting.
+
+Such as the consideration made by Plumb et al.~\cite{google-edge-for-mmog} in their article: they analyzed the theoretical benefits of using a Peer-to-Peer architecture for a mobile game after moving the logic to the edge, in view of the fact that edge servers can be trusted while devices out of the control of the developer cannot be trusted.
+We believe this concept of trust applies also to many other use cases and applications, and not only to games.
+
+At the 2020 ICFEC, Karagiannis et al.~\cite{architecture-comparison} showed a simulation used to produce quantitative results in order to examine and compare the efficiency of different architectures for different use cases. They showed that a hierarchical architecture (in which devices communicate only with upper, same-level and lower levels) generally brings an higher communication latency to reach the cloud but provides lower bandwidth utilization and lower latency among neighbours in respect to a flat architecture (in which devices communicate without the use of layers).
+
+
+
+\iffalse
+\section{Preliminary notions}
+\label{sec:preliminaries}
+
+\begin{table}[!ht]
+\centering
+\begin{tabular}{c l} \hline
+\textbf{Notation}&\textbf{Description} \\ \hline
+$G$&Graph\\
+$V$&set of nodes of $G$\\
+$E$&set of edges of $G$\\
+$W$&set of weights corresponding to each edge in $E$\\
+$w_{u,v}$&weight of edge $(u,v)$\\
+$n$&$|V|$, number of nodes\\
+$m$&$|E|$, number of edges\\
+\hline
+\end{tabular}
+\caption{Graph notation.}
+\label{tab:notation}
+\end{table}
+
+``In this section, we introduce the preliminary notions at the base of our study. We start by briefly introducing the problem, and then we provide the necessary concepts and the notation used."
+
+You may insert a subsection for each of the most relevant features of your problem. You can add some reference if needed, but just to explain the problem. The references with the solutions of the problem should be put in the next section.
+
+You can keep a notation table for the notation used in this chapter as \autoref{tab:notation}. Everything inside the notation table must be written at least once inside this chapter. You can put an extended notation for the whole thesis in the appendix.
+
+It is likely that you have to present definitions, theorems or propositions. We suggests to use the environments provided by the template. You can find the guide in the LaTeX suggestions chapter.
+
+\section{State of the Art}
+\label{sec:sota}
+
+In this section, we survey the most relevant works related to the argument of your thesis. If you face a problem that has more than one macro-topic, you may choose to add a subsection for each of these topics (better no more than 2-3), like \emph{Related works on Topic 1}, etc.
+
+List the works in chronological order and cite only the most important and pertinent ones, avoid 100 citations for a master thesis.
+\fi

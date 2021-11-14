@@ -1,0 +1,480 @@
+\chapter{The Prototype}
+\label{ch:prototype}
+
+In this chapter we will show the implementation of the prototype running the API that we presented in the previous chapter.
+
+\section{The FaaS Platform}
+We saw in Chapter \ref{ch:existing-solutions} the current frameworks to setup a FaaS platforms, we saw also a very valid implementation focused on edge use cases like the one of Cloudflare Workers, which can reach extremely fast cold-start latencies ($\approx$ 5ms), but unfortunately, being a proprietary solution, it cannot be applied in our framework.
+So we resorted to an open source solution and we chose the solution provided by OpenFaaS since they provide two versions of their system, one version for high-performing machines with more overhead but that can scale greatly, and another more efficient version for edge devices with a smaller overhead but that cannot scale horizontally (there can only be one replica of the container running the function).
+
+
+\subsection{Specifying Functions}
+\label{subsec:specifying-functions}
+
+We implemented two FaaS triggers in our prototype: an HTTP trigger (a trigger that gets activated by a simple HTTP request) and the cron trigger (a trigger that is automatically called periodically based on the current time). In the practice the HTTP trigger is always present, and when the cron trigger is activated it calls periodically the relative HTTP endpoint of the function.
+
+The following YAML code can be written to specify two functions, one with only the HTTP trigger, the other with the cron trigger:
+
+\begin{lstlisting}[language=yaml,firstnumber=1]
+functions:
+
+  myHttpFunction:
+    lang: node14
+    handler: ./myHttpFunctionFolder
+    image: dockerHubRef/myHttpFunction:latest
+    limits:
+      memory: 256Mi
+      cpu: 1000m
+    requests:
+      memory: 4Mi
+      cpu: 1m
+
+  myCronFunction
+    lang: node14
+    handler: ./myCronFunctionFolder
+    image: dockerHubRef/myCronFunction:latest
+    limits:
+      memory: 256Mi
+      cpu: 1000m
+    requests:
+      memory: 4Mi
+      cpu: 1m
+    annotations:
+      topic: cron-function
+      schedule: */2 * * * *
+\end{lstlisting}
+
+We now analyze the example provided to better understand the architecture of our prototype. OpenFaas automatically scales and runs Docker images in response to HTTP requests, these Docker images execute the code provided by the developer.
+
+The actual code is a npm project written in Node.js (in this case using Node version 14) placed in the folder specified in the \inlinecode{handler} section of the YAML. For example the function with name \inlinecode{myHttpFunction} has its code specified in the folder \inlinecode{./myHttpFunctionFolder}.
+This code during deployment is compiled into a Docker Image and published to a Docker Registry (specified in \inlinecode{image} section of the YAML), so that machines that receive the deployment can pull the Docker Image from the Docker Registry and execute the function when requested.
+
+OpenFaas adopted this architecture so that, when a function becomes idle for a lot of time and the machine is in need of resources, the cached Docker Image can be discarded since it can be easily re-obtained again from the Docker Registry.
+
+In the YAML the developer can also specify the CPU and RAM usage. In the \inlinecode{limits} section of the YAML it can be specified the maximum amount of RAM and CPU the instance can use, while in the \inlinecode{requests} section there can be specified the minimum amount of resources the machine must have free to run the instance.
+
+Finally in the \inlinecode{annotations} section of the YAML the developer can optionally specify the cron trigger of the function with the standard Unix cron syntax \cite{cron-syntax}.
+
+
+\section{Deployments}
+We saw in the previous Chapter how our API can help the developer make precise deployments even on large scale networks thanks to the fields \inlinecode{inEvery}, \inlinecode{inAreas} and \inlinecode{exceptIn}. We implemented these fields in a Command Line Interface (CLI) that interacts with the APIs provided by OpenFaas to perform the deployment on the whole network.
+
+But to make any deployment we must first provide a way to specify the network with its hierarchy. The network can be specified by the web infrastructure company or by the developer (when using a proprietary network).
+
+
+\subsection{Specifying the Hierarchy}
+We provided a way to specify the hierarchy associated to the infrastructure by using the JavaScript Object Notation (JSON) format.
+Below we provide an example of a hierarchy with 4 levels: continent, country, city, district.
+
+\begin{lstlisting}[language=json,firstnumber=1]
+{
+  "areaTypesIdentifiers": ["continent", "country", "city", "district"],
+  "hierarchy": {
+    "europe": {
+      "main-location": { },
+      "italy": {
+        "main-location": { },
+        "milan": {
+          "main-location": { },
+          "milan001": { },
+          "milan002": { }
+        },
+        "turin": {
+          "main-location": { },
+          "turin001": { },
+          "turin002": { }
+        }
+      },
+      "france": {
+        "main-location": { },
+        "paris": {
+          "main-location": { },
+          "paris001": { },
+          "paris002": { }
+        },
+        "nice": {
+          "main-location": { },
+          "nice001": { },
+          "nice002": { }
+        }
+      }
+    }
+  }
+}
+\end{lstlisting}
+
+We used the hierarchical structure of JSON to represent the infrastructure hierarchy. In this example we have one "continent" location called "europe", containing two "country" locations called "italy" and "france", containing four "city" locations called "milan", "turin", "paris" and "nice", in turn containing eight "district" locations.
+
+To simplify the visualization of the JSON we didn't show in this example the details of the machines associated to the areas. But these information must be written in the places where two empty braces \inlinecode{\{ \}} are present. The fields that are inserted in the empty braces are the following:
+
+\begin{itemize}
+    \item \inlinecode{openfaas\_gateway}: the entrypoint for the OpenFaas API (e.g., "10.211.55.33:31112");
+    \item \inlinecode{openfaas\_password}: the password for the OpenFaas entrypoint;
+    \item \inlinecode{redis\_host}: the location that the code running in OpenFaas can use to access the Redis Database (e.g., "aaa.bbb.svc.cluster.local");
+    \item \inlinecode{redis\_port}: the port that the Redis Database is using (e.g., "6379");
+    \item \inlinecode{redis\_password}: the password for accessing the Redis Database;
+\end{itemize}
+
+
+\subsection{The Command Line Interface}
+The CLI can then be used by the developer to perform the actual deployment.
+By issuing the command \inlinecode{edge-deployer deploy --help}, the CLI shows the usage of the "deploy" command:
+
+\begin{lstlisting}[language=bash]
+Usage: edge-deployer deploy [options] <functionName> <infrastructure>
+
+Deploys the function to the infrastructure specified.
+
+Options:
+  --inEvery <areaTypeIdentifier>  In which area type to deploy the function. If not specified the function is deployed to the lowest level.
+  --inAreas <areas...>            The name of the areas in which to deploy the function. If not specified the function is deployed everywhere.
+  --exceptIn <areas...>           The name of the areas in which to NOT deploy the function.
+  -f, --yaml <path>               Path to the YAML file describing the function. (default: "stack.yml")
+\end{lstlisting}
+
+For the "deploy" command two field are required, the \inlinecode{functionName} field specifying which function to be deployed and the \inlinecode{infrastructure} field specifying the path to the infrastructure JSON.
+Then we have the \inlinecode{inEvery}, \inlinecode{inAreas} and \inlinecode{exceptIn} fields that are used to specify where to make the deployments (if some of these fields are not specified a default value is assumed).
+And at last the \inlinecode{yaml} field is used to specify the path to the YAML file describing the function as seen in subsection \ref{subsec:specifying-functions}.
+
+To better understand how the CLI works we now present an example:
+
+\begin{lstlisting}[language=bash]
+edge-deployer deploy myHttpFunction infrastructure.json --inEvery district --inAreas italy paris --exceptIn milan paris001 --yaml stack.yml
+\end{lstlisting}
+
+In this example the function called \inlinecode{myHttpFunction}, specified in the YAML file \inlinecode{stack.yml}, is deployed to the infrastructure. The function is deployed at the \inlinecode{district} level in all the districts contained in the areas of \inlinecode{italy} and \inlinecode{paris}, but excluding the districts contained in the area of \inlinecode{milan} and excluding the district \inlinecode{paris001}.
+
+The CLI first analyzes the infrastructure and the deployment locations specified with the fields \inlinecode{inEvery}, \inlinecode{inAreas} and \inlinecode{exceptIn}. After listing all the locations where the deploy is needed the CLI builds the code of the function into a Docker Image, then it publishes the Docker Image to the Docker Registry and finally performs the actual deployments by calling the OpenFaas API of the machines running in the locations collected.
+
+
+\section{Stateful Support}
+To provide stateful computation we created an API that interacts with a Redis instance running on the machine.
+In our prototype we run the Redis container (a Docker Image) as a Persistent Volume on the container-orchestration system that runs OpenFaas.
+
+
+\subsection{Reads and Writes}
+
+For allowing the developer to make writes and reads on the Redis instance we wrote a JavaScript API that can be added as a dependency in the npm project of a function.
+In this early prototype we provided the following APIs:
+
+\begin{itemize}
+    \item \textit{get}: gets the value associated to a key;
+    \item \textit{getList}: gets the list of values associated to the key;
+    \item \textit{set}: sets the key to hold the provided value;
+    \item \textit{addToList}: adds a value to the list specified by the key (if the list does not exists it is automatically created).
+\end{itemize}
+
+
+\subsubsection{Get}
+The provided \textit{get} API uses the parameters reported below:
+
+\begin{itemize}
+    \item \inlinecode{key}: the key to be used for getting the value associated to it.
+\end{itemize}
+
+\begin{example}
+Get the value associated to the key "my\_key1".
+\begin{lstlisting}[language=javascript]
+const edgeDb = require('edge-db');
+const value = await edgeDb.get("my_key1");
+\end{lstlisting}
+\end{example}
+
+
+\subsubsection{GetList}
+The provided \textit{getList} API uses the parameters reported below:
+
+\begin{itemize}
+    \item \inlinecode{key}: the key to be used for getting the list associated to it.
+\end{itemize}
+
+\begin{example}
+Get the list associated to the key "my\_list1".
+\begin{lstlisting}[language=javascript]
+const edgeDb = require('edge-db');
+const list = await edgeDb.getList("my_list1");
+\end{lstlisting}
+\end{example}
+
+
+\subsubsection{Set}
+The provided \textit{set} API uses the parameters reported below:
+
+\begin{itemize}
+    \item \inlinecode{referringAreaType}: the identifier of the level in the hierarchy where we want the aggregation to happen (e.g., "district", "city", "country").
+    \item \inlinecode{saveAlsoInIntermediateLevels}: a boolean that if set to true will save the value to all levels starting from the current level where the function is deployed, up until the level specified in \inlinecode{referringAreaType}. If false the value will be only saved at the level specified in \inlinecode{referringAreaType}.
+    \item \inlinecode{ttl}: the Time-To-Live of the value.
+    \item \inlinecode{key}: the key where to save the value.
+    \item \inlinecode{data}: the value to be saved.
+\end{itemize}
+
+The \textit{set} API also offers two optional parameters for some more advanced configurations:
+\begin{itemize}
+    \item \inlinecode{onlySetIfKeyDoesNotAlreadyExist}: set to true if the write should be performed only if the key does not already exist.
+    \item \inlinecode{onlySetIfKeyAlreadyExist}: set to true if the write should be performed only if the key already exists.
+\end{itemize}
+
+\begin{example}
+Suppose the function is to be deployed in the "city" level. Here we set the value of the key "my\_key1" equal to "myValue1".
+\begin{lstlisting}[language=javascript]
+const edgeDb = require('edge-db');
+const dataDomain = { referringAreaType: "continent", saveAlsoInIntermediateLevels: false, ttl: 60*60*1000 };
+const isSuccess = await edgeDb
+    .withDataDomain(dataDomain)
+    .set("my_key1", "myValue1");
+\end{lstlisting}
+The \inlinecode{referringAreaType} is set to "continent" and the write happened with the \inlinecode{saveAlsoInIntermediateLevels} boolean set to false, so the write will be only performed on the corresponding "continent" location.
+\end{example}
+
+\begin{example}
+Suppose the function is to be deployed in the "city" level and that the levels in the hierarchy are the following in an increasing order of size: "district", "city", "country", "continent". Here we set the value of the key "my\_key1" equal to "myValue2".
+\begin{lstlisting}[language=javascript]
+const edgeDb = require('edge-db');
+const dataDomain = { referringAreaType: "continent", saveAlsoInIntermediateLevels: true, ttl: 60*60*1000 };
+const isSuccess = await edgeDb
+    .withDataDomain(dataDomain)
+    .set("my_key1", "myValue2");
+\end{lstlisting}
+The \inlinecode{referringAreaType} is set to "continent" and the write happened with the \inlinecode{saveAlsoInIntermediateLevels} boolean set to true, so the write will be performed on the corresponding "city", "country" and "continent" locations.
+\end{example}
+
+
+\subsubsection{AddToList}
+The provided \textit{addToList} API uses the parameters reported below:
+
+\begin{itemize}
+    \item \inlinecode{referringAreaType}: the identifier of the level in the hierarchy where we want the aggregation to happen (e.g., "district", "city", "country").
+    \item \inlinecode{saveAlsoInIntermediateLevels}: a boolean that if set to true will save the value to all levels starting from the current level where the function is deployed, up until the level specified in \inlinecode{referringAreaType}. If false the value will be only saved at the level specified in \inlinecode{referringAreaType}.
+    \item \inlinecode{ttl}: the Time-To-Live of the value.
+    \item \inlinecode{key}: the key associated to the list.
+    \item \inlinecode{data}: the value to be saved in the list.
+\end{itemize}
+
+\begin{example}
+Suppose the function is to be deployed in the "city" level. Here we add the value "myValue1" to the list specified by the key "my\_list1".
+\begin{lstlisting}[language=javascript]
+const edgeDb = require('edge-db');
+const dataDomain = { referringAreaType: "continent", saveAlsoInIntermediateLevels: false, ttl: 60*60*1000 };
+const isSuccess = await edgeDb
+    .withDataDomain(dataDomain)
+    .addToList("my_list1", "myValue1");
+\end{lstlisting}
+The \inlinecode{referringAreaType} is set to "continent" and the write happened with the \inlinecode{saveAlsoInIntermediateLevels} boolean set to false, so the value "myValue1" will be only added to the list "my\_list1" present in the corresponding "continent" location.
+\end{example}
+
+\begin{example}
+Suppose the function is to be deployed in the "city" level and that the levels in the hierarchy are the following in an increasing order of size: "district", "city", "country", "continent". Here we add the value "myValue2" to the list specified by the key "my\_list1".
+\begin{lstlisting}[language=javascript]
+const edgeDb = require('edge-db');
+const dataDomain = { referringAreaType: "continent", saveAlsoInIntermediateLevels: true, ttl: 60*60*1000 };
+const isSuccess = await edgeDb
+    .withDataDomain(dataDomain)
+    .addToList("my_list1", "myValue2");
+\end{lstlisting}
+The \inlinecode{referringAreaType} is set to "continent" and the write happened with the \inlinecode{saveAlsoInIntermediateLevels} boolean set to true, so the value "myValue2" will be added to the list "my\_list1" present in the corresponding "city", "country" and "continent" locations.
+\end{example}
+
+
+\subsection{Internal Communication}
+In some of the write calls, locations need to communicate internally to exchange the data. For example in a scenario where a simple "set" is performed on the "city" level with \inlinecode{referringAreaType} equal to "continent", the \inlinecode{edge-db} needs to forward the data to the corresponding "continent" location.
+
+To implement the communication we chose to use the same OpenFaas system used for running functions written by the developer: we implemented an HTTP-triggered function that receives the data and can save it in the database of the location.
+Having a function makes the architecture more modular, and it will be easier to add filters or a more advanced authentication to the communication.
+
+
+\section{Applying the Prototype to Use Cases}
+In this section we show a few examples where we apply our solutions to solve the same use cases that we presented in the previous Chapter (Section \ref{sec:solution_use_cases}).
+
+\subsubsection{IoT Data Compression}
+As we showed, in this use case we are trying to compress the data of IoT sensor by sending only significant value changes.
+
+This has been done by developing a stateful function that checks whether the new value is equal to the previous value:
+
+Function code (placed in folder "iot-data-reduction"):
+\begin{lstlisting}[language=javascript]
+const edgeDb = require("edge-db");
+const ioTDataDomain = { referringAreaType: "location", saveAlsoInIntermediateLevels: false, ttl: 5*24*60*60*1000 }; // 5 days TTL.
+
+module.exports = async (event, context) => {
+  const iotData = event.body.iot_data;
+  const sensorName = event.body.sensor_name;
+  const previousIotData = await edgeDb.get("latest_data_of_" + sensorName);
+
+  if(iotData !== previousIotData) {
+    await edgeDb
+      .withDataDomain(ioTDataDomain)
+      .set("latest_data_of_" + sensorName, iotData);
+        
+    // Send value to the cloud.
+
+    return context
+        .status(200)
+        .succeed('Value updated.');
+  } else {
+    return context
+        .status(200)
+        .succeed('Value not changed.');
+  }
+}
+\end{lstlisting}
+
+Function specification:
+\begin{lstlisting}[language=yaml,firstnumber=1]
+functions:
+
+  iot-data-reduction:
+    lang: node14
+    handler: ./iot-data-reduction
+    image: dockerHubRef/iot-data-reduction:latest
+    limits:
+      memory: 256Mi
+      cpu: 1000m
+    requests:
+      memory: 4Mi
+      cpu: 0m
+\end{lstlisting}
+
+Deployment command:
+\begin{lstlisting}[language=bash]
+deployer deploy iot-data-reduction infrastructure.json --inEvery building --inAreas factory1 factory2
+\end{lstlisting}
+
+Essentially we developed a stateful function that compares the saved value of a sensor with the current value, and if different this value gets updated and forwarded to the cloud.
+
+
+\subsubsection{Road Traffic Monitoring}
+As we showed, in this use case we analyze video footage data to get an insight on the road traffic and then use such insight in an algorithm to find the fastest path between two points.
+
+It has been implemented by using two funtions: an HTTP trigger that receives data from the cameras, converts the footage in a value of traffic and finally saves this value; and another HTTP trigger that is called by the user when interested in obtaining the fastest path between two points.
+
+Code of the first function (placed in folder "video-footage-receiver"):
+\begin{lstlisting}[language=javascript]
+const edgeDb = require("edge-db");
+const trafficStatusDataDomain = { referringAreaType: "central", saveAlsoInIntermediateLevels: true, ttl: 30*60*1000 }; // 30 minutes TTL.
+
+module.exports = async (event, context) => {
+  const videoFootageData = event.body.footage_data;
+  const cameraId = event.body.camera_id;
+  const trafficStatus = await analyzeCrowdStatus(videoFootageData);
+  const response = await edgeDb
+      .withDataDomain(trafficStatusDataDomain)
+      .set("traffic_" + cameraId, trafficStatus);
+  return context
+      .status(200)
+      .succeed(response);
+}
+\end{lstlisting}
+
+Code of the second function (placed in folder "get-fastest-path"):
+\begin{lstlisting}[language=javascript]
+const edgeDb = require("edge-db");
+
+module.exports = async (event, context) => {
+  const startingPoint = event.body.starting_point;
+  const destinationPoint = event.body.destination_point;
+
+  const cameraIds = await getCameraIdsForPossiblePaths(startingPoint, destinationPoint);
+  const trafficStatuses = [];
+  for(const cameraId of cameraIds) {
+    const trafficStatus = await edgeDb.get("traffic_" + cameraId);
+    if(trafficStatus === null || trafficStatus === undefined)
+      trafficStatuses.push(1.0);
+    else
+      trafficStatuses.push(trafficStatus);
+  }
+
+  const bestPath = await computeBestPath(cameraIds, trafficStatuses);
+
+  return context
+      .status(200)
+      .succeed(bestPath);
+}
+\end{lstlisting}
+
+Functions specification:
+\begin{lstlisting}[language=yaml,firstnumber=1]
+functions:
+
+  video-footage-receiver:
+    lang: node14
+    handler: ./video-footage-receiver
+    image: dockerHubRef/video-footage-receiver
+    limits:
+      memory: 256Mi
+      cpu: 500m
+    requests:
+      memory: 4Mi
+      cpu: 0m
+      
+  get-fastest-path:
+    lang: node14
+    handler: ./get-fastest-path
+    image: dockerHubRef/get-fastest-path
+    limits:
+      memory: 256Mi
+      cpu: 1000m
+    requests:
+      memory: 4Mi
+      cpu: 0m
+\end{lstlisting}
+
+Deployment commands:
+\begin{lstlisting}[language=bash]
+deployer deploy video-footage-receiver infrastructure.json --inEvery district --inAreas us
+
+deployer deploy get-fastest-path infrastructure.json --inEvery city --inAreas us
+
+deployer deploy get-fastest-path infrastructure.json --inEvery country --inAreas us
+\end{lstlisting}
+
+
+\subsubsection{Trending Topics}
+In this use case we want to find the trending topics in a certain region in an application (like trending user in a social network, or trending searches).
+
+We can divide the implementation of this use case in two parts: a first part where we aggregate the data of the topics per region; and a second part that periodically finds the trending topics from the raw data.
+
+We may also want to aggregate this data with different granularities: "city", "territory", "country".
+
+So with our solution a possible execution for the first part can be the following:
+\begin{example}
+Deployment:
+\begin{itemize}
+    \item \inlinecode{inEvery}: "city"
+    \item \inlinecode{inAreas}: [ ]
+    \item \inlinecode{exceptIn}: [ ]
+\end{itemize}
+With this deployment we are deploying a function in every location at the "city" level.
+
+Writes:
+\begin{itemize}
+    \item Write Action: add to list
+    \item Key: trending-topics
+    \item Data: <<topic seen or searched by the client>>
+    \item Referring Area Level: country
+    \item Should Save In Intermediate Levels: true
+    \item Time To Live: 2 days
+\end{itemize}
+With this database action that we are performing at the "city" level (since the function is deployed at the "city" level) we are adding data to the list of "trending-topics". The Referring Area Level is "country" so the data will be aggregated to the "country" level, but since we are also saving in intermediate locations this data will be also sent to the respective "territory" location and saved locally in the current "city" location.
+
+We make an example with actual names to be more clear: a client is searching the topic "My search" and the client is located in the city of Milan. This client send this topic to the deployed function, the function has been deployed at the "city" level so it will be executed in a data center in Milan. This function executing in Milan can perform a pre-process on the input (e.g., making it lowercase) and then adds the input to the list "trending-topics". The write is performed with Referring Area Level "country" but also saved in intermediate locations, therefore the input will be forwarded to the respective "country" location (in this case a data center that refers to the Italy area), to the "territory" location (in this case a data center that refers to the Northern region of Italy) and also saved locally in the data center in Milan.
+\end{example}
+
+While a possible execution for the second part of finding the trending topics (in this case the trending topics of the territory) can be the following:
+\begin{example}
+Deployment:
+\begin{itemize}
+    \item \inlinecode{inEvery}: "territory"
+    \item \inlinecode{inAreas}: [ ]
+    \item \inlinecode{exceptIn}: [ ]
+\end{itemize}
+With this deployment we are deploying a function in every location at the "territory" level.
+
+Reads:
+\begin{itemize}
+    \item Read Action: get list
+    \item Key: trending-topics
+\end{itemize}
+With this database action that we are performing at the "territory" level (since the function is deployed at the "territory" level) we are reading all the non-expired data in the list "trending-topics". In our case this list contains all the topics searched by the users in the last 2 days in the respective "territory" area where this function is executed. This function can then be executed periodically to update the trending topics.
+
+Since the list is obtained in its entirety the trending algorithm can be anything the developer prefers (e.g., most-frequent analysis, derivative of the frequency, etc...).
+\end{example}

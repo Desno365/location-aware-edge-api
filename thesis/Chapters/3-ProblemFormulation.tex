@@ -1,0 +1,144 @@
+\chapter{Problem formulation}
+\label{ch:problem_formulation}
+
+We define the problem by collecting and organizing the use cases which we have encountered in our research.
+
+
+\section{Edge Applications}
+Before diving into the use cases, in table \ref{tab:edge-applications} we report a survey we created of the high level applications where Egde Computing can be used and that have been found during our research.
+
+\begin{tabularx}{\textwidth}{|X|X|X|}
+\hline
+\textbf{Application}            & \textbf{Where to perform the computation?}   & \textbf{How it has been motivated?}   \\ \hline \hline
+Smart Home  \cite{edge-vision-and-challenges}    & The device itself; Cloudlet; Small data center.   & Privacy: keep data in-home.   \\ \hline
+Smart City \cite{edge-vision-and-challenges} \cite{data-driven-stream}   & Cloudlet; Small data center.   & Large quantity of data; Latency; Location awareness.   \\ \hline
+Augmented reality \cite{emergence-edge-computing}   & The device itself; Cloudlet; Small data center.   & Latency; Need more computational power.   \\ \hline
+IoT for transports, environment, supply chain management, etc... \cite{lightweight-virtualization} & IoT themselves; Cloudlet; Small data center.   & Large quantity of data; Latency.   \\ \hline
+Wearable healthcare devices \cite{mobile-edge-survey}   & Devices themselves; Cloudlet; Small data center.   & Privacy; Latency.   \\ \hline
+Connected Vehicles \cite{mobile-edge-survey} \cite{emergence-edge-computing}   & The car themselves; Cloudlet in a 5G tower.   & Latency; Location awareness.   \\ \hline
+Games application \cite{google-edge-for-mmog}   & The smartphones; Cloudlet; Small data center.   & Latency.   \\ \hline
+Analyze surveillance footage \cite{mobile-edge-survey} \cite{emergence-edge-computing} \cite{promise-of-edge-computing}   & The camera themselves; Small server in-loco; Cloudlet.   & Latency; Bandwidth to send the stream of the video.   \\ \hline
+Mobile app data analytics \cite{mobile-edge-survey}   & The smartphones; Small data center.   & Bandwidth if sending many data.   \\ \hline
+Building environment control (temperature, humidity) \cite{mobile-edge-survey}   & The devices themselves; Small server in-loco; Small data center.   & Bandwidth.   \\ \hline
+Any sensor related measure (e.g. ocean control with sensors, smart agricolture) \cite{mobile-edge-survey} \cite{how-to-deploy-fog-applications}   & The sensors themselves; Small-server near.   & Latency; Bandwidth.   \\ \hline
+Wearable cognitive assistance (e.g. Google Glass) \cite{stream-processing-survey-resource-elasticity}   & The devices themselves; Cloudlet; Small data center.   & Latency; Bandwidth.   \\ \hline
+Online shopping cart \cite{promise-of-edge-computing}   & Cloudlet; Small data center   & Latency.   \\ \hline
+Automated energy management systems \cite{mobile-edge-survey}   & The devices themselves; Small server in-loco; Cloudlet; Small data center.   & Latency; Privacy.   \\ \hline
+Urban logistics with robots \cite{context-aware-stream-processing}   & The devices themselves; Small server in-loco; Cloudlet; Small data center.   & Latency; Bandwidth.   \\ \hline
+\caption{Survey on edge applications}
+\label{tab:edge-applications}
+\end{tabularx}
+
+
+\section{Edge Use Cases}
+Here we present a survey we created with the main use cases that we found during our research.
+
+
+\subsubsection{Video Upload}
+Upload a video to an application or service (e.g., like in a social network).
+\begin{itemize}
+    \item \textbf{Why on the edge?} - Reduce bandwidth;
+    \item \textbf{How can it be implemented?} - Use edge resources to resize and compress the video (e.g., with ffmpeg);
+    \item \textbf{Where can it be performed?} - Stateless serverless at the edge; Custom servers; on the devices.
+\end{itemize}
+
+
+\subsubsection{Trending Topics}
+Find trending topics of a certain area in an application (like trending user in a social network, or trending searches).
+\begin{itemize}
+    \item \textbf{Why on the edge?} - Location awareness; Reduce bandwidth;
+    \item \textbf{How can it be implemented?} - Send to the edge the actions of users (views, searches, etc...), process them locally since they all come from near locations and perform a trending algorithm (e.g., most viewed or most searched elements);
+    \item \textbf{Where can it be performed?} - Stateful edge servers.
+\end{itemize}
+
+
+\subsubsection{Road Traffic Monitoring}
+Analyze video footage to monitor the traffic in a certain road.
+\begin{itemize}
+    \item \textbf{Why on the edge?} - Location awareness; Reduce bandwidth;
+    \item \textbf{How can it be implemented?} - Send to the edge the video footage, then a Machine Learning model can provide an estimation of the traffic in the road section. This information can be used to provide a better navigation system;
+    \item \textbf{Where can it be performed?} - Stateful edge servers; Custom servers.
+\end{itemize}
+
+
+\subsubsection{Anomaly detection with IoT sensors}
+Find anomalies in the time series reported by IoT sensors.
+\begin{itemize}
+    \item \textbf{Why on the edge?} - Reduce bandwidth;
+    \item \textbf{How can it be implemented?} - Compare IoT sensors value with past sensor value or by doing a time series prediction and see if it varies significantly;
+    \item \textbf{Where can it be performed?} - Stateful edge servers; Custom servers.
+\end{itemize}
+
+
+\subsubsection{Wearable Healthcare}
+Anomaly detection using data coming from wearable healthcare devices.
+\begin{itemize}
+    \item \textbf{Why on the edge?} - Reduce bandwidth; Could provide more privacy (data deleted after some time for example);
+    \item \textbf{How can it be implemented?} - Detect fall by analyzing accelerometer values; Detect patient’s changing health condition;
+    \item \textbf{Where can it be performed?} - Stateful edge servers; Custom servers; On the devices.
+\end{itemize}
+Conversely, detecting patterns in large amounts of historic data requires analytics techniques that depend on the cloud.
+
+
+\subsubsection{Smart City}
+Features to improve the quality of life in cities, e.g., allowing people with physical impediment to choose paths with less dense crowds by analyzing camera footage.
+\begin{itemize}
+    \item \textbf{Why on the edge?} - Reduce bandwidth of camera footage; Location awareness;
+    \item \textbf{How can it be implemented?} - Local edge servers analyze the footage provided by video cameras and provide an estimation on the crowds, the user then asks the nearest server for a less crowded path.
+    \item \textbf{Where can it be performed?} - Custom servers mounted in the city; May also use some computation on the camera themselves;
+\end{itemize}
+
+
+\subsubsection{Smart Agriculture}
+Make agriculture more efficient with monitoring and automatic irrigation of crops.
+\begin{itemize}
+    \item \textbf{Why on the edge?} - More privacy; Reduce bandwidth; Location awareness;
+    \item \textbf{How can it be implemented?} - Local edge servers obtain the streaming dataset of sensors’ value, they process the data and automate actions or provide feedback to the owner;
+    \item \textbf{Where can it be performed?} - Custom servers near the field.
+\end{itemize}
+
+
+\subsubsection{Massively Multiplayer Online Games}
+Games where numerous players interact with each other.
+\begin{itemize}
+    \item \textbf{Why on the edge?} - Game logic must not be on the client otherwise cannot be trusted; Reduce latency;
+    \item \textbf{How can it be implemented?} - Use local edge servers to run the game logic, players then connect to the local edge servers;
+    \item \textbf{Where can it be performed?} - Custom servers.
+\end{itemize}
+
+
+\subsubsection{Message Aggregation Caching}
+Aggregate messages in batch before sending them to the cloud.
+\begin{itemize}
+    \item \textbf{Why on the edge?} - Reduce bandwidth;
+    \item \textbf{How can it be implemented?} - Use local edge servers to combine multiple messages together and send a batch simultaneously at delayed intervals;
+    \item \textbf{Where can it be performed?} - Stateful edge servers; Custom servers; On the devices.
+\end{itemize}
+
+
+\subsubsection{Urban Logistics}
+Logistics performed with robots that autonomously pick up packages at dedicated hubs and deliver them to the customers.
+\begin{itemize}
+    \item \textbf{Why on the edge?} - Reduce bandwidth to cloud; Reduce Latency; Location awareness;
+    \item \textbf{How can it be implemented?} - Devices can process sensors values to avoid obstacles; An external server should organize the coordination of all the robots.
+    \item \textbf{Where can it be performed?} - Stateful edge servers; Custom servers.
+\end{itemize}
+
+
+\subsubsection{Industrial IoT Data Compression}
+IoT sensors in industrial scenarios creates a huge amount of data, many of which are redundant.
+\begin{itemize}
+    \item \textbf{Why on the edge?} - Reduce bandwidth;
+    \item \textbf{How can it be implemented?} - Compress and optimize the data sent through edge, so that the cloud still keeps all the useful data but it’s more lightweight (e.g. send only value change of the sensor, apply compression, etc..)
+    \item \textbf{Where can it be performed?} - Stateful edge servers; Custom servers; On the devices.
+\end{itemize}
+
+
+
+
+
+\iffalse
+This chapter is dedicated to the formal presentation of the problem with the technical details. Here your should put also the figure of merit you use to compare your solution with the ones of the related works you presented.
+
+In this thesis, we address the problem of ... . [Description of the problem and classical approaches]. The figure of merit we use to compare the solutions is ... .
+\fi

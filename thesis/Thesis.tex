@@ -64,6 +64,7 @@
 % PACKAGES FOR TABLES
 \usepackage{tabularx}
 \usepackage{longtable} % Tables that can span several pages
+\usepackage{ltablex} % Tables that can span several page and have automatic width
 \usepackage{colortbl}
 
 % PACKAGES FOR ALGORITHMS (PSEUDO-CODE)
@@ -117,7 +118,7 @@
 \definecolor{light-gray}{gray}{0.95}
 \newcommand{\inlinecode}[1]{\colorbox{light-gray}{\texttt{#1}}}
 
-% Show code in text
+% Show code in text (JSON)
 \colorlet{punct}{red!60!black}
 \definecolor{CodeBackground}{HTML}{EEEEEE}
 \definecolor{delim}{RGB}{20,105,176}
@@ -140,6 +141,89 @@
       {[}{{{\color{delim}{[}}}}{1}
       {]}{{{\color{delim}{]}}}}{1},
 }
+
+% Show code in text (JavaScript)
+\definecolor{lightgray}{rgb}{.9,.9,.9}
+\definecolor{darkgray}{rgb}{.4,.4,.4}
+\definecolor{purple}{rgb}{0.65, 0.12, 0.82}
+\lstdefinelanguage{javascript}{
+  keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
+  keywordstyle=\color{blue}\bfseries,
+  ndkeywords={const, await, class, export, boolean, throw, implements, import, this},
+  ndkeywordstyle=\color{darkgray}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{purple}\ttfamily,
+  stringstyle=\color{red}\ttfamily,
+  morestring=[b]',
+  morestring=[b]"
+}
+\lstset{
+   language=javascript,
+   backgroundcolor=\color{lightgray},
+   extendedchars=true,
+   basicstyle=\footnotesize\ttfamily,
+   showstringspaces=false,
+   showspaces=false,
+   %numbers=right,
+   %numberstyle=\footnotesize,
+   %numbersep=8pt,
+   tabsize=2,
+   breaklines=true,
+   showtabs=false,
+   captionpos=b
+}
+
+% Show code in text (BASH)
+\lstdefinelanguage{bash}{
+    basicstyle=\normalfont\ttfamily,
+    numbers=left,
+    numberstyle=\scriptsize,
+    stepnumber=1,
+    numbersep=8pt,
+    showstringspaces=false,
+    breaklines=true,
+    frame=lines,
+    backgroundcolor=\color{CodeBackground},
+}
+
+% Show code in text (YAML)
+\newcommand\YAMLcolonstyle{\color{red}\mdseries}
+\newcommand\YAMLkeystyle{\color{black}\bfseries}
+\newcommand\YAMLvaluestyle{\color{blue}\mdseries}
+\makeatletter
+\newcommand\language@yaml{yaml} % macro expanding to the name of the language (handy if you decide to change it further down the road)
+\expandafter\expandafter\expandafter\lstdefinelanguage
+\expandafter{\language@yaml}
+{
+    keywords={true,false,null,y,n},
+    keywordstyle=\color{darkgray}\bfseries,
+    backgroundcolor=\color{CodeBackground},
+    basicstyle=\YAMLkeystyle, % assuming a key comes first
+    numbers=left,
+    numberstyle=\scriptsize,
+    stepnumber=1,
+    numbersep=8pt,
+    sensitive=false,
+    comment=[l]{\#},
+    morecomment=[s]{/*}{*/},
+    commentstyle=\color{purple}\ttfamily,
+    stringstyle=\YAMLvaluestyle\ttfamily,
+    moredelim=[l][\color{orange}]{\&},
+    moredelim=[l][\color{magenta}]{*},
+    moredelim=**[il][\YAMLcolonstyle{:}\YAMLvaluestyle]{:}, % switch to value style at :
+    morestring=[b]',
+    morestring=[b]",
+    literate =  {---}{{\ProcessThreeDashes}}3
+                {>}{{\textcolor{red}\textgreater}}1     
+                {|}{{\textcolor{red}\textbar}}1 
+                {\ -\ }{{\mdseries\ -\ }}3,
+}
+\lst@AddToHook{EveryLine}{\ifx\lst@language\language@yaml\YAMLkeystyle\fi} % switch to key style at EOL
+\makeatother
+\newcommand\ProcessThreeDashes{\llap{\color{cyan}\mdseries-{-}-}}
 
 % Example box. \begin{example} ... \end{example}
 \definecolor{ExampleBoxBackground}{HTML}{999999}
@@ -186,11 +270,11 @@
 \puttitle{
 	title=Location-Aware and Stateful Serverless Computing on the Edge, % Title of the thesis
 	name=Dennis Motta, % Author Name and Surname
-	course=Computer Science and Engineering, % Study Programme (in Italian)
+	course=Computer Science and Engineering, % Study Programme
 	ID  = 940064,  % Student ID number (numero di matricola)
 	advisor= Alessandro Margara, % Supervisor name
 	coadvisor={Gianpaolo Cugola}, % Co-Supervisor name, remove this line if there is none
-	academicyear={2020-21},  % Academic Year
+	academicyear={2020-2021},  % Academic Year
 } % These info will be put into your Title page 
 
 %----------------------------------------------------------------------------
@@ -200,23 +284,33 @@
 \setcounter{page}{1} % Set page counter to 1
 
 % ABSTRACT IN ENGLISH
-\input{Chapters/Abstract}
+\input{Chapters/AbstractEN}
 
 % ABSTRACT IN ITALIAN
-%\input{Chapters/AbstractIT}
+\input{Chapters/AbstractIT}
 
 % ACKNOWLEDGEMENTS
 \input{Chapters/Acknowledgements}
 
 %----------------------------------------------------------------------------
 %	LIST OF CONTENTS/FIGURES/TABLES/SYMBOLS
-%----------------------------------------------------------------------------
+%---------------------------------------------------------------------------
 
 % TABLE OF CONTENTS
 \thispagestyle{empty}
 \tableofcontents % Table of contents 
 \thispagestyle{empty}
 \cleardoublepage
+
+
+% LIST OF FIGURES
+\listoffigures
+
+% LIST OF TABLES
+\listoftables
+
+% LIST OF SYMBOLS
+\input{Chapters/Acronyms}
 
 %-------------------------------------------------------------------------
 %	THESIS MAIN TEXT
@@ -239,14 +333,29 @@
 % --------------------------------------------------------------------------
 % NUMBERED CHAPTERS % Regular chapters following
 % --------------------------------------------------------------------------
-\input{Chapters/Introduction}
-\input{Chapters/PreliminariesAndSota}
 %\input{Chapters/LaTeX_tips}
-\input{Chapters/ProblemFormulation}
-\input{Chapters/Solution}
-\input{Chapters/Prototype}
-\input{Chapters/Evaluation}
-\input{Chapters/Conclusions}
+\input{Chapters/1-Introduction}
+\input{Chapters/2-PreliminariesAndSota}
+\input{Chapters/3-ProblemFormulation}
+\input{Chapters/4-ExistingSolutions}
+\input{Chapters/5-Solution}
+\input{Chapters/6-Prototype}
+\input{Chapters/7-Evaluation}
+\input{Chapters/8-Conclusions}
+\cleardoublepage
+
+%-------------------------------------------------------------------------
+%	APPENDICES
+%-------------------------------------------------------------------------
+
+\addtocontents{toc}{\vspace{2em}} % Add a gap in the Contents, for aesthetics
+\appendix
+\input{Chapters/AppendixA}
+
+% INFORMAL ACKNOWLEDGEMENTS
+%\input{Chapters/Thanks}
+
+\cleardoublepage
 
 %-------------------------------------------------------------------------
 %	BIBLIOGRAPHY
@@ -254,29 +363,5 @@
 
 \addtocontents{toc}{\vspace{2em}} % Add a gap in the Contents, for aesthetics
 \bibliography{Thesis_bibliography} % The references information are stored in the file named "Thesis_bibliography.bib"
-
-%-------------------------------------------------------------------------
-%	APPENDICES
-%-------------------------------------------------------------------------
-
-\cleardoublepage
-\addtocontents{toc}{\vspace{2em}} % Add a gap in the Contents, for aesthetics
-\appendix
-\input{Chapters/AppendixA}
-\input{Chapters/AppendixB}
-
-% LIST OF FIGURES
-\listoffigures
-
-% LIST OF TABLES
-\listoftables
-
-% LIST OF SYMBOLS
-\input{Chapters/Acronyms}
-
-% INFORMAL ACKNOWLEDGEMENTS
-%\input{Chapters/Thanks}
-
-\cleardoublepage
 
 \end{document}

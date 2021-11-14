@@ -1,5 +1,5 @@
 \chapter{Experimental evaluation}
-\label{ch:experiments}
+\label{ch:evaluation}
 
 In this chapter, we present experimental results on the system proposed. Two types of evaluations are present: a first assessment done on the working prototype running on multiple Virtual Machines (VMs) and an evaluation of the performance of the approach, measured using a simulation run on a discrete-event simulator.
 In the first case, since it's not possible to emulate a network similar to a real edge network due to the amount of resources needed, we focus on the effectiveness, efficiency and usability of the framework.
@@ -77,13 +77,13 @@ The realizations of \inlinecode{ProcessingUnit} are shown below in Figure \ref{f
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.66\linewidth]{Figures/Evaluation/processing-unit-realizations.png}
+    \includegraphics[width=0.99\linewidth]{Figures/Evaluation/processing-unit-realizations.png}
     \caption{Concrete realizations of the ProcessingUnit component.}
     \label{fig:processing-unit-realizations}
 \end{figure}
 
 
-\subsection{Matching the abstractions to a real use case}
+\subsection{Matching the Abstractions to a Use Case}
 To better narrow down the abstractions we can see in one of our use cases how these abstractions match a real scenario: in the traffic use case (TODO ref to use case chapter) the \inlinecode{DataProducerClient} represents the camera producing frames of the road. In our edge scenario the camera sends the frame to the lowest level in the hierarchy, which in our example architecture correspond to the "district" level (\inlinecode{ProcessingLocationDistrict}). While in the core-centric scenario the camera sends the frame to the central cloud (\inlinecode{ProcessingLocationCentral}).
 
 The action of sending the frame is simulated using the \inlinecode{Transmission} component. The frame is then processed by applying an image recognition algorithm, an algorithm which is simulated as a data processing by the receiving \inlinecode{ProcessingUnit}.
@@ -494,10 +494,9 @@ Similarly here read requests are made to the lowest level of the hierarchy, the 
 
 The read operation is a fast operation that does not require heavy processing, this allows both the cloud solution and the edge solution to fulfill a million of requests in a small amount of time before starting to not keep up with the load.
 
-\subsection{Summing up}
-Thanks to the simulation and by performing the various experiments we showed that by using our framework we get immense benefits in terms of traffic generated in the network while allowing faster reads when the data aggregation needed is not central.
+\subsection{Summing Up}
+Thanks to the simulation and by performing the various experiments we showed that by using our framework we get immense benefits in terms of reduced traffic in the network while allowing faster reads when the data aggregation needed is not central.
 In a case where a central aggregation is still needed we showed that the write requests suffer an increase in latency, but the increase is not substantial.
 
 We also noticed how our edge solution can be affected by random spikes in the requests due to the small number of cores and resources in the lowest level of the hierarchy, so there is a clear room for improvements on this matter, but still the increase in latency is not drastic.
-
 
