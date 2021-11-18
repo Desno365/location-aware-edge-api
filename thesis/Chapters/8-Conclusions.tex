@@ -1,14 +1,29 @@
-\chapter{Conclusions and future developments}
+\chapter{Conclusions and Future Developments}
 \label{ch:conclusions}
-TODO
 
 
 \section{Conclusions}
-TODO
+The large diffusion of smart devices and IoT sensors has resulted in an unprecedented growth in the amount of collected data. Core-centric approaches have shown to be inefficient as they need to transfer data back and forth between the core and the devices, generating notable latencies. Therefore new approaches, which exploit the tremendous power of the edge of the network, are replacing the core-centric approaches.
+
+In this thesis we have studied the problem of performing stateful computations in a geo-distributed and heterogeneous scenario, that is the edge of the network.
+
+After analyzing the state of the art in the literature, we defined key research questions that guided our research.
+We started by collecting and organizing the use cases predominantly affected by bandwidth and latency constraints. With the use cases at hand we studied the current frameworks provided by the industry and we noticed that some of the use cases were left out and couldn't be fulfilled by the available frameworks. This situation forces developers to create ad hoc solutions on the infrastructure, a process which is error-prone and task-specific.
+
+Therefore we tried to solve the gap of fulfillment present in the use cases, by proposing a new solution which supports the characteristics of the uses cases left out. We designed and then implemented a prototype for this solution which brings stateful computations and location awareness in contexts where a change of location of the clients does not occur or is not important (the solution in fact does not provide session consistency).
+
+We then evaluated the performance and usability of our prototype in a simple scenario. Instead to evaluate the solution in a complex but more realistic scenario we resorted to a discrete-event simulation.
+We found that, by using our framework with the right use cases, we get immense benefits in terms of reduced traffic in the network and in terms of lower latencies, especially in cases where the data aggregation needed is not central. However we noticed also how our solution can be affected by a latency increase due to random spikes in the requests and due to the small number of cores and resources, cores that can't process these spikes in time. Nevertheless the results of the evaluation confirmed the power and effectiveness of the proposed solution.
 
 
 \section{Future Works}
-TODO
+In this thesis, we have addressed several key issues related to stateful serverless computing on the edge by designing and implementing a new solution. However, with our solution, not every use case can be fulfilled, in fact the absence of \textbf{session consistency} makes the usage impractical in dynamic context where the location of the client changes.
+Therefore a possible improvement and a possible research direction could be session consistency in the context of stateful serverless computing on the edge.
+
+Another problem with our solution is the possibility for edge locations to be overwhelmed due to random spikes in requests targeting a specific location: our solution does not support the \textbf{offload of the computation} to free up some resources from an overloaded node. On the contrary, for how we thought our solution, in some use cases it's important to be static and to reach always the same node. 
+
+In the context of serverless computing a common problem is the phenomenon of \textbf{cold-start}, which impacts processing latency. As we saw, there exists solutions that firmly mitigated the problem reaching milliseconds cold-start latencies (Cloudflare Workers), but unfortunately these solutions are currently proprietary.
+
 
 
 \iffalse

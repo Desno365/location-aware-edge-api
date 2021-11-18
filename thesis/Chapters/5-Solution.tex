@@ -32,8 +32,6 @@ So we must provide a way to specify the hierarchy, we chose to implement the API
     \item Location: each location must be associated to an entry point that defines the actual cloudlet or data center to be used (so for the location there must be defined gateway, port and password).
 \end{itemize}
 
-TODO show constraints
-
 
 \subsection{Specifying Deployments}
 Now that we have the hierarchy specified we can use this hierarchy to make a powerful deployment API. The developer should be able to deploy on a specific level of the hierarchy only in a certain area and to exclude a specific subsection from this area.
@@ -76,8 +74,6 @@ Becomes:
 \end{example}
 
 In the examples we saw that the developer should also be allowed to mix the levels of the areas specified, using different levels of the hierarchy inside the \inlinecode{inAreas} and \inlinecode{exceptIn} lists.
-
-TODO show constraints
 
 
 \section{Managing Limited Resources}
@@ -173,6 +169,19 @@ The developer makes the following read call on a function deployed at the "count
 \end{itemize}
 The framework will obtain all the not expired elements contained in the list associated to the key "mylist1".
 \end{example}
+
+
+\section{Finding the Nearest Location}
+Our solution assumes to be able to contact the nearest server automatically, without the intervention of the developer (the developer just needs to send the request to the function's URL).
+
+This process has already been proved to be feasible and is in fact exploited by many web infrastructure companies to provide a Content Delivery Network or to provide serverless edge computing (AWS Lambda@Edge and Cloudflare Workers automatically find the nearest server with the URL as the only input). The most common procedures to perform the process are the following:
+\begin{itemize}
+    \item Anycast Routing: this routing procedure uses the Border Gateway Protocol (BGP) to route clients using the natural network flow, indeed the information collected by the BGP protocol about network neighbors is used to efficiently route traffic based on hop count ensuring the shortest traveling distance between the client and its final destination \cite{anycast-cloudflare}.
+    \item Unicast Routing: a process which can be incorporated into the standard Domain Name System (DNS) resolution process by using recursive DNS queries which redirect clients to the server closest to the DNS resolver (and usually the DNS resolver is physically near the client) \cite{unicast-vs-anycast}.
+    \item Manual Routing: a procedure in which the client computes on its own which is most appropriate server to contact, with this procedure GPS-equipped devices can use more precise information about the location.
+\end{itemize}
+
+In this thesis we assume to have the ability to contact the nearest server: in the implementation of our prototype we use a Manual Routing procedure where the clients would manually contact the nearest server, but in a real scenario a process like Unicast Routing or Anycast Routing would be preferred.
 
 
 \section{Applying the Solution to Use Cases}
@@ -279,7 +288,7 @@ Writes:
     \item Data: <<topic seen or searched by the client>>
     \item Referring Area Level: country
     \item Should Save In Intermediate Levels: true
-    \item Time To Live: 2 days
+    \item Time To Live: 4 hours
 \end{itemize}
 With this database action that we are performing at the "city" level (since the function is deployed at the "city" level) we are adding data to the list of "trending-topics". The Referring Area Level is "country" so the data will be aggregated to the "country" level, but since we are also saving in intermediate locations this data will be also sent to the respective "territory" location and saved locally in the current "city" location.
 
@@ -306,3 +315,13 @@ With this database action that we are performing at the "territory" level (since
 Since the list is obtained in its entirety the trending algorithm can be anything the developer prefers (e.g., most-frequent analysis, derivative of the frequency, etc...).
 \end{example}
 
+
+\subsection{Suitable Use Cases}
+Our solution, for how has been thought, is clearly suitable for use cases with the following characteristics:
+\begin{itemize}
+    \item Stateful computation: the use case needs a stateful support with frequent writes and reads.
+    \item Location awareness: the use cases works on geographic partitions of the data;
+    \item Location is static: data producers do not change location;\\OR\\Location is dynamic but it’s not a problem to have a discontinuity in the data: e.g., if there is an aggregation of “city” and the data producers exits the city its data will have a discontinuity;
+    \item Session consistency is not needed: the concept of session, where the user maintains consistency of the data even when the connected server changes, is not provided by our solution;
+    \item An immediate aggregation of data is not needed: e.g., if data are aggregated by “country” and the execution is by “city”, the “country” aggregation is reached in an eventual consistent way and not instantly.
+\end{itemize}

@@ -9,8 +9,26 @@ In both scenarios we compare the proposed approach to a typical core-centric app
 
 
 \section{Emulation}
-TODO
+We tested our prototype on an emulation of an edge network.
 
+Emulating a node required running a Virtual Machine (VM), installing Kubernetes on the VM and installing OpenFaas and Redis on top of Kubernetes.
+These services require the usage of hardware resources, so we were only able to test our prototype with a small number of nodes, and not on an emulation with hundreds of nodes, which would be more similar to a real edge network.
+
+
+\subsection{Performance}
+We found that, after paying the cold-start price where the initialization of the container running the function would create a noticeable latency, functions were executed in milliseconds even when using the (local) stateful support. This speed of the stateful support has been possible thanks to the usage of an in-memory database like Redis.
+
+We also tested the scalability of our solution when using the \textit{faas} flavour of OpenFaas: we made 10'000 sequential calls to a node running a simple function and analyzed with the tools provided by Kubernetes the internal situation of containers. We noticed that new containers were immediately created to fulfill the stream of requests. After the 10'000 calls ended and no new calls were made, OpenFaas automatically scaled down and brought the number of idle containers to one.
+
+
+\subsection{Usability}
+In Section \ref{sec:prototype_applying_to_use_cases} we presented an implementation of a few use cases using our prototype. We believe that, after understanding the functioning of our solution, implementing new use cases becomes very easy.
+
+Our solution allows developer to forget about the location, which instead is handled internally, and forget about handling the complex management of hundreds of geo-distributed nodes.
+This avoid the creations of custom solutions that overfit on the available infrastructure, creating a code that becomes task-specific and difficult to extend and maintain.
+
+In fact if a developer where to implement the "Road Traffic Monitoring" (seen in Section \ref{sec:prototype_applying_to_use_cases}) use case on an edge infrastructure, they would need to manually forward the processed video footage to upper levels in the hierarchy, a hierarchy that would have to be manually specified. And all the deployments would need to be carefully made since there is no tool that allow to deploy the functions by hierarchy level.
+Also developers would need to setup the infrastructure all by themselves, a process which can create errors or malfunctions, while the FaaS architecture in our solution allows to forget about the handling of the infrastructure.
 
 
 \section{Simulation}
@@ -494,7 +512,7 @@ Similarly here read requests are made to the lowest level of the hierarchy, the 
 
 The read operation is a fast operation that does not require heavy processing, this allows both the cloud solution and the edge solution to fulfill a million of requests in a small amount of time before starting to not keep up with the load.
 
-\subsection{Summing Up}
+\subsection{Simulation Summary}
 Thanks to the simulation and by performing the various experiments we showed that by using our framework we get immense benefits in terms of reduced traffic in the network while allowing faster reads when the data aggregation needed is not central.
 In a case where a central aggregation is still needed we showed that the write requests suffer an increase in latency, but the increase is not substantial.
 

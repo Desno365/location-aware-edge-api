@@ -283,6 +283,7 @@ Having a function makes the architecture more modular, and it will be easier to 
 
 
 \section{Applying the Prototype to Use Cases}
+\label{sec:prototype_applying_to_use_cases}
 In this section we show a few examples where we apply our solutions to solve the same use cases that we presented in the previous Chapter (Section \ref{sec:solution_use_cases}).
 
 \subsubsection{IoT Data Compression}
@@ -429,52 +430,78 @@ deployer deploy get-fastest-path infrastructure.json --inEvery country --inAreas
 
 
 \subsubsection{Trending Topics}
-In this use case we want to find the trending topics in a certain region in an application (like trending user in a social network, or trending searches).
+As we showed, in this use case we want to find the trending topics in a certain region in an application (like trending user in a social network, or trending searches).
 
-We can divide the implementation of this use case in two parts: a first part where we aggregate the data of the topics per region; and a second part that periodically finds the trending topics from the raw data.
+It has been implemented using two function: an HTTP trigger that receives the topics from the users and aggregates the data; and a cron trigger that gets called periodically to find the trending topics from the list of topics present in the region.
 
-We may also want to aggregate this data with different granularities: "city", "territory", "country".
+Code of the HTTP-triggered function (placed in folder "search-analytics-data-receiver"):
+\begin{lstlisting}[language=javascript]
+const edgeDb = require("edge-db");
+const trendingSearchesDataDomain = { referringAreaType: "country", saveAlsoInIntermediateLevels: true, ttl: 4*60*60*1000  }; // 4 hours TTL.
 
-So with our solution a possible execution for the first part can be the following:
-\begin{example}
-Deployment:
-\begin{itemize}
-    \item \inlinecode{inEvery}: "city"
-    \item \inlinecode{inAreas}: [ ]
-    \item \inlinecode{exceptIn}: [ ]
-\end{itemize}
-With this deployment we are deploying a function in every location at the "city" level.
+module.exports = async (event, context) => {
+  const searchData = event.body.search_data.toLowerCase();
+  const response = await edgeDb
+      .withDataDomain(trendingSearchesDataDomain)
+      .addToList("latest_searches_list", searchData);
+  return context
+      .status(200)
+      .succeed(response);
+}
+\end{lstlisting}
 
-Writes:
-\begin{itemize}
-    \item Write Action: add to list
-    \item Key: trending-topics
-    \item Data: <<topic seen or searched by the client>>
-    \item Referring Area Level: country
-    \item Should Save In Intermediate Levels: true
-    \item Time To Live: 2 days
-\end{itemize}
-With this database action that we are performing at the "city" level (since the function is deployed at the "city" level) we are adding data to the list of "trending-topics". The Referring Area Level is "country" so the data will be aggregated to the "country" level, but since we are also saving in intermediate locations this data will be also sent to the respective "territory" location and saved locally in the current "city" location.
+Code of the cron-triggered function (placed in folder "search-analytics-performer"):
+\begin{lstlisting}[language=javascript]
+const edgeDb = require("edge-db");
 
-We make an example with actual names to be more clear: a client is searching the topic "My search" and the client is located in the city of Milan. This client send this topic to the deployed function, the function has been deployed at the "city" level so it will be executed in a data center in Milan. This function executing in Milan can perform a pre-process on the input (e.g., making it lowercase) and then adds the input to the list "trending-topics". The write is performed with Referring Area Level "country" but also saved in intermediate locations, therefore the input will be forwarded to the respective "country" location (in this case a data center that refers to the Italy area), to the "territory" location (in this case a data center that refers to the Northern region of Italy) and also saved locally in the data center in Milan.
-\end{example}
+module.exports = async (event, context) => {
+  const latestSearchesList = await edgeDb.getList("latest_searches_list");
 
-While a possible execution for the second part of finding the trending topics (in this case the trending topics of the territory) can be the following:
-\begin{example}
-Deployment:
-\begin{itemize}
-    \item \inlinecode{inEvery}: "territory"
-    \item \inlinecode{inAreas}: [ ]
-    \item \inlinecode{exceptIn}: [ ]
-\end{itemize}
-With this deployment we are deploying a function in every location at the "territory" level.
+  const trendingSearches = await getTrendingSearches(latestSearchesList);
 
-Reads:
-\begin{itemize}
-    \item Read Action: get list
-    \item Key: trending-topics
-\end{itemize}
-With this database action that we are performing at the "territory" level (since the function is deployed at the "territory" level) we are reading all the non-expired data in the list "trending-topics". In our case this list contains all the topics searched by the users in the last 2 days in the respective "territory" area where this function is executed. This function can then be executed periodically to update the trending topics.
+  return context
+      .status(200)
+      .succeed(trendingSearches);
+}
 
-Since the list is obtained in its entirety the trending algorithm can be anything the developer prefers (e.g., most-frequent analysis, derivative of the frequency, etc...).
-\end{example}
+async function getTrendingSearches(latestSearchesList) {
+  // Compute trending searches from searches list.
+}
+\end{lstlisting}
+
+Functions specification:
+\begin{lstlisting}[language=yaml,firstnumber=1]
+functions:
+
+  search-analytics-data-receiver:
+    lang: node14
+    handler: ./search-analytics-data-receiver
+    image: dockerHubRef/search-analytics-data-receiver
+    limits:
+      memory: 256Mi
+      cpu: 1000m
+    requests:
+      memory: 4Mi
+      cpu: 0m
+
+  search-analytics-performer:
+    lang: node14
+    handler: ./search-analytics-performer
+    image: dockerHubRef/search-analytics-performer
+    limits:
+      memory: 256Mi
+      cpu: 1000m
+    requests:
+      memory: 4Mi
+      cpu: 0m
+    annotations:
+      topic: cron-function
+      schedule: "0,30 * * * *"
+\end{lstlisting}
+
+Deployment commands:
+\begin{lstlisting}[language=bash]
+deployer deploy search-analytics-data-receiver infrastructure.json --inEvery city
+
+deployer deploy search-analytics-performer infrastructure.json --inEvery territory
+\end{lstlisting}

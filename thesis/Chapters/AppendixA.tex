@@ -2,15 +2,181 @@
 
 The resulting artifacts of our research have been released as open-source software \cite{thesis-github}. Here we present a concise guide on how to run and use these artifacts.
 
-\section{Running the prototype}
-TODO
+Note that this guide is not meant to be universal, and instead shows the steps we performed to run the system in our specific setup.
+
+\section{Running the Prototype}
+For running the prototype we used the \textit{faas} flavour of \textit{OpenFaas}, which runs on top of \textit{Kubernetes}. If \textit{faasd}, the lighter version of \textit{OpenFaas}, is needed, then a slightly different setup would be necessary.
+
+
+\subsection{Prerequisites}
+The following applications and Command Line Interface programs are needed to setup the framework:
+\begin{itemize}
+    \item \textbf{arkade}: \textit{arkade} provides a portable marketplace for downloading popular devops CLIs and installing helm charts;
+    \\It can be installed with \inlinecode{curl -sLS https://get.arkade.dev | sudo sh};
+    \\More info at this link \href{https://github.com/alexellis/arkade}{github.com/alexellis/arkade}
+    
+    \item \textbf{faas-cli}: the Command Line Interface of \textit{OpenFaas};
+    \\It can be installed with \inlinecode{arkade get faas-cli};
+    
+    \item \textbf{helm}: the \textit{Kubernetes} package manager;
+    \\It can be installed with \inlinecode{arkade get helm};
+    
+    \item \textbf{minikube}: a local \textit{Kubernetes} engine;
+    \\On our setup running macOS Big Sur with a x86-64 CPU it was installed with \inlinecode{brew install minikube};
+    \\More info at this link \href{https://minikube.sigs.k8s.io/docs/start/}{minikube.sigs.k8s.io/docs/start/}
+\end{itemize}
+
+
+\subsection{Kubernetes Setup}
+To run \textit{Kubernetes} we used \textit{minikube}, a software which allows to easily create a Virtual Machine environment equipped with \textit{Kubernetes}. Note that in a production environment \textit{minikube} is not recommended, but in our emulation it was perfect to run multiple nodes that emulate the nodes in an edge network.
+
+The following are the commands we used to start the Virtual Machines (note that as virtualization software connected to \textit{minikube} we used \textit{Parallels Desktop}):
+\begin{lstlisting}[language=bash]
+minikube delete --all  # Delete previous VMs
+
+minikube config set driver parallels  # Set Parallels as virtualization software
+
+minikube config set cpus 2  # Set 2 CPUs per VM
+
+minikube config set memory 2048  # Set 2048MB of RAM per VM
+
+minikube start --profile p1  # Start a new VM with name p1
+
+minikube start --profile p2  # Start a new VM with name p2
+
+minikube ip --profile p1  #  Get IP address of p1
+
+minikube ip --profile p2  #  Get IP address of p2
+
+kubectl config get-contexts  #  Print Kubernetes contexts (should show two Kubernetes machines, p1 and p2)
+
+kubectl config use-context p1  #  Use p1 for the next commands
+
+kubectl get po -A  # List all pods running on Kubernetes
+\end{lstlisting}
+
+At the end of these commands the results are, in this case, the creation of two empty VMs running \textit{Kubernetes}, without any external software installed on it.
+Now the goal is to install the framework we developed on top of these \textit{Kubernetes} installations.
+
+Three steps are still needed:
+\begin{itemize}
+    \item Install the \textit{faas} flavour of \textit{OpenFaas} on top of \textit{Kubernetes};
+    \item Install \textit{Redis} on top of Kubernetes;
+    \item Deploy on \textit{OpenFaas} the function we developed that allows locations to receive forwarded write actions.
+\end{itemize}
+
+
+\subsection{OpenFaas Setup}
+On each \textit{Kubernetes} environment it is needed to install \textit{OpenFaas}. The installation can be performed in the following way:
+\begin{lstlisting}[language=bash]
+# Use p1 for the next commands (should be changed for every VM)
+kubectl config use-context p1
+
+# Apply OpenFaas configuration
+kubectl apply -f https://raw.githubusercontent.com/openfaas/faas-netes/master/namespaces.yml
+
+# Write OpenFaas password in a secret
+kubectl -n openfaas create secret generic basic-auth --from-literal=basic-auth-user=admin --from-literal=basic-auth-password="customOpenFaasPassword"  
+
+# Install OpenFaas
+helm upgrade openfaas --install openfaas/openfaas --namespace openfaas --set functionNamespace=openfaas-fn --set basic_auth=true
+
+# Install the cron addon
+helm upgrade --install cron-connector openfaas/cron-connector --namespace openfaas
+
+# Login to OpenFaas running on machine p1 that we have just installed
+echo "customOpenFaasPassword" | faas-cli login -u admin --password-stdin --gateway http://$(minikube ip --profile p1):31112
+\end{lstlisting}
+At the end of this step we have the \textit{faas} flavour of \textit{OpenFaas} installed on every node.
+
+
+\subsection{Redis Setup}
+On each \textit{Kubernetes} environment it is needed to install \textit{Redis}. The installation can be performed in the following way:
+\begin{lstlisting}[language=bash]
+# Use p1 for the next commands (should be changed for every VM)
+kubectl config use-context p1
+
+# Install Redis
+helm install my-openfaas-redis bitnami/redis --namespace openfaas-fn --set auth.password="customRedisPassword" --set master.persistence.enabled=false
+\end{lstlisting}
+At the end of this step we have a Redis instance installed on every node on top of \textit{Kubernetes}.
+Now we can put all the IP addresses of the machines in the JSON of the infrastructure.
+\\The IP addresses can be obtained, as seen, with \inlinecode{minikube ip --profile p1}.
+
+
+\subsection{The Receiver Function}
+After the infrastructure JSON file is ready we can deploy the function "edge-db-data-receiver" which allows locations to receive forwarded write actions.
+\begin{lstlisting}[language=bash]
+# Move in the directory where the "edge-db-data-receiver" function is stored
+cd ./framework/functions-main/
+
+# Build and publish the "edge-db-data-receiver" function on a Docker Registry
+faas-cli publish --filter edge-db-data-receiver --platforms linux/arm/v7,linux/amd64
+
+# Deploy the function on every level, except the lowest level
+deployer deploy edge-db-data-receiver infrastructure.json --inEvery city
+deployer deploy edge-db-data-receiver infrastructure.json --inEvery country
+deployer deploy edge-db-data-receiver infrastructure.json --inEvery continent
+\end{lstlisting}
+At the end of this step the framework is ready to receive custom functions, that can be created by the developer as seen in Chapter \ref{ch:prototype}. 
+
+
+\subsection{Deploying Custom Function}
+To deploy new custom functions it is simply needed to perform the following commands:
+\begin{lstlisting}[language=bash]
+# Move in the directory where the "stack.yml" file is defined
+cd ./framework/functions-main/
+
+# Build and publish the function on a Docker Registry
+faas-cli publish --filter my-function-name --platforms linux/arm/v7,linux/amd64
+
+# Deploy the function
+deployer deploy my-function-name infrastructure.json --inEvery district --inAreas italy paris --exceptIn milan
+\end{lstlisting}
+
+
+\section{Debugging the Prototype}
+
+\subsection{Debugging Custom Functions}
+The following commands can be used to print the logs of a function:
+\begin{lstlisting}[language=bash]
+# Select which node to debug
+kubectl config use-context p1
+
+# Print the logs of the function running on that node
+kubectl logs -n openfaas-fn deploy/my-function-name -f
+\end{lstlisting}
+Or alternatively the \textit{faas-cli} can be used as follows:
+\begin{lstlisting}[language=bash]
+faas-cli logs my-function-name --gateway http://$(minikube ip --profile p1):31112
+\end{lstlisting}
+
+
+\subsection{Debugging the Framework}
+To debug the framework itself or to understand why a function is having issues starting up, the following commands can be used:
+\begin{lstlisting}[language=bash]
+# Select which node to debug
+kubectl config use-context p1
+
+# List all pods and components running on Kubernetes
+kubectl get po -A
+
+# Print many info about a single component (in this example the gateway component)
+kubectl describe -n openfaas deploy/gateway
+kubectl logs -n openfaas deploy/gateway
+
+# Print events happened in the openfaas namespace
+kubectl get events -n openfaas --sort-by=.metadata.creationTimestamp
+\end{lstlisting}
+
 
 \section{Running the Simulation}
-TODO
+The Simulation is composed of many Phython files, one file for each scenario. To run a scenario it is simply possible to run the Python file with a Python IDE (e.g., PyCharm).
+
+Note that a single configuration in some scenarios may simulate millions of machines and the simulation of such a huge number of machines requires an high utilization of RAM.
+For example the scenario included in \inlinecode{simulation\_read\_district\_level\_clients\_ratio.py} can use up to 14 GB or RAM for the simulation.
+If such usage of RAM becomes a problem, it is possible to make a modification to the trade-off between the speed of the execution of the simulation and the usage of RAM by modifying the following line:\\
+\inlinecode{pool = multiprocessing.Pool(processes=4)}\\
+and replacing the 4 with a lower number to use less RAM, while also using less parallelism for the simulation, resulting in a slower execution. In practice this number represents how many configurations of the scenario can be run in parallel on the given processes.
 
 
-\iffalse
-If you need to include an appendix to support the research in your thesis, you can place it at the end of the manuscript.
-An appendix contains supplementary material (figures, tables, data, codes, mathematical proofs, surveys, \dots)
-which supplement the main results contained in the previous chapters.
-\fi
