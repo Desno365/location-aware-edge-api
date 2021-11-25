@@ -259,6 +259,7 @@ second_link_latencies = [result.get_average_second_link_latency() for result in 
 second_processing_latencies = [result.get_average_second_processing_latency() for result in results]
 first_traffic_per_distance = [result.get_total_first_link_traffic_per_distance() for result in results]
 second_traffic_per_distance = [result.get_total_second_link_traffic_per_distance() for result in results]
+total_traffic_per_distance = [(result.get_total_first_link_traffic_per_distance() + result.get_total_second_link_traffic_per_distance()) / 1000 for result in results]
 names = [result.simulation_name.replace(" ", "\n") for result in results]
 colors = ['green' if result.simulation_type == 'edge' else 'red' for result in results]
 x_positions = (range(len(results)))
@@ -289,6 +290,15 @@ plt.bar(x_positions, bars4, bottom=bars_1_plus_2_plus_3, color='#34e363')
 plt.xticks(x_positions, names)
 plt.ylabel("Average Write Latency")
 plt.legend(["First link", "Processing", "Second Link", "Aggregation"])
+plt.tight_layout()
+plt.show()
+
+# Plot sum of traffic uncut without details.
+plt.figure(figsize=(8, 6))
+plt.title('Traffic * Distance')
+plt.bar(x_positions, total_traffic_per_distance, color='#333333')
+plt.xticks(x_positions, names)
+plt.ylabel("Total (traffic in GB) * (distance in Km)")
 plt.tight_layout()
 plt.show()
 
