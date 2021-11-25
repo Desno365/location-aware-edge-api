@@ -1,4 +1,4 @@
-<img src="./politecnico-background.png" alt="drawing" height="200"/>
+![politecnico-background](./politecnico-background.png)
 
 # Location-Aware and Stateful Serverless Computing on the Edge
 
