@@ -103,7 +103,7 @@ The realizations of \inlinecode{ProcessingUnit} are shown below in Figure \ref{f
 \subsection{Matching the Abstractions to a Use Case}
 To better narrow down the abstractions we can see in one of our use cases how these abstractions match a real scenario: in the "Road Traffic Monitoring" use case the \inlinecode{DataProducerClient} represents the camera producing frames of the road. The camera sends the frame to the lowest level in the hierarchy, which in our example architecture corresponds to the "district" level (\inlinecode{ProcessingLocationDistrict}). While in the core-centric scenario the camera sends the frame to the central cloud (\inlinecode{ProcessingLocationCentral}).
 
-The action of sending the frame is simulated using the \inlinecode{Transmission} component. The frame is then processed by applying an image recognition algorithm, an algorithm which is simulated as a data processing by the receiving \inlinecode{ProcessingUnit}.
+The action of sending the frame is simulated using the \inlinecode{Transmission} component. The frame is then processed by applying an image recognition algorithm, an algorithm which is simulated by the receiving \inlinecode{ProcessingUnit}.
 
 In the core-centric scenario the output data is ready when finished processing. While in our edge scenario the ouput data is sent to the specified aggregating \inlinecode{ProcessingUnit} which needs to save the data. The communication is again simulated using the \inlinecode{Transmission} component, while the saving of data is simulated as a small processing of data in the aggregating \inlinecode{ProcessingUnit}.
 

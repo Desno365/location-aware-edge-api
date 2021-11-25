@@ -119,10 +119,10 @@ To simplify the visualization of the JSON we didn't show in this example the det
 
 \subsection{The Command Line Interface}
 The CLI can then be used by the developer to perform the actual \textbf{deployment}.
-By issuing the command \inlinecode{edge-deployer deploy --help}, the CLI shows the usage of the "deploy" command:
+By issuing the command \inlinecode{deployer deploy --help}, the CLI shows the usage of the "deploy" command:
 
 \begin{lstlisting}[language=bash]
-Usage: edge-deployer deploy [options] <functionName> <infrastructure>
+Usage: deployer deploy [options] <functionName> <infrastructure>
 
 Deploys the function to the infrastructure specified.
 
@@ -140,7 +140,7 @@ And at last the \inlinecode{yaml} field is used to specify the path to the YAML 
 To better understand how the CLI works we now present an example:
 
 \begin{lstlisting}[language=bash]
-edge-deployer deploy myHttpFunction infrastructure.json --inEvery district --inAreas italy paris --exceptIn milan paris001 --yaml stack.yml
+deployer deploy myHttpFunction infrastructure.json --inEvery district --inAreas italy paris --exceptIn milan paris001 --yaml stack.yml
 \end{lstlisting}
 
 In this example the function called \inlinecode{myHttpFunction}, specified in the YAML file \inlinecode{stack.yml}, is deployed to the infrastructure. The function is deployed at the \inlinecode{district} level in all the districts contained in the areas of \inlinecode{italy} and \inlinecode{paris}, but excluding the districts contained in the area of \inlinecode{milan} and excluding the district \inlinecode{paris001}.

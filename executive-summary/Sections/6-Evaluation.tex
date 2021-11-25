@@ -19,7 +19,7 @@ This avoids the creation of custom solutions that overfit on the available infra
 In fact, developers would need to set up the infrastructure all by themselves, a process which can create errors or malfunctions, while the serverless FaaS architecture in our solution allows to forget about the handling of the infrastructure.
 
 \subsection{Simulation Summary}
-Thanks to the various experiments performed on the simulation we showed that by using our framework we get immense benefits in terms of \textbf{reduced traffic} in the network (Figure \ref{fig:write-by-traffic1}) while allowing \textbf{faster reads} when the data aggregation needed is not central.
+Thanks to the various experiments performed on the simulation, we found that by using our framework we get immense benefits in terms of \textbf{reduced traffic} in the network (Figure \ref{fig:write-by-traffic1}), while allowing \textbf{faster reads} when the data aggregation needed is not central.
 
 \begin{figure}
     \centering
@@ -37,6 +37,6 @@ Thanks to the various experiments performed on the simulation we showed that by 
 \end{figure}
 \fi
 
-In a case where a central aggregation is still needed we showed that the write requests suffer an increase in latency, but the increase is not substantial ($\approx$139ms on the simulation of our approach, versus the $\approx$109ms on the simulation of the cloud solution).
+In a case where a central aggregation is still needed we found that the write requests suffer an increase in latency, but the increase is not substantial ($\approx$139ms on the simulation of our approach, versus the $\approx$109ms on the simulation of the cloud solution).
 
-During the simulations we also noticed how our edge solution can be affected by an increase in the average write latency due to random spikes in the requests. This is caused by the small number of cores and resources in the lowest level of the hierarchy that can't keep up with the spike of requests. Fortunately this increase is not drastic.
+During the simulations we also noticed how our edge solution can be affected by an increase in the average write latency due to random spikes in the requests. This is caused by the small number of cores and resources in the lowest level of the hierarchy, that can't keep up with the spike of requests. Fortunately this increase is not drastic.
