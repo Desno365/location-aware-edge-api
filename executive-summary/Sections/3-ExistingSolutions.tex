@@ -1,0 +1,15 @@
+\section{Existing Solutions}
+\label{sec:existing-solutions}
+
+We studied the current frameworks publicly available in the industry to perform \textbf{serverless computations on the edge} on a large scale and in the thesis we analyzed one by one each of these solutions. The most popular solutions are AWS Lambda@Edge, Cloudflare Workers and Akamai EdgeWorkers.
+
+However, these frameworks do not provide stateful support for use cases with \textbf{frequent write operations}. They only provide support for caching, stateless, forwarding or infrequent-write use cases.
+If we apply the frameworks to the use cases we collected, we can fulfill only the stateless use cases. All the other use cases require an abundant rate of write operations, \textbf{making the available frameworks unsuitable} for the tasks.
+
+Therefore, we tried to think of a new solution which can fulfill the use cases we collected.
+
+Before thinking about a new solution we studied the platforms that can be used to set up a FaaS architecture, with the idea in mind to build a prototype of our solution on this infrastructure.
+
+Indeed we have seen while studying the available framework that the \textbf{FaaS paradigm} is the most used paradigm to allow computations on the edge in the industry, while long-running solutions are not widespread, this is expected since the FaaS paradigm can allow to reach an \textbf{high efficiency}  \cite{lightweight-virtualization} which in the edge is essential.
+
+Therefore we studied the open-source FaaS platforms and found interesting solutions in this field, with the most popular solutions being Apache OpenWhisk, Fission and OpenFaas. We especially found OpenFaas interesting since they provide two flavours of their system: the \textit{faas} flavour allows vast \textbf{scalability} but comes with a \textbf{bigger overhead}, while the \textit{faasd} flavour \textbf{cannot scale} horizontally but can run on \textbf{hardware-limited} devices, in fact we were able to try the system also on our Raspberry Pi 3 Model B+ (a device with only 1 GB of RAM).

@@ -1,0 +1,31 @@
+\section{The Prototype}
+\label{sec:prototype}
+
+We chose to implement our prototype on top of OpenFaas since, with their two versions, it is possible to create a FaaS architecture both on high-performing machines and on hardware-limited devices.
+OpenFaas automatically scales and runs Docker images in response to triggers; these Docker images contain the functions provided by the developer and are run using a popular container-orchestration system, Kubernetes.
+We provided two triggers for the system: the \textbf{HTTP trigger}, where the function gets activated by a simple HTTP request, and the \textbf{cron trigger}, where the function is automatically called periodically based on the current time.
+OpenFaas also allows the developer to specify RAM and CPU usage limits.
+
+
+\subsection{Deployments}
+With a \textbf{Command Line Interface} (CLI) that we built and which interacts with the APIs provided by OpenFaas, we allow the developer to perform the deployment on the whole network.
+The developer can use the following options:
+\begin{itemize}
+    \item \inlinecode{inEvery}: a string representing the level on which to deploy the function (e.g., "city", "continent").
+    \item \inlinecode{inAreas}: a list of string of areas, specifying in which areas to deploy. If unspecified we can assume the developer wants it deployed on every area of the level specified in \inlinecode{inEvery} (e.g., "milan", "france"). 
+    \item \inlinecode{exceptIn}: a list of strings of areas that are an exception to what was previously defined before. In these areas the developer does not want to perform the deployment.
+\end{itemize}
+The CLI can then perform automatically the deployment on the areas requested. The hierarchy and the relation between areas and machines is specified by using the \textbf{hierarchical structure} of a JSON file: in this file the whole network and its division by hierarchy is specified.
+
+
+\subsection{Stateful Support}
+To provide support for stateful computations we created a JavaScript API that interacts with a \textbf{Redis instance} running on the machine, and a custom function which allows machines on a lower level of the hierarchy to forward data on an upper level.
+In our prototype we provided the following APIs:
+\begin{itemize}
+    \item \textit{get}: gets the value associated to a key;
+    \item \textit{getList}: gets the list of values associated to the key;
+    \item \textit{set}: sets the key to hold the provided value;
+    \item \textit{addToList}: adds a value to the list specified by the key (if the list does not exists it is automatically created).
+\end{itemize}
+The two "read" APIs allow only to read the values that the current location contains, so if the developer wants to access "continent" level data, the developer will need to deploy a function at the "continent" level and perform a get operation in the function. 
+While the two write APIs allow saving the data on one or multiple levels. Since the processing should be done on a lower level so that it is performed as close as possible to the user, these APIs only allow forwarding data on upper levels. In every write action there must also be specified a Time-To-Live that will be applied to that value, this forces developers to not accumulate data in the stateful support. Accumulating data should be avoided due to the more bounded resources present at the edge of the network.

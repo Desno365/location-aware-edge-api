@@ -1,10 +1,10 @@
 % Set the geometric layout of the document
 \usepackage{geometry}
 \geometry{
-  top=3cm,
-  left = 2.0cm,
-  right = 2.0cm,
-  bottom=2cm,
+  top=2.8cm,
+  left = 1.9cm,
+  right = 1.9cm,
+  bottom=2.0cm,
   headheight= 2cm,
   headsep= 0cm,
 }
@@ -57,12 +57,12 @@
 
 % Create command for background pic
 \newcommand\BackgroundPic{% Adding background picture
-	\put(230,358){
+	\put(237,365){
 		\parbox[b][\paperheight]{\paperwidth}{%
 			\vfill
 			\centering
 			\transparent{0.4}
-			\includegraphics[width=0.5\paperwidth]{raggiera_polimi.eps}%
+			\includegraphics[width=0.44\paperwidth]{raggiera_polimi.eps}%
 			\vfill
 }}}
 
@@ -99,7 +99,7 @@
 % -> Create the header
 \chead[C]{
 \centering
-\begin{tcolorbox}[arc=0pt, boxrule=0pt, colback=bluePoli!60, width=\textwidth, colupper=white]
+\begin{tcolorbox}[arc=0pt, boxrule=0pt, colback=bluePoli!60, width=\textwidth, colupper=white, top=1.7mm, bottom=1.7mm]
     \textbf{Executive summary} \hfill \textbf{\author}  
 \end{tcolorbox}
 }

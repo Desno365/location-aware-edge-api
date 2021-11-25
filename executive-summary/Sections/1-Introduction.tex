@@ -1,9 +1,41 @@
 \section{Introduction}
 \label{sec:introduction}
 
-This document is intended to be both an example of the Polimi \LaTeX{} template for the Executive Summary
-of your thesis, as well as a short introduction to its use.
+With the increasing number of connected devices and with Internet-of-Thing (IoT) implementation now becoming more widespread, cloud-centric architectures are starting to be ineffective. The numerous devices are generating a lot of data at the end of the network and many applications are already being deployed at the edge to process the information.
+Cisco Systems predicts that an estimated 29 billion devices will connect to the Internet by 2023 \cite{cisco2018-2023}.
 
-The Executive Summary is required only
-if the thesis has been assigned to a reviewer (\textit{controrelatore})
-for an independent evaluation of its quality, scientific/technical relevance and original contribution.
+Due to the volume, variety and velocity of data generated at the end of the network, the cloud cannot fully support applications that must meet compelling \textbf{latency} or \textbf{bandwidth} constraints: huge distances need to be covered by the communication, increasing the latency and making a large quantity of data pass through the network.
+Indeed, the considerable increase in the amount of data produced at the end of the network was not accompanied by a comparable increase of available bandwidth from/to the cloud \cite{promise-of-edge-computing}.
+
+To deal with the aforementioned situation new approaches have been introduced in both academia and industry, exploiting the power of the edge of the network to perform the computation closer to the data source.
+
+In this thesis we study the state of the art for stateful computations and data processing on the edge and after carefully analyzing the issues and the needs of the scenario we collect the use cases predominantly affected by bandwidth and latency constraints. We then show the current frameworks available in the industry and notice how these solutions do not cover the use cases found. So we then propose a serverless approach effectively applicable by web infrastructure companies, that takes into consideration the problem of the scarcity of the resources, while still allowing quite powerful stateful computations on the edge. We also show how we implemented this new approach through a working prototype, and finally we investigate the gains developers may obtain by using our approach. We demonstrate how several use cases can benefit from this new system through discrete-event simulation, since running our prototype on an emulation of a global edge network was infeasible due to the sheer amount of resources needed to emulate even a small edge network.
+
+
+
+\iffalse
+The Executive Summary is a critical overview of your thesis
+with a focus on the main achievements that have emerged from your research.
+
+The Executive Summary should be organized in sections/paragraphs
+in order to better highlight the major points of your work.
+The length should range from four to six pages depending on the length of the thesis manuscript.
+Keep the Executive Summary concise enough to be effective but long enough to allow it to be complete.
+It should be written after completing the thesis manuscript as a stand-alone independent document
+of sufficient clarity and detail to ensure that the reader can figure out the overall objectives,
+the methodology employed and the results/impact of your research.
+
+In writing the Executive Summary, keep in mind that it is not an abstract, it is not a preface,
+and it is not a random collection of highlights.
+With a few exceptions, do not simply cut and paste whole sections or paragraphs of the thesis manuscript
+into a disorganized and cluttered Executive Summary.
+You should reorganize information to be informative as well as concise.
+
+The Executive Summary could contain a few important equations related to your work.
+It could also include the most relevant figures and tables taken or elaborated from the thesis manuscript.
+
+You should also include in the Executive Summary the very essential bibliography of your study.
+The number of selected references should range from three to five depending on the type of work.
+
+The Executive Summary should contain a final section reporting the main conclusions drawn from your research.
+\fi

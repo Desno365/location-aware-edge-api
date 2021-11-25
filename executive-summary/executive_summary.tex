@@ -82,10 +82,165 @@
 %	ADD YOUR PACKAGES (be careful of package interaction)
 %----------------------------------------------------------------------------
 
+\usepackage{array,tabularx}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{svg}
+\usepackage[utf8]{inputenc}
+\usepackage{xcolor}
+\usepackage{graphicx,wrapfig} % For figures inside the text
+\usepackage{listings} % Show code in text
+\usepackage{mdframed} % Example box \begin{example} ... \end{example}
+\usepackage{soul} % Show code inline
 
 %----------------------------------------------------------------------------
 %	ADD YOUR DEFINITIONS AND COMMANDS (be careful of existing commands)
 %----------------------------------------------------------------------------
+
+
+% Better inline code
+\definecolor{light-gray}{gray}{0.95}
+%\newcommand{\inlinecode}[1]{
+%    \colorbox{light-gray}{\texttt{#1}}
+%}
+\usepackage{soul}
+\newcommand{\inlinecode}[1]{
+    \begingroup
+    \sethlcolor{light-gray}
+    \hl{\texttt{#1}}
+    \endgroup
+}
+
+% Show code in text (JSON)
+\colorlet{punct}{red!60!black}
+\definecolor{CodeBackground}{HTML}{EEEEEE}
+\definecolor{delim}{RGB}{20,105,176}
+\colorlet{numb}{magenta!60!black}
+\lstdefinelanguage{json}{
+    basicstyle=\normalfont\ttfamily,
+    numbers=left,
+    numberstyle=\scriptsize,
+    stepnumber=1,
+    numbersep=8pt,
+    showstringspaces=false,
+    breaklines=true,
+    frame=lines,
+    backgroundcolor=\color{CodeBackground},
+    literate=
+     *{:}{{{\color{punct}{:}}}}{1}
+      {,}{{{\color{punct}{,}}}}{1}
+      {\{}{{{\color{delim}{\{}}}}{1}
+      {\}}{{{\color{delim}{\}}}}}{1}
+      {[}{{{\color{delim}{[}}}}{1}
+      {]}{{{\color{delim}{]}}}}{1},
+}
+
+% Show code in text (JavaScript)
+\definecolor{lightgray}{rgb}{.9,.9,.9}
+\definecolor{darkgray}{rgb}{.4,.4,.4}
+\definecolor{purple}{rgb}{0.65, 0.12, 0.82}
+\lstdefinelanguage{javascript}{
+  keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
+  keywordstyle=\color{blue}\bfseries,
+  ndkeywords={const, await, class, export, boolean, throw, implements, import, this},
+  ndkeywordstyle=\color{darkgray}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{purple}\ttfamily,
+  stringstyle=\color{red}\ttfamily,
+  morestring=[b]',
+  morestring=[b]"
+}
+\lstset{
+   language=javascript,
+   backgroundcolor=\color{lightgray},
+   extendedchars=true,
+   basicstyle=\footnotesize\ttfamily,
+   showstringspaces=false,
+   showspaces=false,
+   %numbers=right,
+   %numberstyle=\footnotesize,
+   %numbersep=8pt,
+   tabsize=2,
+   breaklines=true,
+   showtabs=false,
+   captionpos=b
+}
+
+% Show code in text (BASH)
+\lstdefinelanguage{bash}{
+    basicstyle=\normalfont\ttfamily,
+    numbers=left,
+    numberstyle=\scriptsize,
+    stepnumber=1,
+    numbersep=8pt,
+    showstringspaces=false,
+    breaklines=true,
+    frame=lines,
+    backgroundcolor=\color{CodeBackground},
+}
+
+% Show code in text (YAML)
+\newcommand\YAMLcolonstyle{\color{red}\mdseries}
+\newcommand\YAMLkeystyle{\color{black}\bfseries}
+\newcommand\YAMLvaluestyle{\color{blue}\mdseries}
+\makeatletter
+\newcommand\language@yaml{yaml} % macro expanding to the name of the language (handy if you decide to change it further down the road)
+\expandafter\expandafter\expandafter\lstdefinelanguage
+\expandafter{\language@yaml}
+{
+    keywords={true,false,null,y,n},
+    keywordstyle=\color{darkgray}\bfseries,
+    backgroundcolor=\color{CodeBackground},
+    basicstyle=\YAMLkeystyle, % assuming a key comes first
+    numbers=left,
+    numberstyle=\scriptsize,
+    stepnumber=1,
+    numbersep=8pt,
+    sensitive=false,
+    comment=[l]{\#},
+    morecomment=[s]{/*}{*/},
+    commentstyle=\color{purple}\ttfamily,
+    stringstyle=\YAMLvaluestyle\ttfamily,
+    moredelim=[l][\color{orange}]{\&},
+    moredelim=[l][\color{magenta}]{*},
+    moredelim=**[il][\YAMLcolonstyle{:}\YAMLvaluestyle]{:}, % switch to value style at :
+    morestring=[b]',
+    morestring=[b]",
+    literate =  {---}{{\ProcessThreeDashes}}3
+                {>}{{\textcolor{red}\textgreater}}1     
+                {|}{{\textcolor{red}\textbar}}1 
+                {\ -\ }{{\mdseries\ -\ }}3,
+}
+\lst@AddToHook{EveryLine}{\ifx\lst@language\language@yaml\YAMLkeystyle\fi} % switch to key style at EOL
+\makeatother
+\newcommand\ProcessThreeDashes{\llap{\color{cyan}\mdseries-{-}-}}
+
+% Example box. \begin{example} ... \end{example}
+\definecolor{ExampleBoxBackground}{HTML}{999999}
+\newmdenv[ % Define mdframe settings and store as leftrule
+  linecolor=ExampleBoxBackground,
+  linewidth = 2pt,
+  topline=false,
+  bottomline=false,
+  rightline=false,
+  skipabove=\topsep,
+  skipbelow=\topsep
+]{leftrule}
+\newenvironment{example}{
+	\medskip
+	\begin{leftrule}
+	\textbf{Example}
+	\medskip
+	\color{black!60}
+   	\newline%
+}{
+	\medskip
+    \end{leftrule}
+}
+
 
 
 % Do not change Configuration_files/config.tex file unless you really know what you are doing. 
@@ -127,13 +282,15 @@
 % CONTENT
 %-----------------------------------------------------------------------------
 \input{Sections/1-Introduction}
-\input{Sections/2-Guidelines}
-\input{Sections/3-SectionsAndSubsections}
-\input{Sections/4-EquationsFiguresTablesAndAlgorithms}
-\input{Sections/5-Recommendations}
-\input{Sections/6-Bibliography}
+\input{Sections/2-PreliminariesAndOpenProblems}
+\input{Sections/3-ExistingSolutions}
+\input{Sections/4-Solution}
+\input{Sections/5-Prototype}
+\input{Sections/6-Evaluation}
 \input{Sections/7-Conclusions}
-\input{Sections/8-Acknowledgements}
+\input{Sections/8-FutureDevelopments}
+
+\input{Sections/Acknowledgements}
 
 %---------------------------------------------------------------------------
 %  BIBLIOGRAPHY
