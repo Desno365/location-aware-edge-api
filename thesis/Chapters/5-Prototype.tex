@@ -5,13 +5,13 @@ In this chapter we will show the implementation of the prototype running the API
 
 \section{The FaaS Platform}
 We saw in Chapter \ref{ch:existing-solutions} the current frameworks to setup a FaaS platforms, we saw also a very valid implementation focused on edge use cases like the one of Cloudflare Workers, which can reach extremely fast cold-start latencies ($\approx$ 5ms), but unfortunately, being a proprietary solution, it cannot be applied in our framework.
-So we resorted to an open source solution and we chose the solution provided by OpenFaaS since they provide two versions of their system, one version for high-performing machines with more overhead but that can scale greatly, and another more efficient version for edge devices with a smaller overhead but that cannot scale horizontally (there can only be one replica of the container running the function).
+So we resorted to an \textbf{open source} solution and we chose the solution provided by \textbf{OpenFaaS} since they provide two versions of their system, one version for high-performing machines with more overhead but that can scale greatly, and another more efficient version for edge devices with a smaller overhead but that cannot scale horizontally (there can only be one replica of the container running the function).
 
 
 \subsection{Specifying Functions}
 \label{subsec:specifying-functions}
 
-We implemented two FaaS triggers in our prototype: an HTTP trigger (a trigger that gets activated by a simple HTTP request) and the cron trigger (a trigger that is automatically called periodically based on the current time). In the practice the HTTP trigger is always present, and when the cron trigger is activated it calls periodically the relative HTTP endpoint of the function.
+We implemented two FaaS triggers in our prototype: an \textbf{HTTP trigger} (the function gets activated by a simple HTTP request) and the \textbf{cron trigger} (the function is automatically called periodically based on the current time). In practice the HTTP trigger is always present, and when the cron trigger is activated it periodically calls the relative HTTP endpoint of the function.
 
 The following YAML code can be written to specify two functions, one with only the HTTP trigger, the other with the cron trigger:
 
@@ -44,26 +44,26 @@ functions:
       schedule: */2 * * * *
 \end{lstlisting}
 
-We now analyze the example provided to better understand the architecture of our prototype. OpenFaas automatically scales and runs Docker images in response to HTTP requests, these Docker images execute the code provided by the developer.
+We now analyze the example provided to better understand the architecture of our prototype. OpenFaas automatically scales and runs Docker images in response to HTTP requests; these Docker images execute the code provided by the developer.
 
-The actual code is a npm project written in Node.js (in this case using Node version 14) placed in the folder specified in the \inlinecode{handler} section of the YAML. For example the function with name \inlinecode{myHttpFunction} has its code specified in the folder \inlinecode{./myHttpFunctionFolder}.
-This code during deployment is compiled into a Docker Image and published to a Docker Registry (specified in \inlinecode{image} section of the YAML), so that machines that receive the deployment can pull the Docker Image from the Docker Registry and execute the function when requested.
+The actual code is a \textbf{npm project} written in Node.js (in this case using Node version 14) placed in the folder specified in the \inlinecode{handler} section of the YAML. For example the function with name \inlinecode{myHttpFunction} has its code specified in the folder \inlinecode{./myHttpFunctionFolder}.
+This code during deployment is compiled into a \textbf{Docker Image} and published to a \textbf{Docker Registry} (specified in \inlinecode{image} section of the YAML), so that machines that receive the deployment can pull the Docker Image from the Docker Registry and execute the function when requested.
 
 OpenFaas adopted this architecture so that, when a function becomes idle for a lot of time and the machine is in need of resources, the cached Docker Image can be discarded since it can be easily re-obtained again from the Docker Registry.
 
-In the YAML the developer can also specify the CPU and RAM usage. In the \inlinecode{limits} section of the YAML it can be specified the maximum amount of RAM and CPU the instance can use, while in the \inlinecode{requests} section there can be specified the minimum amount of resources the machine must have free to run the instance.
+In the YAML the developer can also specify the \textbf{CPU and RAM usage}. In the \inlinecode{limits} section of the YAML the developer can specify the maximum amount of RAM and CPU the instance can use, while in the \inlinecode{requests} section there can be specified the minimum amount of resources the machine must have free to run the instance.
 
 Finally in the \inlinecode{annotations} section of the YAML the developer can optionally specify the cron trigger of the function with the standard Unix cron syntax \cite{cron-syntax}.
 
 
 \section{Deployments}
-We saw in the previous Chapter how our API can help the developer make precise deployments even on large scale networks thanks to the fields \inlinecode{inEvery}, \inlinecode{inAreas} and \inlinecode{exceptIn}. We implemented these fields in a Command Line Interface (CLI) that interacts with the APIs provided by OpenFaas to perform the deployment on the whole network.
+We saw in the previous Chapter how our API can help the developer make precise deployments even on large scale networks thanks to the fields \inlinecode{inEvery}, \inlinecode{inAreas} and \inlinecode{exceptIn}. We implemented these fields in a \textbf{Command Line Interface} (CLI) that we built and which interacts with the APIs provided by OpenFaas to perform the deployment on the whole network.
 
-But to make any deployment we must first provide a way to specify the network with its hierarchy. The network can be specified by the web infrastructure company or by the developer (when using a proprietary network).
+To make any deployment we must first provide a way to specify the network with its hierarchy. The network can be specified by the web infrastructure company or by the developer (when using a proprietary network).
 
 
 \subsection{Specifying the Hierarchy}
-We provided a way to specify the hierarchy associated to the infrastructure by using the JavaScript Object Notation (JSON) format.
+We provided a way to specify the hierarchy associated with the infrastructure by using the JavaScript Object Notation (JSON) format.
 Below we provide an example of a hierarchy with 4 levels: continent, country, city, district.
 
 \begin{lstlisting}[language=json,firstnumber=1]
@@ -103,12 +103,13 @@ Below we provide an example of a hierarchy with 4 levels: continent, country, ci
 }
 \end{lstlisting}
 
-We used the hierarchical structure of JSON to represent the infrastructure hierarchy. In this example we have one "continent" location called "europe", containing two "country" locations called "italy" and "france", containing four "city" locations called "milan", "turin", "paris" and "nice", in turn containing eight "district" locations.
+We used the \textbf{hierarchical structure} of JSON to represent the infrastructure hierarchy. In this example we have one "continent" location called "europe", containing two "country" locations called "italy" and "france", containing four "city" locations called "milan", "turin", "paris" and "nice", in turn containing eight "district" locations.
 
-To simplify the visualization of the JSON we didn't show in this example the details of the machines associated to the areas. But these information must be written in the places where two empty braces \inlinecode{\{ \}} are present. The fields that are inserted in the empty braces are the following:
+To simplify the visualization of the JSON we didn't show in this example the details of the machines associated to the areas; this information must be written in the places where two empty braces \inlinecode{\{ \}} are present. The fields that are inserted in the empty braces are the following:
 
 \begin{itemize}
-    \item \inlinecode{openfaas\_gateway}: the entrypoint for the OpenFaas API (e.g., "10.211.55.33:31112");
+    \item \inlinecode{openfaas\_gateway}: the entrypoint for the OpenFaas API (e.g.,\\%Overfull
+    "10.211.55.33:31112");
     \item \inlinecode{openfaas\_password}: the password for the OpenFaas entrypoint;
     \item \inlinecode{redis\_host}: the location that the code running in OpenFaas can use to access the Redis Database (e.g., "aaa.bbb.svc.cluster.local");
     \item \inlinecode{redis\_port}: the port that the Redis Database is using (e.g., "6379");
@@ -117,7 +118,7 @@ To simplify the visualization of the JSON we didn't show in this example the det
 
 
 \subsection{The Command Line Interface}
-The CLI can then be used by the developer to perform the actual deployment.
+The CLI can then be used by the developer to perform the actual \textbf{deployment}.
 By issuing the command \inlinecode{edge-deployer deploy --help}, the CLI shows the usage of the "deploy" command:
 
 \begin{lstlisting}[language=bash]
@@ -132,9 +133,9 @@ Options:
   -f, --yaml <path>               Path to the YAML file describing the function. (default: "stack.yml")
 \end{lstlisting}
 
-For the "deploy" command two field are required, the \inlinecode{functionName} field specifying which function to be deployed and the \inlinecode{infrastructure} field specifying the path to the infrastructure JSON.
+For the "deploy" command two fields are required, the \inlinecode{functionName} field specifying which function to be deployed and the \inlinecode{infrastructure} field specifying the path to the infrastructure JSON.
 Then we have the \inlinecode{inEvery}, \inlinecode{inAreas} and \inlinecode{exceptIn} fields that are used to specify where to make the deployments (if some of these fields are not specified a default value is assumed).
-And at last the \inlinecode{yaml} field is used to specify the path to the YAML file describing the function as seen in subsection \ref{subsec:specifying-functions}.
+And at last the \inlinecode{yaml} field is used to specify the path to the YAML file describing the function as seen in Subsection \ref{subsec:specifying-functions}.
 
 To better understand how the CLI works we now present an example:
 
@@ -148,13 +149,13 @@ The CLI first analyzes the infrastructure and the deployment locations specified
 
 
 \section{Stateful Support}
-To provide stateful computation we created an API that interacts with a Redis instance running on the machine.
+To provide support for stateful computations we created an API that interacts with a \textbf{Redis instance} running on the machine.
 In our prototype we run the Redis container (a Docker Image) as a Persistent Volume on the container-orchestration system that runs OpenFaas.
 
 
 \subsection{Reads and Writes}
 
-For allowing the developer to make writes and reads on the Redis instance we wrote a JavaScript API that can be added as a dependency in the npm project of a function.
+For allowing the developer to make writes and reads on the Redis instance we wrote a JavaScript API that can be added as a \textbf{dependency} in the npm project of a function.
 In this early prototype we provided the following APIs:
 
 \begin{itemize}
@@ -163,6 +164,8 @@ In this early prototype we provided the following APIs:
     \item \textit{set}: sets the key to hold the provided value;
     \item \textit{addToList}: adds a value to the list specified by the key (if the list does not exists it is automatically created).
 \end{itemize}
+The two "read" APIs allow only to read the values that the current location contains, so if the developer wants to access "continent" level data, the developer will need to deploy a function at the "continent" level and perform a get operation in the function. 
+While the two write APIs allow saving the data on one or multiple levels. Since the processing should be done on a lower level so that it is performed as close as possible to the user, these APIs only allow forwarding data on upper levels. In every write action there must also be specified a Time-To-Live that will be applied to that value, this forces developers to not accumulate data in the stateful support. Accumulating data should be avoided due to the more bounded resources present at the edge of the network.
 
 
 \subsubsection{Get}
@@ -276,22 +279,22 @@ The \inlinecode{referringAreaType} is set to "continent" and the write happened 
 
 
 \subsection{Internal Communication}
-In some of the write calls, locations need to communicate internally to exchange the data. For example in a scenario where a simple "set" is performed on the "city" level with \inlinecode{referringAreaType} equal to "continent", the \inlinecode{edge-db} needs to forward the data to the corresponding "continent" location.
+In some of the write calls, locations need to \textbf{communicate internally} to exchange the data. For example in a scenario where a simple "set" is performed at the "city" level with \inlinecode{referringAreaType} equal to "continent", the \inlinecode{edge-db} needs to forward the data to the corresponding "continent" location. In our solution this exchange only happens starting from a location of a lower level, going into a location of an upper level. There is no internal communication happening up-to-down or mid-level.
 
-To implement the communication we chose to use the same OpenFaas system used for running functions written by the developer: we implemented an HTTP-triggered function that receives the data and can save it in the database of the location.
+To implement the communication we chose to use the same OpenFaas system used for running functions written by the developer: we implemented an \textbf{HTTP-triggered function} that receives the data and can save it in the database of the location.
 Having a function makes the architecture more modular, and it will be easier to add filters or a more advanced authentication to the communication.
 
 
 \section{Applying the Prototype to Use Cases}
 \label{sec:prototype_applying_to_use_cases}
-In this section we show a few examples where we apply our solutions to solve the same use cases that we presented in the previous Chapter (Section \ref{sec:solution_use_cases}).
+In this section we show a few examples where we apply our solutions to solve the same use cases that we presented in Section \ref{sec:solution_use_cases}.
 
 \subsubsection{IoT Data Compression}
-As we showed, in this use case we are trying to compress the data of IoT sensor by sending only significant value changes.
+As we showed, in this use case we are trying to compress the data of IoT sensors by sending only significant value changes.
 
 This has been done by developing a stateful function that checks whether the new value is equal to the previous value:
 
-Function code (placed in folder "iot-data-reduction"):
+Function code (placed in the folder "iot-data-reduction"):
 \begin{lstlisting}[language=javascript]
 const edgeDb = require("edge-db");
 const ioTDataDomain = { referringAreaType: "location", saveAlsoInIntermediateLevels: false, ttl: 5*24*60*60*1000 }; // 5 days TTL.
@@ -346,9 +349,9 @@ Essentially we developed a stateful function that compares the saved value of a 
 \subsubsection{Road Traffic Monitoring}
 As we showed, in this use case we analyze video footage data to get an insight on the road traffic and then use such insight in an algorithm to find the fastest path between two points.
 
-It has been implemented by using two funtions: an HTTP trigger that receives data from the cameras, converts the footage in a value of traffic and finally saves this value; and another HTTP trigger that is called by the user when interested in obtaining the fastest path between two points.
+It has been implemented by using two functions: an HTTP trigger that receives data from the cameras, converts the footage in a value of traffic and finally saves this value; and another HTTP trigger that is called by the user when interested in obtaining the fastest path between two points.
 
-Code of the first function (placed in folder "video-footage-receiver"):
+Code of the first function (placed in the folder "video-footage-receiver"):
 \begin{lstlisting}[language=javascript]
 const edgeDb = require("edge-db");
 const trafficStatusDataDomain = { referringAreaType: "central", saveAlsoInIntermediateLevels: true, ttl: 30*60*1000 }; // 30 minutes TTL.
@@ -366,7 +369,7 @@ module.exports = async (event, context) => {
 }
 \end{lstlisting}
 
-Code of the second function (placed in folder "get-fastest-path"):
+Code of the second function (placed in the folder "get-fastest-path"):
 \begin{lstlisting}[language=javascript]
 const edgeDb = require("edge-db");
 
@@ -430,11 +433,11 @@ deployer deploy get-fastest-path infrastructure.json --inEvery country --inAreas
 
 
 \subsubsection{Trending Topics}
-As we showed, in this use case we want to find the trending topics in a certain region in an application (like trending user in a social network, or trending searches).
+As we showed, in this use case we want to find the trending topics in a certain region in an application (like trending users in a social network, or trending searches).
 
-It has been implemented using two function: an HTTP trigger that receives the topics from the users and aggregates the data; and a cron trigger that gets called periodically to find the trending topics from the list of topics present in the region.
+It has been implemented using two functions: an HTTP trigger that receives the topics from the users and aggregates the data; and a cron trigger that gets called periodically to find the trending topics from the list of topics present in the region.
 
-Code of the HTTP-triggered function (placed in folder "search-analytics-data-receiver"):
+Code of the HTTP-triggered function (placed in the folder "search-analytics-data-receiver"):
 \begin{lstlisting}[language=javascript]
 const edgeDb = require("edge-db");
 const trendingSearchesDataDomain = { referringAreaType: "country", saveAlsoInIntermediateLevels: true, ttl: 4*60*60*1000  }; // 4 hours TTL.
@@ -450,7 +453,7 @@ module.exports = async (event, context) => {
 }
 \end{lstlisting}
 
-Code of the cron-triggered function (placed in folder "search-analytics-performer"):
+Code of the cron-triggered function (placed in the folder "search-analytics-performer"):
 \begin{lstlisting}[language=javascript]
 const edgeDb = require("edge-db");
 

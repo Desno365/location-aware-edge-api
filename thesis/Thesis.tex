@@ -109,6 +109,7 @@
 \usepackage{graphicx,wrapfig} % For figures inside the text
 \usepackage{listings} % Show code in text
 \usepackage{mdframed} % Example box \begin{example} ... \end{example}
+\usepackage{soul} % Show code inline
 
 %----------------------------------------------------------------------------
 %	ADD YOUR DEFINITIONS AND COMMANDS (be careful of existing commands)
@@ -116,7 +117,16 @@
 
 % Better inline code
 \definecolor{light-gray}{gray}{0.95}
-\newcommand{\inlinecode}[1]{\colorbox{light-gray}{\texttt{#1}}}
+%\newcommand{\inlinecode}[1]{
+%    \colorbox{light-gray}{\texttt{#1}}
+%}
+\usepackage{soul}
+\newcommand{\inlinecode}[1]{
+    \begingroup
+    \sethlcolor{light-gray}
+    \hl{\texttt{#1}}
+    \endgroup
+}
 
 % Show code in text (JSON)
 \colorlet{punct}{red!60!black}
@@ -333,15 +343,13 @@
 % --------------------------------------------------------------------------
 % NUMBERED CHAPTERS % Regular chapters following
 % --------------------------------------------------------------------------
-%\input{Chapters/LaTeX_tips}
 \input{Chapters/1-Introduction}
-\input{Chapters/2-PreliminariesAndSota}
-\input{Chapters/3-ProblemFormulation}
-\input{Chapters/4-ExistingSolutions}
-\input{Chapters/5-Solution}
-\input{Chapters/6-Prototype}
-\input{Chapters/7-Evaluation}
-\input{Chapters/8-Conclusions}
+\input{Chapters/2-PreliminariesAndOpenProblems}
+\input{Chapters/3-ExistingSolutions}
+\input{Chapters/4-Solution}
+\input{Chapters/5-Prototype}
+\input{Chapters/6-Evaluation}
+\input{Chapters/7-Conclusions}
 \cleardoublepage
 
 %-------------------------------------------------------------------------
@@ -351,9 +359,6 @@
 \addtocontents{toc}{\vspace{2em}} % Add a gap in the Contents, for aesthetics
 \appendix
 \input{Chapters/AppendixA}
-
-% INFORMAL ACKNOWLEDGEMENTS
-%\input{Chapters/Thanks}
 
 \cleardoublepage
 

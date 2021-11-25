@@ -7,7 +7,7 @@
 With the increasing number of connected devices and with Internet-of-Thing (IoT) implementation now becoming more widespread, in some cases cloud-centric architectures are starting to be ineffective. Devices are generating a lot of data at the end of the network and many applications are already being deployed at the edge to process the information.
 Cisco Systems predicts that an estimated 29 billion devices will connect to the Internet by 2023 \cite{cisco2018-2023}.
 
-Due to the volume, variety and velocity of data generated at the end of the network, the cloud cannot fully support applications that must meet compelling latency or bandwidth constraints: huge distances need to be covered by the communication, increasing the latency and making a large quantity of data pass through the network.
+Due to the volume, variety and velocity of data generated at the end of the network, the cloud cannot fully support applications that must meet compelling \textbf{latency} or \textbf{bandwidth} constraints: huge distances need to be covered by the communication, increasing the latency and making a large quantity of data pass through the network.
 Indeed, the considerable increase in the amount of data produced at the end of the network was not accompanied by a comparable increase of available bandwidth from/to the cloud \cite{promise-of-edge-computing}.
 
 % Furthermore, Cloud connection latencies are not adequate to host real-time tasks such as life-saving connected devices, augmented reality, or gaming [3].
@@ -15,21 +15,21 @@ Indeed, the considerable increase in the amount of data produced at the end of t
 % Some of the applications they run might require very short response times, some might involve private data, and some might produce huge quantities of data. Cloud computing can’t support these IoT applications. Edge computing, on the other hand, can do so and will promote many new IoT applications.
 
 \section{Research Questions}
-An increasing trend in edge computing has been found in the last years, however the industry lacks the presence of a stateful development abstraction that allows developers to easily exploit the power of the edge. The absence of this abstraction makes developers still prefer cloud-centric approach despite the related problems.
+An increasing trend in edge computing has been found in the last years, however the industry lacks the presence of a development abstraction with stateful support that allows developers to easily exploit the power of the edge. The absence of this abstraction makes developers still prefer cloud-centric approaches despite the related problems.
 
 A non-technology and non-infrastructure dependant framework is needed in order to allow the development of applications with strict constraints of latency and bandwidth.
 
 Therefore this work aims at answering the following research questions (RQ):
 \begin{itemize}
-    \item[\textbf{RQ.1}]\emph{Which use cases are predominantly affected by bandwidth and latency constraints? What are the common characteristics of these use cases?}
+    \item[\textit{RQ.1}]\emph{Which use cases are predominantly affected by bandwidth and latency constraints? What are the common characteristics of these use cases?}
     
-    \item[\textbf{RQ.2}]\emph{Which frameworks allowing computation on the edge are currently available in the industry? Can the available frameworks accomplish the use cases seen in RQ.1?}
+    \item[\textit{RQ.2}]\emph{Which frameworks allowing computation on the edge are currently available in the industry? Can the available frameworks accomplish the use cases seen in RQ.1?}
     
-    \item[\textbf{RQ.3}]\emph{Can a new approach accomplish the use cases seen in RQ.1? How can such approach be implemented?}
+    \item[\textit{RQ.3}]\emph{Can a new approach accomplish the use cases seen in RQ.1? How can such approach be implemented?}
     
-    \item[\textbf{RQ.4}]\emph{Does the new approach simplify the development? Is it easy to use?}
+    \item[\textit{RQ.4}]\emph{Does the new approach simplify the development? Is it easy to use?}
     
-    \item[\textbf{RQ.5}]\emph{Does the new approach obtain better performance? What are the practical measurable benefits? How much resources does it use? What are its drawbacks?}
+    \item[\textit{RQ.5}]\emph{Does the new approach obtain better performance? What are the practical measurable benefits? How much resources does it use? What are its drawbacks?}
 \end{itemize}
 
 We use the answers to these questions to propose an innovative framework that allows the developers to abstract away both the infrastructure and the location of the users.
@@ -37,33 +37,38 @@ We use the answers to these questions to propose an innovative framework that al
 \section{Research Methodology}
 The research approach adopted in this thesis can be summarized at high-level with the following steps:
 \begin{itemize}
-    \item A review and analysis of the state‐of‐the‐art research on edge and fog computing, with a particular emphasis on data processing and identification of objectives;
+    \item A review and analysis of the \textbf{state‐of‐the‐art} research on edge and fog computing, with a particular emphasis on \textbf{data processing} and identification of objectives;
     
-    \item Identification of common use cases and formulation of the key requirements needed to better fulfill the use cases;
+    \item Identification of common \textbf{use cases} and formulation of the key requirements needed to better fulfill the use cases;
     
-    \item A review of the publicly available frameworks provided by the industry in the field of Function-as-a-Service (FaaS), edge computing and stateful logic on the edge. 
+    \item A review of the publicly \textbf{available frameworks} provided by the industry in the field of edge computing, stateful logic on the edge and Function-as-a-Service (FaaS). 
     
-    \item Design of a novel problem solution based on the identified requirements;
+    \item Design of a novel problem \textbf{solution} based on the identified requirements;
     
-    \item Evaluation of the solution through the development of a prototype and through simulations.
+    \item \textbf{Evaluation} of the solution through the development of a prototype and through simulations.
 \end{itemize}
 A thorough literature review is the basis of this thesis. For this purpose, we do not limit the analysis scope to the edge data processing problem and instead enlarge our focus generally to edge and fog computing. We started from surveys on edge computing, then moved to papers presented at the "IEEE International Conference on Fog and Edge Computing (ICFEC)", especially focusing on papers about data processing, and finally we performed specific searches to have a deeper emphasis on the data processing part.
-We gained understanding of the main issues and collected the motivating use cases (\textbf{RQ1}).
+We gained understanding of the main issues and collected the motivating use cases (\textit{RQ.1}).
 
-We then moved to a review of publicly available frameworks provided by the industry and analyzed their usability in relation with the motivating use cases collected (\textbf{RQ2}). As we will show we did not find any framework able to sufficiently fulfill the use cases, so we tried to propose a novel solution.
+We then moved to a review of publicly available frameworks provided by the industry and analyzed their usability in relation with the motivating use cases collected (\textit{RQ.2}). As we will show we did not find any framework able to sufficiently fulfill the use cases, so we tried to propose a novel solution.
 
-To analyze the effectiveness of our solution we implemented a working prototype (\textbf{RQ3}) and by using our implementation we were able to study its value and benefits (\textbf{RQ4}). Due to the size of an edge network, emulating our prototype to study its performance on a similar setup was infeasible, so we developed a discrete-event simulation to simulate the behavior of our approach in a scenario more similar to the real (\textbf{RQ5}).
+To analyze the effectiveness of our solution we implemented a working prototype (\textit{RQ.3}) and by using our implementation we were able to study its value and benefits (\textit{RQ.4}). Due to the size of an edge network, emulating our prototype to study its performance on a similar setup was infeasible, so we developed a discrete-event simulation to simulate the behavior of our approach in a scenario more similar to the real (\textit{RQ.5}).
 
-The resulting artifacts of our research have been released as open-source software \cite{thesis-github}.
+The \textbf{resulting artifacts} of our research have been released as open-source software \cite{thesis-github}.
 
 
 \section{Thesis Outline}
-The remainder of this thesis is organized as follows.\\
-In Chapter \ref{ch:preliminaries_and_sota}, we review and analyze state-of-the-art solutions in the field of Edge Computing, starting from surveys and general concept and then moving our focus to the data processing part.\\
-In Chapter \ref{ch:problem_formulation}, we define the problem by collecting, organizing and commenting the use cases which we have encountered in our research.\\
-In Chapter \ref{ch:existing-solutions}, we present the solutions made available publicly by the industry in the field of Edge Computing. We show that the current solutions do not cover in an adequate way the use cases collected.\\
-In Chapter \ref{ch:design-of-the-solution}, we develop the idea of our solution, showcasing the indented usage of our APIs.\\
-In Chapter \ref{ch:prototype}, we show our actual implementation of the solution we proposed.\\
-In Chapter \ref{ch:evaluation}, we investigate the gains developers may obtain by using our approach and we demonstrate how several use cases can benefit from this new system though discrete-event simulation.\\
-We conclude in Chapter \ref{ch:conclusions}, summarizing our contributions and highlighting possible future research directions.
+The remainder of this thesis is organized as follows.
+
+In Chapter \ref{ch:preliminaries_and_open_problems}, we review and analyze \textbf{state-of-the-art} solutions in the field of Edge Computing, starting from surveys and general concepts and then moving our focus to the data processing part. We then define the \textbf{open problems} by collecting, organizing and commenting the \textbf{use cases} which we have encountered in our research.
+
+In Chapter \ref{ch:existing-solutions}, we present the solutions made available publicly by the industry in the field of Edge Computing. We show that the \textbf{current solutions} do not cover in an adequate way the use cases collected.
+
+In Chapter \ref{ch:design-of-the-solution}, we develop the idea of \textbf{our solution}, showcasing the intended usage of our APIs.
+
+In Chapter \ref{ch:prototype}, we show our actual \textbf{implementation} of the solution we proposed.
+
+In Chapter \ref{ch:evaluation}, we investigate the \textbf{gains} developers may obtain by using our approach and we demonstrate how several use cases can benefit from this new system though discrete-event simulation.
+
+We \textbf{conclude} in Chapter \ref{ch:conclusions}, summarizing our contributions and highlighting possible future research directions.
 

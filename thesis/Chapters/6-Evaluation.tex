@@ -1,10 +1,9 @@
 \chapter{Experimental evaluation}
 \label{ch:evaluation}
 
-In this chapter, we present experimental results on the system proposed. Two types of evaluations are present: a first assessment done on the working prototype running on multiple Virtual Machines (VMs) and an evaluation of the performance of the approach, measured using a simulation run on a discrete-event simulator.
-In the first case, since it's not possible to emulate a network similar to a real edge network due to the amount of resources needed, we focus on the effectiveness, efficiency and usability of the framework.
-While with the discrete-event simulation at hand we can focus on the performance obtained and the resources consumed.
-In both scenarios we compare the proposed approach to a typical core-centric approach.
+In this chapter, we present experimental results on the system proposed. Two types of evaluation are present: a first assessment done on the \textbf{working prototype} running on multiple Virtual Machines (VMs) and an evaluation using simulations run on a \textbf{discrete-event simulator}.
+In the first case, since it's not possible to emulate a network similar to a real edge network due to the amount of resources needed, we focus on the \textbf{effectiveness}, \textbf{efficiency} and \textbf{usability} of the framework.
+While with the discrete-event simulation at hand we can focus on the \textbf{latency} and the \textbf{bandwidth} consumed.
 
 
 
@@ -16,19 +15,19 @@ These services require the usage of hardware resources, so we were only able to 
 
 
 \subsection{Performance}
-We found that, after paying the cold-start price where the initialization of the container running the function would create a noticeable latency, functions were executed in milliseconds even when using the (local) stateful support. This speed of the stateful support has been possible thanks to the usage of an in-memory database like Redis.
+We found that, after paying the \textbf{cold-start} price where the initialization of the container running the function would create a noticeable latency, functions were executed in milliseconds even when using the (local) stateful support. This speed of the stateful support has been possible thanks to the usage of an in-memory database like Redis.
 
-We also tested the scalability of our solution when using the \textit{faas} flavour of OpenFaas: we made 10'000 sequential calls to a node running a simple function and analyzed with the tools provided by Kubernetes the internal situation of containers. We noticed that new containers were immediately created to fulfill the stream of requests. After the 10'000 calls ended and no new calls were made, OpenFaas automatically scaled down and brought the number of idle containers to one.
+We also tested the \textbf{scalability} of our solution when using the \textit{faas} flavour of OpenFaas: we made 10'000 sequential calls to a node running a simple function and analyzed with the tools provided by Kubernetes the internal situation of containers. We noticed that new containers were immediately created to fulfill the stream of requests. After the 10'000 calls ended and no new calls were made, OpenFaas automatically scaled down and brought the number of idle containers to one.
 
 
 \subsection{Usability}
-In Section \ref{sec:prototype_applying_to_use_cases} we presented an implementation of a few use cases using our prototype. We believe that, after understanding the functioning of our solution, implementing new use cases becomes very easy.
+In Section \ref{sec:prototype_applying_to_use_cases} we presented an implementation of a few use cases using our prototype. We believe that, after understanding the functioning of our solution, implementing new use cases becomes \textbf{straightforward}.
 
-Our solution allows developer to forget about the location, which instead is handled internally, and forget about handling the complex management of hundreds of geo-distributed nodes.
-This avoid the creations of custom solutions that overfit on the available infrastructure, creating a code that becomes task-specific and difficult to extend and maintain.
+Our solution allows developers to forget about the location, which instead is handled internally, and forget about handling the complex management of hundreds of geo-distributed nodes.
+This avoids the creation of custom solutions that overfit on the available infrastructure, creating a code that becomes task-specific and difficult to extend and maintain.
 
-In fact if a developer where to implement the "Road Traffic Monitoring" (seen in Section \ref{sec:prototype_applying_to_use_cases}) use case on an edge infrastructure, they would need to manually forward the processed video footage to upper levels in the hierarchy, a hierarchy that would have to be manually specified. And all the deployments would need to be carefully made since there is no tool that allow to deploy the functions by hierarchy level.
-Also developers would need to setup the infrastructure all by themselves, a process which can create errors or malfunctions, while the FaaS architecture in our solution allows to forget about the handling of the infrastructure.
+In fact if a developer where to implement the "Road Traffic Monitoring" (seen in Section \ref{sec:prototype_applying_to_use_cases}) use case on an edge infrastructure, they would need to manually forward the processed video footage to upper levels in the hierarchy, a hierarchy that would have to be manually specified. And all the deployments would need to be carefully made since there is no tool that allows to deploy the functions by hierarchy level.
+Also developers would need to set up the infrastructure all by themselves, a process which can create errors or malfunctions, while the serverless FaaS architecture in our solution allows to forget about the handling of the infrastructure.
 
 
 \section{Simulation}
@@ -72,7 +71,7 @@ To compute the latency the \inlinecode{Transmission} component does as follows:
 
 \[ distance\_delay = \frac{distance}{SPEED\_OF\_SIGNAL} \]
 
-The \inlinecode{network\_delay} is a value representing a constant latency toll that needs to be paid when making the communication, this value depends only on the \inlinecode{is\_weak\_network} boolean. The network which is used by the client (i.e., Wi-Fi, LTE, copper cables) is considered to be weak.
+The \inlinecode{network\_delay} is a value representing a constant latency toll that needs to be paid when making the communication, this value depends only on the boolean \inlinecode{is\_weak\_network}. The network which is used by the client (i.e., Wi-Fi, LTE, copper cables) is considered to be weak.
 
 The \inlinecode{distance\_delay} is a value that is proportional to the distance that the signal needs to travel.
 
@@ -102,7 +101,7 @@ The realizations of \inlinecode{ProcessingUnit} are shown below in Figure \ref{f
 
 
 \subsection{Matching the Abstractions to a Use Case}
-To better narrow down the abstractions we can see in one of our use cases how these abstractions match a real scenario: in the traffic use case (TODO ref to use case chapter) the \inlinecode{DataProducerClient} represents the camera producing frames of the road. In our edge scenario the camera sends the frame to the lowest level in the hierarchy, which in our example architecture correspond to the "district" level (\inlinecode{ProcessingLocationDistrict}). While in the core-centric scenario the camera sends the frame to the central cloud (\inlinecode{ProcessingLocationCentral}).
+To better narrow down the abstractions we can see in one of our use cases how these abstractions match a real scenario: in the "Road Traffic Monitoring" use case the \inlinecode{DataProducerClient} represents the camera producing frames of the road. The camera sends the frame to the lowest level in the hierarchy, which in our example architecture corresponds to the "district" level (\inlinecode{ProcessingLocationDistrict}). While in the core-centric scenario the camera sends the frame to the central cloud (\inlinecode{ProcessingLocationCentral}).
 
 The action of sending the frame is simulated using the \inlinecode{Transmission} component. The frame is then processed by applying an image recognition algorithm, an algorithm which is simulated as a data processing by the receiving \inlinecode{ProcessingUnit}.
 
@@ -258,8 +257,8 @@ Processing start delay      & 4ms             & 1ms                           \\
 
 
 \subsection{Results}
-In each experiment we ran our SimPy simulation and let thousands of clients connect to the thousands of cloudlets and data centers, we collected data about latencies, distances and traffic and now we show in this section the results.
-By having many variables extracted from the truncated normal distributions, we are effectively running random experiments where it makes sense to show a confidence interval calculated on the list of samples obtained. But collecting numerous samples is easy in a simulation, in fact we obtained in all the experiments a really tight 95\% confidence interval that cannot even be seen on the plot.
+In each experiment we ran our SimPy simulation and let thousands of clients connect to the hundreds of cloudlets and data centers, we collected data about \textbf{latencies}, \textbf{distances} and \textbf{traffic} and now we show in this section the results.
+By having many variables extracted from the truncated normal distributions, we are effectively running random experiments where it makes sense to show a confidence interval calculated on the list of samples obtained. But collecting numerous samples is easy in a simulation, in fact we obtained in all the experiments a really tight 95\% confidence interval on the average that cannot even be seen on the plot.
 
 
 \subsubsection{Write by level}
@@ -306,7 +305,7 @@ In Figure \ref{fig:write-by-traffic2} we zoom on the values of the setups of the
 
 
 \subsubsection{Write all levels}
-In this experiment, for the edge approach, we suppose that the developer uses the boolean \inlinecode{saveAlsoInIntermediateLevels} set to \inlinecode{true} and sets the \inlinecode{referringAreaType} in our framework to the highest level of the hierarchy (central). Meaning that all writes made at the receiving  \inlinecode{ProcessingLocationDistrict} are forwarded to the upper levels. This setup is compared to the cloud setup in which data are sent to a central data center that can aggregate them by location.
+In this experiment, for the edge approach, we suppose that the developer uses the boolean \inlinecode{saveAlsoInIntermediateLevels} set to \inlinecode{true} and sets the \inlinecode{referringAreaType} in our framework to the highest level of the hierarchy (central). Meaning that all writes made at the receiving  \inlinecode{ProcessingLocationDistrict} are forwarded to the upper levels. This setup is compared to the cloud setup in which data is sent to a central data center that can aggregate them by location.
 
 Writes to upper levels happen in parallel, so we expect to have an average latency similar to the latency of the edge setup with central aggregation of the previous experiment. This is in fact what we obtain as can be seen in Figure \ref{fig:write-all-latency}. In terms of latency we are clearly in a case of disadvantage here since as it has been seen in the previous experiment that by doing a central aggregation, like the cloud approach does, we are not exploiting our edge approach to the max.
 
@@ -326,7 +325,7 @@ Many more messages are sent in parallel to the various aggregating \inlinecode{P
     \label{fig:write-all-traffic1}
 \end{figure}
 
-We saw in this experiment that even in a disadvantage situation where our approach is used to aggregate the data in a central manner, which is not the intended use case, the increase in write latency is less than 27\%, but the improvement in terms of traffic sent in the network is tremendous.
+We saw in this experiment that even in a disadvantageous situation where our approach is used to aggregate the data in a central manner, which is not the intended use case, the increase in write latency is less than 27\%, but the improvement in terms of traffic sent in the network is tremendous.
 
 
 \subsubsection{Write all levels, with cores performance as parameter}
@@ -343,7 +342,7 @@ In our simulation we represented the performance of the cores as a processing ba
 
 In Figure \ref{fig:/write-all-cpu-latency} it is shown the changing write latency of the edge solution due to the changing performance of the \inlinecode{ProcessingUnits} cores, compared to the constant latency of the cloud solution.
 
-Note that the value 0.1 on the x-axis means that the performance of the core at the edge is 0.1 times (10\%) the performance of the core of cloud solution.
+Note that the value 0.1 on the x-axis means that the performance of the core at the edge is 0.1 times (10\%) the performance of the core of the cloud solution.
 
 From 1.0 to 0.40 we have an almost linear increase, which is not substantial. Then down from 0.40 the cores can't keep up with the requests and start to put them in queue, creating an exponential increase in the latency.
 
@@ -367,10 +366,10 @@ We start from 1000 clients, rising up to 350'000 clients.
 
 As expected we see in Figure \ref{fig:/write-all-clients-latency} that, when the number of clients becomes too much to handle, both the cores at the edge and the cores in the cloud are overwhelmed and can't keep up with the requests causing the queues to grow indefinitely and consequently making the average latency grow.
 
-We can also notice how the number of cores affects the latency: in the edge approach by having a low number of cores it's easier to be unlucky and having a momentary spike where the \inlinecode{ProcessingLocationDistrict} can't keep up with the requests, causing new requests to be queued for a short time. Basically by increasing the number of clients it become more probable to have a random spike in the requests, that a single \inlinecode{ProcessingLocationDistrict} cannot handle immediately since equipped with only 2 cores. This phenomenon causes a continuous increase in the average latency for the edge solution.
+We can also notice how the number of cores affects the latency: in the edge approach by having a low number of cores it's easier to be unlucky and having a momentary spike where the \inlinecode{ProcessingLocationDistrict} can't keep up with the requests, causing new requests to be queued for a short time. Basically by increasing the number of clients it becomes more probable to have a random spike in the requests, that a single \inlinecode{ProcessingLocationDistrict} cannot handle immediately since it is equipped with only 2 cores. This phenomenon causes a continuous increase in the average latency for the edge solution.
 Instead in the cloud solution, to start to queue requests we have to first fill the 1000 cores, and for that to happen it needs many more clients.
 
-It's important also to consider that in our simulation we are not modelling the access to the database: in a cloud scenario in which writes happen to a single instance of the database it can easily become a bottleneck if not replicated and handed correctly.
+It's important also to consider that in our simulation we are not modelling the access to the database: in a cloud scenario in which writes happen to a single instance of the database it can easily become a bottleneck if not replicated and handled correctly.
 
 But again the improvements relative to the traffic generated in the network are immense. In Figure \ref{fig:/write-all-clients-traffic} we show the total traffic*distance as a function of the number of clients. Both the edge solution and cloud solution have a linear increase, but the coefficient of the increase in the cloud solution is evidently bigger than the one of the edge solution.
 
@@ -381,12 +380,12 @@ But again the improvements relative to the traffic generated in the network are 
     \label{fig:/write-all-clients-traffic}
 \end{figure}
 
-In this experiment we showed that our framework can keep up effectively with heavy load, with only minor random congestions at the lower levels of the hierarchy. But still provide immensely benefits in term of traffic through the network.
+In this experiment we showed that our framework can keep up effectively with heavy load, with only minor random congestions at the lower levels of the hierarchy. But still provide immensely benefits in terms of traffic through the network.
 
 
 \subsubsection{Read by level}
-We now start with a new type of experiment, focusing on the reads and not on the writes. We will immediately see the benefit on the latency since by having a geographical aggregation we can avoid to travel huge distances.
-In practice in this experiment we have different setups in which every \inlinecode{DataReaderClients} in the setup communicates to a certain level of the hierarchy of the edge solution. While in the cloud solution they can only communicate to the central cloud.
+We now start with a new type of experiment, focusing on the reads and not on the writes. We will immediately see the benefit on the latency since by having a geographical aggregation we can avoid travelling huge distances.
+In practice in this experiment we have different setups in which every \inlinecode{DataReaderClients} in the setup communicates to a certain level of the hierarchy of the edge solution. While in the cloud solution clients can only communicate to the central cloud.
 In the figures reported below we can see, for each level of aggregation, the average latency and the average distance traveled, compared to the cloud solution.
 
 \begin{figure}[H]
@@ -467,7 +466,7 @@ If we compare the best scenario, in which the aggregation is performed at the lo
 
 
 \subsubsection{Read all levels}
-This time we allow clients to perform the reads on every level, this means that to have the data available the writes must have happen with the \inlinecode{saveAlsoInIntermediateLevels} boolean set to \inlinecode{true}.
+This time we allow clients to perform the reads on every level, this means that to have the data available the writes must have happened with the \inlinecode{saveAlsoInIntermediateLevels} boolean set to \inlinecode{true}.
 In the 51 setups that we ran we increased the probability of making a read on an upper level of the hierarchy. The first setup performs all the read requests at the district level, in the intermediate setup the clients perform the read requests with almost an equal probability to all levels, while the last setup performs all the read requests to the single central level.
 
 \begin{figure}[H]
@@ -513,7 +512,7 @@ Similarly here read requests are made to the lowest level of the hierarchy, the 
 The read operation is a fast operation that does not require heavy processing, this allows both the cloud solution and the edge solution to fulfill a million of requests in a small amount of time before starting to not keep up with the load.
 
 \subsection{Simulation Summary}
-Thanks to the simulation and by performing the various experiments we showed that by using our framework we get immense benefits in terms of reduced traffic in the network while allowing faster reads when the data aggregation needed is not central.
+Thanks to the various experiments performed on the simulation we showed that by using our framework we get immense benefits in terms of \textbf{reduced traffic} in the network while allowing \textbf{faster reads} when the data aggregation needed is not central.
 In a case where a central aggregation is still needed we showed that the write requests suffer an increase in latency, but the increase is not substantial.
 
 We also noticed how our edge solution can be affected by random spikes in the requests due to the small number of cores and resources in the lowest level of the hierarchy, so there is a clear room for improvements on this matter, but still the increase in latency is not drastic.

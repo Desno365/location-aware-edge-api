@@ -1,12 +1,33 @@
 \chapter{Design of the Solution}
 \label{ch:design-of-the-solution}
 
-Let’s imagine a global infrastructure with many edge locations. Some web infrastructure companies already provide a network with many locations, like the one of Cloudflare with more than 250 locations worldwide located in more than 100 different countries \cite{cloudflare-network}, or the network of Amazon Web Services (AWS) with more than 265 edge locations \cite{aws-network}.
-These networks are only the beginning of the development of edge networks: AWS is currently introducing AWS Wavelength \cite{aws-wavelength} a new service in partnership with popular telecommunication providers (i.e., Verizon, Vodafone) to scale across global 5G networks.
+The high-level concepts of our solution consist in splitting the infrastructure in \textbf{hierarchical levels} and allowing the developers to specify on which levels the clients save and access the data.
+\\Our API allows to:
+\begin{itemize}
+    \item Specify the \textbf{hierarchy} of the infrastructure, in serverless setups this should be done by the web infrastructure companies;
+    \item Deploy \textbf{geo-distributed functions} exactly where needed;
+    \item Have a \textbf{geographically-partitioned stateful support}, where each location (e.g., the cloudlet in a city) has its own set of data;
+    \item \textbf{Save data easily} by only specifying one or multiple levels, then the actual location is obtained by the framework.
+\end{itemize}
+
+These concepts allow a lot of versatility where the developer can process the data at a certain level and then organize the results in geographic partitions, without actually specifying where to save the results, but only specifying the levels and letting the framework handle the rest.
+
+In Figure \ref{fig:/high-level-architecture} we show an example with three levels. Clients can \textbf{invoke functions} on the nearest location of a certain level, these functions can be used for both \textbf{sending data} or \textbf{requesting data}. When clients send data, the function written by the developer can process the data and then save the results in the provided stateful support. The results can be saved on different and multiple levels.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.90\linewidth]{Figures/Solution/high-level-architecture.png}
+    \caption{High-level architecture of an example setup}
+    \label{fig:/high-level-architecture}
+\end{figure}
+
+We will now go into the details of the reasoning behind the decisions we made and the features we embedded into the solution.
 
 
 \section{Managing the Network}
-By having such a vast and heterogeneous network the first step in our approach is to abstract away the difficult management of the deployment to the many edge locations.
+Let’s imagine a global infrastructure with \textbf{many edge locations}. Some web infrastructure companies already provide a network with many locations, like the one of Cloudflare with more than 250 locations worldwide located in more than 100 different countries \cite{cloudflare-network}, or the network of Amazon Web Services (AWS) with more than 265 edge locations \cite{aws-network}.
+These networks are only the beginning of the development of edge networks: AWS is currently introducing AWS Wavelength \cite{aws-wavelength} a new service in partnership with popular telecommunication providers (i.e., Verizon, Vodafone) to scale across global 5G networks.
+
+By having such a \textbf{vast and heterogeneous network} the first step in our approach is to abstract away the difficult management of the deployment to the many edge locations.
 In a traditional cloud setup the developer specifies individually on which data center to deploy, this cannot be done efficiently for a vast edge network because the developer would have to specify hundreds of specific deployments.
 The developer could also want to use only more powerful data centers and not the limited cloudlets at the border of the network.
 
@@ -16,31 +37,31 @@ The developer could also want to use only more powerful data centers and not the
 \includegraphics[width=5.5cm]{Figures/Solution/hierarchy.png}
 \end{wrapfigure} 
 
-To allow flexibility in the deployments and, as we will see later, to allow geographical aggregations we can organize the various machines running in the data centers and cloudlets in a hierarchy with multiple levels.
+To allow flexibility in the deployments and to allow the geographical aggregation we can organize the various machines running in the data centers and cloudlets in a \textbf{hierarchy with multiple levels}.
 In Figure \ref{fig:hierarchy} we reported an example: we first have a division by continent (or large regions), then by country, territory, city and district.
 Note that each element in the hierarchy should not necessarily be a different data center: a big data center in Milan can be both a receiver for "city" and "country" deployments/aggregations.
 \vspace{0.5cm}
 
 
 \subsection{Specifying Locations}
-The job of specifying the available locations should be responsibility of the web infrastructure company, but still the developer may want to customize the arrangement or may want to use their personal infrastructure. 
+The job of specifying the available locations should be the responsibility of the web infrastructure company, but still the developer may want to customize the arrangement or may want to use their personal infrastructure. 
 
-So we must provide a way to specify the hierarchy, we chose to implement the API in the following way:
+So we must provide a way to specify the infrastructure, we chose to implement the API in the following way:
 \begin{itemize}
-    \item Levels: the list of levels characterized by their identifiers (e.g., "continent", "country", "territory", "city", "district");
-    \item Hierarchy: a way to specify the hierarchy, starting from the uppermost level and going down to the lowest level. Each level can contain multiple locations, and each location will aggregate data of the relative area;
-    \item Location: each location must be associated to an entry point that defines the actual cloudlet or data center to be used (so for the location there must be defined gateway, port and password).
+    \item \textbf{Levels}: the list of levels characterized by their identifiers (e.g., "central", "continent", "country", "territory", "city", "district");
+    \item \textbf{Hierarchy}: a way to specify the hierarchy, starting from the uppermost level and going down to the lowest level. Each level can contain multiple locations, and each location will aggregate data of the relative area;
+    \item \textbf{Location}: each location must be associated to an entry point that defines the actual cloudlet or data center to be used (so for the location there must be defined gateway, port and password).
 \end{itemize}
 
 
 \subsection{Specifying Deployments}
-Now that we have the hierarchy specified we can use this hierarchy to make a powerful deployment API. The developer should be able to deploy on a specific level of the hierarchy only in a certain area and to exclude a specific subsection from this area.
+Now that we have the hierarchy specified we can use this hierarchy to make a powerful deployment API. The developer should be able to deploy on a specific level of the hierarchy only in a \textbf{certain area} and to \textbf{exclude a specific subsection} from this area.
 
 To allow such deployment we established the following concepts:
 \begin{itemize}
     \item \inlinecode{inEvery}: a string representing the level on which to deploy the function.
     \item \inlinecode{inAreas}: a list of string of areas, specifying in which areas to deploy. If unspecified we can assume the developer wants it deployed on every area of the level specified in \inlinecode{inEvery}. 
-     \item \inlinecode{exceptIn}: a list of string of areas, that are an exception to what previously defined before. In these areas the developer does not want to perform the deployment.
+    \item \inlinecode{exceptIn}: a list of strings of areas that are an exception to what was previously defined before. In these areas the developer does not want to perform the deployment.
 \end{itemize}
 
 \begin{example}
@@ -77,18 +98,18 @@ In the examples we saw that the developer should also be allowed to mix the leve
 
 
 \section{Managing Limited Resources}
-Edge locations have limited resources compared to central data centers, so web infrastructure companies have to work around the limitations in order to provide a reliable service.
+Edge locations have \textbf{limited resources} compared to central data centers, so web infrastructure companies have to work around the limitations in order to provide a reliable service.
 Due to these limitations, Function-as-a-Service (FaaS) is the current de facto standard for companies that provide computing resources at the edge to the public. Examples of services are AWS Lambda@Edge (an evolution of the famous AWS Lambda service on the cloud) \cite{aws-lambda-at-edge} or Cloudflare Workers \cite{cloudflare-workers}. It can be easily understood that providing Infrastructure-as-a-Service (IaaS) or Platform-as-a-Service (PaaS) to the public on the limited resources available at the edge is clearly less efficient for companies.
 
-Therefore we decided to use in our framework the FaaS paradigm as a way to allow the users of the framework (the developers) to perform computation on the edge. The developer, should also be able to specify the Random Access Memory (RAM) allocated for the function. The default allocated memory can be a low value, but if there is a more complex function requiring additional memory usage the developer can change the allocated memory (the web infrastructure company can then charge more based on the memory requested).
+Therefore we decided to use in our framework the \textbf{FaaS paradigm} as a way to allow the users of the framework (the developers) to perform computation on the edge. The developer should also be able to specify the Random Access Memory (RAM) allocated for the function. The default \textbf{allocated memory} can be a low value, but if there is a more complex function requiring additional memory usage the developer can change the allocated memory (the web infrastructure company can then charge more based on the memory requested).
 
-But resources are not only limited in the sense of computation, also storage resources are limited on the edge. To take into account the aforementioned issue we decided to use a key-value database for the stateful part of our approach. A key-value database allows us to perform extremely efficient (but simple) queries, and is perfect for the limited resources available on the edge. To avoid to accumulate data we also introduced in our framework a Time-To-Live (TTL) which the developer must specify. For example with a TTL of 5 days, after making a write to the database the data, if not updated, can be deleted after 5 days.
+Resources are not only limited in the sense of computation, also storage resources are limited on the edge. To take into account the aforementioned issue we decided to use a key-value database for the stateful part of our approach. A key-value database allows us to perform extremely efficient (but simple) queries, and is perfect for the limited resources available on the edge. To avoid \textbf{accumulating data} we also introduced in our framework a Time-To-Live (TTL) which the developer must specify. For example with a TTL of 5 days, after making a write to the database the data, if not updated, can be deleted after 5 days.
 
 
 \subsection{Writing Data}
-Our goal is to provide the developers an easy way to create geographical aggregations of data. If for the data it does not make sense to create geographical aggregations then it would make more sense to use a core-centric approach to manage this data. In our approach by having the data geographically distributed it means that those data correspond to information coming from the respective geographic area.
+Our goal is to provide the developers an easy way to create \textbf{geographical aggregations} of data. If for the data it does not make sense to create geographical aggregations then it would make more sense to use a core-centric approach to manage this data. In our approach by having the data geographically distributed it means that those data correspond to information coming from the respective geographic area.
 
-Furthermore in Chapter \ref{ch:problem_formulation} we outlined use cases which are static in the sense of location, or for which having discontinuity in the data is not a problem. Therefore we decided to not introduce any session consistency to avoid the cost of managing such sessions: heavy communications between the locations. This means that if we are performing a "city" aggregation and a client that is sending data is currently travelling and changes its position to a new "city" area, then its old data will remain in the previous "city" area and will not transferred to the new one.
+Furthermore in Section \ref{sec:open_problems} we outlined use cases which are \textbf{static} in the sense of location, or for which having \textbf{discontinuity} in the data is not a problem. Therefore we decided to not introduce any session consistency to avoid the cost of managing such sessions: heavy communications between the locations. This means that if we are performing a "city" aggregation and a client that is sending data is currently travelling and changes its position to a new "city" area, then its old data will remain in the previous "city" area and will not transfer to the new one.
 
 To manage such conditions our approach should have the following properties:
 \begin{itemize}
@@ -125,7 +146,7 @@ The developer makes the following write call on a function deployed at the "city
     \item Should Save In Intermediate Levels: true
     \item Time To Live: 30 days
 \end{itemize}
-The framework will save the data at the continent, country, territory and city levels (so if the code is executed in the "milan" location, the data will be saved in the "it-north", "italy" and "europe" locations). In each of these locations the framework will create (or update) key "mykey2" with the value "data2" and will set a lifespan of the data to 30 days.
+The framework will save the data at the continent, country, territory and city levels (so if the code is executed in the "milan" location, the data will be saved in the "milan", "it-north", "italy" and "europe" locations). In each of these locations the framework will create (or update) key "mykey2" with the value "data2" and will set a lifespan of the data to 30 days.
 \end{example}
 
 \begin{example}
@@ -138,15 +159,15 @@ The developer makes the following write call on a function deployed at the "city
     \item Should Save In Intermediate Levels: false
     \item Time To Live: 1 day
 \end{itemize}
-The framework will save the data only at the continent level (so if the code is executed in the "milan" location, the data will be saved in the "italy" location). The framework will add to the list associated to the key "mylist1" the value "data1" and will set a lifespan to the single element of the list to 1 day.
+The framework will save the data only at the continent level (so if the code is executed in the "milan" location, the data will be saved in the "italy" location). The framework will add to the list associated with the key "mylist1" the value "data1" and will set a lifespan to the single element of the list to 1 day.
 \end{example}
 
 
 \subsection{Reading Data}
-As we have seen the developer has to think carefully how to handle the writing of the data with the objective to partition geographically the data. But after data have been thoughtfully partitioned then the reading of the data is instantaneous.
-When running the code in a certain location, by specifying only the reading action and the key, the framework obtains the data present in the location and associated to that key.
+As we have seen the developer has to think carefully how to handle the writing of the data with the objective to partition geographically the data. But after data have been thoughtfully partitioned then the reading of the data is \textbf{instantaneous}.
+When running the code in a certain location, by specifying only the reading action and the key, the framework obtains the data present in the location and associated with that key.
 
-So only the following two properties are use for making reads:
+Therefore only the following two properties are used for making reads:
 \begin{itemize}
     \item Read Action: the action to perform for reading data, "get" to obtain the single value from the key saved with "set", "get list" to obtain all the values saved with "add to list".
     \item Key: The key of the value or the list to be read.
@@ -172,25 +193,35 @@ The framework will obtain all the not expired elements contained in the list ass
 
 
 \section{Finding the Nearest Location}
-Our solution assumes to be able to contact the nearest server automatically, without the intervention of the developer (the developer just needs to send the request to the function's URL).
+Our solution assumes the presence of the ability to contact the \textbf{nearest server} automatically, without the intervention of the developer (the developer just needs to send the request to the function's URL).
 
 This process has already been proved to be feasible and is in fact exploited by many web infrastructure companies to provide a Content Delivery Network or to provide serverless edge computing (AWS Lambda@Edge and Cloudflare Workers automatically find the nearest server with the URL as the only input). The most common procedures to perform the process are the following:
 \begin{itemize}
-    \item Anycast Routing: this routing procedure uses the Border Gateway Protocol (BGP) to route clients using the natural network flow, indeed the information collected by the BGP protocol about network neighbors is used to efficiently route traffic based on hop count ensuring the shortest traveling distance between the client and its final destination \cite{anycast-cloudflare}.
-    \item Unicast Routing: a process which can be incorporated into the standard Domain Name System (DNS) resolution process by using recursive DNS queries which redirect clients to the server closest to the DNS resolver (and usually the DNS resolver is physically near the client) \cite{unicast-vs-anycast}.
-    \item Manual Routing: a procedure in which the client computes on its own which is most appropriate server to contact, with this procedure GPS-equipped devices can use more precise information about the location.
+    \item \textbf{Anycast Routing}: this routing procedure uses the Border Gateway Protocol (BGP) to route clients using the natural network flow, indeed the information collected by the BGP protocol about network neighbors is used to efficiently route traffic based on hop count ensuring the shortest traveling distance between the client and its final destination \cite{anycast-cloudflare}.
+    \item \textbf{Unicast Routing}: a process which can be incorporated into the standard Domain Name System (DNS) resolution process by using recursive DNS queries which redirect clients to the server closest to the DNS resolver (and usually the DNS resolver is physically near the client) \cite{unicast-vs-anycast}.
+    \item \textbf{Manual Routing}: a procedure in which the client computes on its own which is the most appropriate server to contact, with this procedure GPS-equipped devices can use more precise information about the location.
 \end{itemize}
 
-In this thesis we assume to have the ability to contact the nearest server: in the implementation of our prototype we use a Manual Routing procedure where the clients would manually contact the nearest server, but in a real scenario a process like Unicast Routing or Anycast Routing would be preferred.
+In this thesis we assume to have the ability to contact the nearest server: in the implementation of our prototype we use a Manual Routing procedure where the clients would manually contact the nearest server, but in a real scenario a process like Unicast Routing or Anycast Routing could be preferred.
+
+
+\section{Suitable Use Cases}
+Our solution, for how has been thought, is clearly suitable for use cases with the following characteristics:
+\begin{itemize}
+    \item \textbf{Stateful computation}: the use case needs a stateful support with \textbf{frequent writes} and reads.
+    \item \textbf{Location awareness}: the use cases works on \textbf{geographic partitions} of the data;
+    \item \textbf{Location is static}: data producers do not change location;\\OR\\\textbf{Location is dynamic but it’s not a problem to have a discontinuity in the data}: e.g., if there is an aggregation of “city” and a data producer exits the city, its data will have a discontinuity;
+    \item \textbf{Session consistency is not needed}: the concept of session, where the user maintains consistency of the data even when the connected server changes, is not provided by our solution;
+\end{itemize}
 
 
 \section{Applying the Solution to Use Cases}
 \label{sec:solution_use_cases}
-In this section we show how the solution we thought can be applied to some of the use cases we presented in Chapter \ref{ch:problem_formulation}.
+In this section we show how the solution we thought can be applied to various use cases we showed.
 
 
 \subsubsection{IoT Data Compression}
-In this use case we try to compress the data of IoT sensor by sending only significant value changes, this concept can be applied for example to a temperature sensor where the value can be pretty much equal for very long periods of time.
+In this use case we try to compress the data of IoT sensors by sending only significant value changes, this concept can be applied for example to a temperature sensor where the value can be pretty much equal for very long periods of time.
 
 We can implement this use case by having a stateful function that checks whether the new value is equal or almost equal to the previous value.
 
@@ -260,12 +291,12 @@ Reads:
     \item Key: <<camera ID>>
 \end{itemize}
 This read action can be performed for multiple camera IDs depending on the possible paths that can be taken between the two points.
-By having the information of the traffic an algorithm can be created to compute which path is likely faster. 
+By having the information of the traffic an algorithm can be created to compute which path is likely to be faster. 
 \end{example}
 
 
 \subsubsection{Trending Topics}
-In this use case we want to find the trending topics in a certain region in an application (like trending user in a social network, or trending searches).
+In this use case we want to find the trending topics in a certain region in an application (like trending users in a social network, or trending searches).
 
 We can divide the implementation of this use case in two parts: a first part where we aggregate the data of the topics per region; and a second part that periodically finds the trending topics from the raw data.
 
@@ -292,7 +323,7 @@ Writes:
 \end{itemize}
 With this database action that we are performing at the "city" level (since the function is deployed at the "city" level) we are adding data to the list of "trending-topics". The Referring Area Level is "country" so the data will be aggregated to the "country" level, but since we are also saving in intermediate locations this data will be also sent to the respective "territory" location and saved locally in the current "city" location.
 
-We make an example with actual names to be more clear: a client is searching the topic "My search" and the client is located in the city of Milan. This client send this topic to the deployed function, the function has been deployed at the "city" level so it will be executed in a data center in Milan. This function executing in Milan can perform a pre-process on the input (e.g., making it lowercase) and then adds the input to the list "trending-topics". The write is performed with Referring Area Level "country" but also saved in intermediate locations, therefore the input will be forwarded to the respective "country" location (in this case a data center that refers to the Italy area), to the "territory" location (in this case a data center that refers to the Northern region of Italy) and also saved locally in the data center in Milan.
+We make an example with actual names to be more clear: a client is searching the topic "My search" and the client is located in the city of Milan. This client sends the topic to the deployed function, the function has been deployed at the "city" level so it will be executed in a data center in Milan. This function executing in Milan can perform a pre-process on the input (e.g., making it lowercase) and then adds the input to the list "trending-topics". The write is performed with Referring Area Level "country" but also saved in intermediate locations, therefore the input will be forwarded to the respective "country" location (in this case a data center that refers to the Italy area), to the "territory" location (in this case a data center that refers to the Northern region of Italy) and also saved locally in the data center in Milan.
 \end{example}
 
 While a possible execution for the second part of finding the trending topics (in this case the trending topics of the territory) can be the following:
@@ -314,14 +345,3 @@ With this database action that we are performing at the "territory" level (since
 
 Since the list is obtained in its entirety the trending algorithm can be anything the developer prefers (e.g., most-frequent analysis, derivative of the frequency, etc...).
 \end{example}
-
-
-\subsection{Suitable Use Cases}
-Our solution, for how has been thought, is clearly suitable for use cases with the following characteristics:
-\begin{itemize}
-    \item Stateful computation: the use case needs a stateful support with frequent writes and reads.
-    \item Location awareness: the use cases works on geographic partitions of the data;
-    \item Location is static: data producers do not change location;\\OR\\Location is dynamic but it’s not a problem to have a discontinuity in the data: e.g., if there is an aggregation of “city” and the data producers exits the city its data will have a discontinuity;
-    \item Session consistency is not needed: the concept of session, where the user maintains consistency of the data even when the connected server changes, is not provided by our solution;
-    \item An immediate aggregation of data is not needed: e.g., if data are aggregated by “country” and the execution is by “city”, the “country” aggregation is reached in an eventual consistent way and not instantly.
-\end{itemize}

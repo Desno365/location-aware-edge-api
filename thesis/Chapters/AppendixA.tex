@@ -11,9 +11,12 @@ For running the prototype we used the \textit{faas} flavour of \textit{OpenFaas}
 \subsection{Prerequisites}
 The following applications and Command Line Interface programs are needed to setup the framework:
 \begin{itemize}
-    \item \textbf{arkade}: \textit{arkade} provides a portable marketplace for downloading popular devops CLIs and installing helm charts;
+    \item \textbf{npm}: the default package manager for the Node.js runtime environment;
+    \\More info at this link: \href{https://docs.npmjs.com/downloading-and-installing-node-js-and-npm#using-a-node-version-manager-to-install-nodejs-and-npm}{docs.npmjs.com/downloading-and-installing-node-js-and-npm}
+
+    \item \textbf{arkade}: a portable marketplace for downloading popular devops CLIs and installing helm charts;
     \\It can be installed with \inlinecode{curl -sLS https://get.arkade.dev | sudo sh};
-    \\More info at this link \href{https://github.com/alexellis/arkade}{github.com/alexellis/arkade}
+    \\More info at this link: \href{https://github.com/alexellis/arkade}{github.com/alexellis/arkade}
     
     \item \textbf{faas-cli}: the Command Line Interface of \textit{OpenFaas};
     \\It can be installed with \inlinecode{arkade get faas-cli};
@@ -23,7 +26,10 @@ The following applications and Command Line Interface programs are needed to set
     
     \item \textbf{minikube}: a local \textit{Kubernetes} engine;
     \\On our setup running macOS Big Sur with a x86-64 CPU it was installed with \inlinecode{brew install minikube};
-    \\More info at this link \href{https://minikube.sigs.k8s.io/docs/start/}{minikube.sigs.k8s.io/docs/start/}
+    \\More info at this link: \href{https://minikube.sigs.k8s.io/docs/start/}{minikube.sigs.k8s.io/docs/start/}
+    
+    \item \textbf{deployer}: the CLI tool that we developed and that allows to deploy functions on the architecture;
+    \\It can be installed by running the following command in the directory where the source code of the CLI is stored: \inlinecode{npm install -g};
 \end{itemize}
 
 
@@ -173,8 +179,7 @@ kubectl get events -n openfaas --sort-by=.metadata.creationTimestamp
 \section{Running the Simulation}
 The Simulation is composed of many Phython files, one file for each scenario. To run a scenario it is simply possible to run the Python file with a Python IDE (e.g., PyCharm).
 
-Note that a single configuration in some scenarios may simulate millions of machines and the simulation of such a huge number of machines requires an high utilization of RAM.
-For example the scenario included in \inlinecode{simulation\_read\_district\_level\_clients\_ratio.py} can use up to 14 GB or RAM for the simulation.
+Note that a single configuration in some scenarios may simulate millions of machines and the simulation of such a huge number of machines requires an high utilization of RAM. For example the scenario included in \inlinecode{simulation\_read\_district\_ level\_clients\_ratio.py} can use up to 14 GB or RAM for the simulation.
 If such usage of RAM becomes a problem, it is possible to make a modification to the trade-off between the speed of the execution of the simulation and the usage of RAM by modifying the following line:\\
 \inlinecode{pool = multiprocessing.Pool(processes=4)}\\
 and replacing the 4 with a lower number to use less RAM, while also using less parallelism for the simulation, resulting in a slower execution. In practice this number represents how many configurations of the scenario can be run in parallel on the given processes.

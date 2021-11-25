@@ -1,0 +1,219 @@
+\chapter{Preliminaries and Open Problems}
+\label{ch:preliminaries_and_open_problems}
+
+
+\section{Preliminaries}
+We started our research with a broad vision of the current situation in the field of fog and edge computing. In this field, the subject of \textbf{data processing} was for us the most interesting due to our background and expertise, so we then aimed our focus on this subject. We studied relevant papers presented at the "IEEE International Conference on Fog and Edge Computing (ICFEC)" and performed specific searches to have more emphasis on the data processing part of edge computing.
+
+
+\subsection{Edge Computing Background}
+In the Edge Computing paradigm computing and storage nodes are placed at the Internet’s edge in close proximity to mobile devices or IoT sensors, so "edge" can be considered any computing and network resources along the path \textbf{between data sources and cloud data centers}.
+The origin of Edge Computing dates back to the late 1990s when Content Delivery Networks (CDNs) were introduced to increase web performance \cite{edge-computing-origin}. A CDN uses machines at the edge of the network to cache frequently requested contents, allowing to save bandwidth and improve the latency. Now CDNs are expected to deliver 72\% of Internet traffic by 2022 \cite{cdn-usage}. Edge computing generalizes and extends the CDN concept with the goal of moving core-centric applications to a geo-distributed environment as in an edge network.
+
+Edge Computing can address many concerns like response time requirements, mobile devices' limited battery life, as well as bandwidth cost saving \cite{emergence-edge-computing}.
+
+An \textbf{improved latency} can be provided thanks to the proximity between the edge server and the client that allows to avoid the travel-distance needed to make the client communicate to the central cloud platform.
+
+Mobile devices' \textbf{battery life} can be saved by offloading the computation to the nearest edge server, instead of computing it locally. This is particularly useful for battery powered IoT sensors or other devices stringently limited in power.
+
+And ultimately \textbf{bandwidth costs} can be saved thanks to reduced usage of the network and by allowing to run compression techniques directly at the edge near the client.
+
+
+\subsection{Data Processing}
+Data processing on the edge is clearly a field in development, many different ideas are being presented with innovative concepts.
+In several papers it is applied the concept of \textbf{stream processing}, a branch of data processing which Russo \cite{auto-scaling-streams} defines as a process in which \textit{"data are streamed through a network of so-called operators, which apply specific transformations (e.g., filtering) or computations (e.g., pattern-matching) against input data"}.
+
+
+\subsubsection{Stream Processing}
+For stream processing \textbf{long-running operators} are placed in the network and data is bound to be flowing through these operators. Renart et al.~\cite{data-driven-stream} propose at the 2017 ICFEC a framework to evaluate data streams at runtime to decide how and in which node to process their data.
+In the same year at the ICFEC Brogi et al.~\cite{how-to-deploy-fog-applications} show their implementation of a simulation that can be used to select the best deployment for a fog infrastructure, the simulation models links from historical behaviour. Two years later Hiessl et al.~\cite{optimal-placement-stream} expand the idea of Brogi et al.~\cite{how-to-deploy-fog-applications} by selecting the best deployment in the specific context of stream processing on the edge, selected by modeling and then solving an Integer Linear Programming problem.
+
+At the 2019 ICFEC, Wiener et al.~\cite{context-aware-stream-processing} propose to consider, in the context of stream processing, the inherent \textbf{context changes} of edge nodes which are less reliable than a cloud data center, thus allowing to relocate certain elements of stream processing pipelines.
+
+
+\subsubsection{Scarcity of Resources}
+A recurring topic is also the management of less abundant resources, which is for sure a clear distinction in respect to a classic core-centric infrastructure.
+
+At the 2018 ICFEC, Lujic et al.~\cite{efficient-edge-storage} try to optimize data storage on the edge in the context of data analytics scenarios by providing an architecture and an adaptive algorithm to find a balance between high forecast accuracy and the amount of data stored in the space-limited storage.
+
+At the 2019 ICFEC, Zehnder et al.~\cite{virtual-events-edge} instead focus on improving the existing solutions in the field of bandwidth reduction, these existing solutions typically aim to reduce network load either by pre-processing events directly on the edge or by aggregating events into larger batches, so these solutions are using a static approach, they instead introduce methods for publish/subscribe systems deployed on the edge to dynamically adapt payloads of events at runtime.
+
+
+\subsubsection{Serverless}
+A few articles studied by us during our research proposed also to use serverless solutions for data processing and data analytics on the edge.
+
+Nastic et al. with their article "A Serverless Real-Time Data Analytics Platform for Edge Computing" \cite{serverless-analytics-edge} expose how current approaches for data analytics on the edge force developers to resort to ad hoc solutions tailored to the available infrastructure, a process that is largely manual, task-specific, and error-prone. They defined the main prerequisites and the architecture of a platform which can allow data processing and analytics on the edge while abstracting the complexity of the edge infrastructure. The main concepts of their idea are the following:
+\begin{itemize}
+    \item The edge should focus on \textbf{local views} while the cloud supports global views;
+    \item Developers should simply define the \textbf{function behavior} and data processing logic without dealing with the complexity of different management, orchestration, and optimization processes;
+    \item A function wrapper layer should manage user-provided functions, wrapping the functions in executable artifacts such as containers;
+    \item An orchestration layer should use the scheduling and placement mechanisms to determine the most suitable node (cloud or edge) for an analytics function to reduce the network latency;
+    \item A runtime layer determines the minimally required elastic resources, provisions them, deploys, and then schedules and executes functions;
+    \item For stateful functions, these wrappers also provide implicit state management: the wrapper should transparently handle \textbf{state replication and migration}, and access to a function’s state is controlled via the exposed API.
+\end{itemize}
+As we will see, some of these concepts are the main inspiration behind our work.
+
+With the paper "Serverless Data Analytics with Flint", Kim et al.~\cite{serverless-analytics-cloud} show their framework, this time in the context  of cloud computing, that uses a \textbf{FaaS architecture} to perform analytical processing on big data on the cloud. In this cloud scenario the results are promising and show a trade-off between a bit of performance and elasticity in a pure pay-as-you-go cost model.
+
+At last, in the context of serverless computing, we studied the paper "Enabling Data Processing at the Network Edge through Lightweight Virtualization Technologies" \cite{lightweight-virtualization} in which the authors empirically demonstrated that employing \textbf{virtualization technologies} on top of a limited edge hardware has an almost negligible impact in terms of performance when compared to native execution.
+
+
+\subsubsection{Other remarks}
+There are many considerations that can be done in regards to the potentialities that Edge Computing has to offer.
+We report here a few considerations that we found notable for our setting.
+
+Such as the consideration made by Plumb et al.~\cite{google-edge-for-mmog} in their article: they analyzed the theoretical benefits of using a Peer-to-Peer architecture for a mobile game after moving the logic to the edge, in view of the fact that edge servers can be trusted while devices out of the control of the developer cannot be trusted.
+We believe this \textbf{concept of trust} applies also to many other use cases and applications, and not only to games.
+
+At the 2020 ICFEC, Karagiannis et al.~\cite{architecture-comparison} showed a simulation used to produce quantitative results in order to examine and compare the efficiency of different architectures for different use cases. They showed that a \textbf{hierarchical architecture} (in which devices communicate only with upper, same-level and lower levels) generally brings an higher communication latency to reach the cloud but provides lower bandwidth utilization and lower latency among neighbours in respect to a \textbf{flat architecture} (in which devices communicate without the use of layers).
+
+
+
+\section{Open Problems}
+\label{sec:open_problems}
+
+During our research we collected and organized the high-level applications and the more specific use cases, which have been used to motivate the work done by the research in the field of data processing on the edge.
+We believe these use cases can be the basis from which we can build a project that can then have useful practical implications.
+
+
+\subsection{Edge Applications}
+In the Table \ref{tab:edge-applications} we report a survey we created of the high level applications where Egde Computing can be used and that have been found during our research.
+
+A common characteristic present in all the applications is the \textbf{absence of the need for a fully global view}. If a global view is needed, of course a core-centric approach would be preferred since with all the information in one point it becomes easier to create a result that collects all the information.
+
+Instead the applications usually present a dependency with a \textbf{user} (e.g., \textit{Wearable healthcare devices}, \textit{Online shopping cart}), a \textbf{device} (e.g., \textit{Connected vehicles}, \textit{Surveillance footage analysis}) or a \textbf{geographical area} (e.g., \textit{Smart home}, \textit{Smart city}, \textit{Building environment control}).
+
+Some of the applications necessarily need a \textbf{state} (e.g., \textit{Games application}, \textit{Online shopping cart}) while a few may not need it (e.g., \textit{Surveillance footage analysis}).
+
+We also see a clear difference between applications that have a \textbf{static approach to changes of location} and applications that instead are \textbf{dynamic in changes}. For example \textit{Wearable healthcare devices} is for sure a dynamic application where the person wearing the device can change location frequently, while the \textit{Building environment control} application is clearly static in changes.
+
+And finally we noticed how these applications all have the need of a \textbf{high write throughput}, they do not have a clear predominance of read actions with reference to write actions. In fact applications with high read and low write throughput can be already fulfilled by Content Delivery Networks or similar solutions.
+
+\begin{tabularx}{\textwidth}{|X|X|X|}
+\hline
+\textbf{Application}            & \textbf{Where to perform the computation?}   & \textbf{How it has been motivated?}   \\ \hline \hline
+Smart Home  \cite{edge-vision-and-challenges}    & The device itself; Cloudlet; Small data center.   & Privacy: keep data in-home.   \\ \hline
+Smart City \cite{edge-vision-and-challenges} \cite{data-driven-stream}   & Cloudlet; Small data center.   & Large quantity of data; Latency; Location awareness.   \\ \hline
+Augmented reality \cite{emergence-edge-computing}   & The device itself; Cloudlet; Small data center.   & Latency; Need more computational power.   \\ \hline
+IoT for transports, environment, supply chain management, etc... \cite{lightweight-virtualization} & IoT themselves; Cloudlet; Small data center.   & Large quantity of data; Latency.   \\ \hline
+Wearable healthcare devices \cite{mobile-edge-survey}   & Devices themselves; Cloudlet; Small data center.   & Privacy; Latency.   \\ \hline
+Connected vehicles \cite{mobile-edge-survey} \cite{emergence-edge-computing}   & The car themselves; Cloudlet in a 5G tower.   & Latency; Location awareness.   \\ \hline
+Games application \cite{google-edge-for-mmog}   & The smartphones; Cloudlet; Small data center.   & Latency.   \\ \hline
+Surveillance footage analysis \cite{mobile-edge-survey} \cite{emergence-edge-computing} \cite{promise-of-edge-computing}   & The camera themselves; Small server in-loco; Cloudlet.   & Latency; Bandwidth to send the stream of the video.   \\ \hline
+Mobile app data analytics \cite{mobile-edge-survey}   & The smartphones; Small data center.   & Bandwidth if sending many data.   \\ \hline
+Building environment control (temperature, humidity) \cite{mobile-edge-survey}   & The devices themselves; Small server in-loco; Small data center.   & Bandwidth.   \\ \hline
+Any sensor related measure (e.g. ocean control with sensors, smart agricolture) \cite{mobile-edge-survey} \cite{how-to-deploy-fog-applications}   & The sensors themselves; Small-server near.   & Latency; Bandwidth.   \\ \hline
+Wearable cognitive assistance (e.g. Google Glass) \cite{stream-processing-survey-resource-elasticity}   & The devices themselves; Cloudlet; Small data center.   & Latency; Bandwidth.   \\ \hline
+Online shopping cart \cite{promise-of-edge-computing}   & Cloudlet; Small data center   & Latency.   \\ \hline
+Automated energy management systems \cite{mobile-edge-survey}   & The devices themselves; Small server in-loco; Cloudlet; Small data center.   & Latency; Privacy.   \\ \hline
+Urban logistics with robots \cite{context-aware-stream-processing}   & The devices themselves; Small server in-loco; Cloudlet; Small data center.   & Latency; Bandwidth.   \\ \hline
+\caption{Survey on edge applications}
+\label{tab:edge-applications}
+\end{tabularx}
+
+
+\subsection{Edge Use Cases}
+In this section we present the more specific use cases that we collected during our research. For each use case we report \textbf{why} it has been deemed necessary an edge implementation, \textbf{how} an implementation can be made and \textbf{where} this implementation can be placed (e.g., stateless servers, stateful servers, on the data producers devices).
+
+We can notice how the usage of the edge, in many of the use cases, has been motivated by the research with the goal of \textbf{bandwidth reduction}. In fact the growth in the amount of data produced was not accompanied by a comparable increase of available bandwidth to the cloud \cite{promise-of-edge-computing}, furthermore the number of devices are expected to continue to increase significantly due to increasing popularity of IoT sensors.
+
+A recurring motivation is also the \textbf{location awareness} which comes for free when working on the edge of the network. The location awareness feature can be used in interesting use cases like \textit{Trending Topics} and \textit{Road Traffic Monitoring}.
+
+\subsubsection{Video Upload}
+Upload a video to an application or service (e.g., like in a social network).
+\begin{itemize}
+    \item \textbf{Why on the edge?} - Reduce bandwidth;
+    \item \textbf{How can it be implemented?} - Use edge resources to resize and compress the video (e.g., with FFmpeg);
+    \item \textbf{Where can it be performed?} - Stateless serverless at the edge; Custom servers; on the producers.
+\end{itemize}
+
+
+\subsubsection{Trending Topics}
+Find trending topics of a certain area in an application (like trending users in a social network, or trending searches).
+\begin{itemize}
+    \item \textbf{Why on the edge?} - Location awareness; Reduce bandwidth;
+    \item \textbf{How can it be implemented?} - Send to the edge the actions of users (views, searches, etc...), process them locally since they all come from near locations and perform a trending algorithm (e.g., most viewed or most searched elements);
+    \item \textbf{Where can it be performed?} - Stateful edge servers.
+\end{itemize}
+
+
+\subsubsection{Road Traffic Monitoring}
+Analyze video footage to monitor the traffic in a certain road.
+\begin{itemize}
+    \item \textbf{Why on the edge?} - Location awareness; Reduce bandwidth;
+    \item \textbf{How can it be implemented?} - Send to the edge the video footage, then a Machine Learning model can provide an estimation of the traffic in the road section. This information can be used to provide a better navigation system;
+    \item \textbf{Where can it be performed?} - Stateful edge servers; Custom servers.
+\end{itemize}
+
+
+\subsubsection{Anomaly detection with IoT sensors}
+Find anomalies in the time series reported by IoT sensors.
+\begin{itemize}
+    \item \textbf{Why on the edge?} - Reduce bandwidth;
+    \item \textbf{How can it be implemented?} - Compare IoT sensors value with past sensor value or by doing a time series prediction and see if it varies significantly;
+    \item \textbf{Where can it be performed?} - Stateful edge servers; Custom servers.
+\end{itemize}
+
+
+\subsubsection{Wearable Healthcare}
+Anomaly detection using data coming from wearable healthcare devices.
+\begin{itemize}
+    \item \textbf{Why on the edge?} - Reduce bandwidth; Could provide more privacy (data deleted after some time for example);
+    \item \textbf{How can it be implemented?} - Detect fall by analyzing accelerometer values; Detect patient’s changing health condition;
+    \item \textbf{Where can it be performed?} - Stateful edge servers; Custom servers; On the producers.
+\end{itemize}
+Conversely, detecting patterns in very large amounts of historic data requires analytics techniques that depend on the cloud.
+
+
+\subsubsection{Smart City}
+Features to improve the quality of life in cities, e.g., allowing people with physical impediment to choose paths with less dense crowds by analyzing camera footage.
+\begin{itemize}
+    \item \textbf{Why on the edge?} - Reduce bandwidth of camera footage; Location awareness;
+    \item \textbf{How can it be implemented?} - Local edge servers analyze the footage provided by video cameras and provide an estimation on the crowds, the user then asks the nearest server for a less crowded path.
+    \item \textbf{Where can it be performed?} - Custom servers mounted in the city; May also use some computation on the camera themselves;
+\end{itemize}
+
+
+\subsubsection{Smart Agriculture}
+Make agriculture more efficient with monitoring and automatic irrigation of crops.
+\begin{itemize}
+    \item \textbf{Why on the edge?} - More privacy; Reduce bandwidth; Location awareness;
+    \item \textbf{How can it be implemented?} - Local edge servers obtain the streaming dataset of sensors’ value, they process the data and automate actions or provide feedback to the owner;
+    \item \textbf{Where can it be performed?} - Custom servers near the field.
+\end{itemize}
+
+
+\subsubsection{Massively Multiplayer Online Games}
+Games where numerous players interact with each other.
+\begin{itemize}
+    \item \textbf{Why on the edge?} - Game logic must not be on the client otherwise cannot be trusted; Reduce latency;
+    \item \textbf{How can it be implemented?} - Use local edge servers to run the game logic, players then connect to the local edge servers;
+    \item \textbf{Where can it be performed?} - Custom servers.
+\end{itemize}
+
+
+\subsubsection{Message Aggregation Caching}
+Aggregate messages in batch before sending them to the cloud.
+\begin{itemize}
+    \item \textbf{Why on the edge?} - Reduce bandwidth;
+    \item \textbf{How can it be implemented?} - Use local edge servers to combine multiple messages together and send a batch simultaneously at delayed intervals;
+    \item \textbf{Where can it be performed?} - Stateful edge servers; Custom servers; On the producers.
+\end{itemize}
+
+
+\subsubsection{Urban Logistics}
+Logistics performed with robots that autonomously pick up packages at dedicated hubs and deliver them to the customers.
+\begin{itemize}
+    \item \textbf{Why on the edge?} - Reduce bandwidth to cloud; Reduce Latency; Location awareness;
+    \item \textbf{How can it be implemented?} - Devices can process sensors values to avoid obstacles; An external server should organize the coordination of all the robots.
+    \item \textbf{Where can it be performed?} - Stateful edge servers; Custom servers.
+\end{itemize}
+
+
+\subsubsection{Industrial IoT Data Compression}
+IoT sensors in industrial scenarios creates a huge amount of data, many of which are redundant.
+\begin{itemize}
+    \item \textbf{Why on the edge?} - Reduce bandwidth;
+    \item \textbf{How can it be implemented?} - Compress and optimize the data sent through edge, so that the cloud still keeps all the useful data but it’s more lightweight (e.g. send only value change of the sensor, apply compression, etc..)
+    \item \textbf{Where can it be performed?} - Stateful edge servers; Custom servers; On the producers.
+\end{itemize}
