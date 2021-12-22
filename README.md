@@ -27,7 +27,7 @@ In this thesis we study the state of the art for stateful computations and data 
 ## Grade
 
 This Thesis was my final exam for the Master of Science in "Computer Science and Engineering".<br>
-I graduated in December 2021 with a grade of "110 Cum Laude" (the maximum award for the Italian system).
+I graduated in December 2021 with a grade of "110 Cum Laude" (the maximum award for the Italian University grading system).
 
 
 ## Acknowledgements
